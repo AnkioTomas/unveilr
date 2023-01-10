@@ -13,7 +13,7 @@
 
 > 自动化反编译微信小程序/小游戏，小程序安全利器
 > 基于 [wxappUnpacker](https://github.com/qwerty472123/wxappUnpacker) 二次开发
-## 特性
+## :sparkles:特性
 ### 1. 针对微信小游戏的优化
 - 微信小游戏一键解包整个项目
 - 重新格式化代码
@@ -29,7 +29,7 @@
 ### 4. 加入解密模块
 - 可一键解密Window平台下的小程序包
 
-## 安装和使用
+## :sparkles:安装和使用
 ### 1. 安装
 ```bash
 # you can use npm install
@@ -42,12 +42,40 @@ cd wxapkg-unpacker
 yarn install
 ```
 ### 2. 使用
+- 命令全称：**wxunpacker**
+- 一般使用别名：**wxupk**
+1. 全局安装的
 ```bash
-# you can use npx
-npx wxunpacker -h
-# or alias
-npx wxupk  -h
-# If you installed globally
-wxunpacker -h
-wxupk  -h
+wxupk --help
+# 或者
+npx wxupk --help
 ```
+2. 克隆仓库的
+```bash
+yarn wxupk --help
+# 或者
+npm run wxupk --help
+```
+3. 解包从安卓手机获取的wxapkg
+```bash
+wxupk /path/to/wxapkg/dir/
+```
+4. 解包被加密的wxapkg, 一般是从Windows获取的 (需要提供[wxAppid](https://zhidao.baidu.com/question/712051619583432605.html))
+```bash
+wxupk /path/to/wxapkg/dir/ -i wx1111222233334444
+```
+5. 子程序都是单独的模块, 可以单独调用
+```bash
+# 子程序参数参考输出提示
+wxupk decrypt
+```
+## :sparkles:屏幕截图
+![image](https://user-images.githubusercontent.com/64947085/211479976-fb7d222e-5247-4261-8fb2-bd21c28225a6.png)
+
+## :sparkles:提交问题
+[ISSUES](https://github.com/r3x5ur/wxapkg-unpacker/issues)
+## :sparkles:更改日志
+[CHANGELOG](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CHANGELOG.md)
+## :sparkles:赞助
+[CONTRIBUTING](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CONTRIBUTING.md)
+
