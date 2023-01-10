@@ -13,7 +13,6 @@ const printAndExit = (...args) => print(...args) && exit()
 const printBanner = () => print(bold(blue(banner)))
 const handlerMap = {
   wxAppid: '',
-  decrypt: false,
   cleanOld: true,
   help() {
     printAndExit(buildHelper({ subroutineH: cyan, optionsH: green }).toString())
@@ -22,14 +21,14 @@ const handlerMap = {
     printAndExit(bold(green(version)))
   },
   path(value) {
-    const { wxAppid, decrypt } = this
+    const { wxAppid } = this
     const unpack = filePath => {
       unPacker.unpackWxapkg(filePath, {
         cleanOld: this.cleanOld === true,
         callback: exit,
       })
     }
-    if (wxAppid && decrypt === true) {
+    if (wxAppid) {
       logger.debug(`Enabled decrypt mode. wxAppid: ${wxAppid}`)
       unPacker.decryptWxapkg({
         wxAppid,
@@ -48,7 +47,7 @@ const handlerMap = {
   },
   subroutine(value) {
     const argv = process.argv
-    argv.splice(argv.indexOf('splitJs'), 1)
+    argv.splice(argv.indexOf(value), 1)
     unPacker[value + 'Cmd'](argv)
     return true
   },

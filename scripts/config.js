@@ -43,27 +43,21 @@ const registeredArgs = {
   cleanOld: {
     alias: 'c',
     type: Boolean,
-    message: 'Clear the previously unpacked before unpacking.',
+    message: 'Clear the previously unpacked before unpacking. <true|false> (default: true)',
     default: true,
     sort: ArgsSortMap.CONF,
   },
   loggerLevel: {
     alias: 'l',
     type: String,
-    message: 'Set logger level [INFO|DEBUG|WARN|ERROR].',
+    message: 'Set logger level <INFO|DEBUG|WARN|ERROR>. (default: DEBUG)',
     default: 'DEBUG',
     sort: ArgsSortMap.CONF,
   },
   wxAppid: {
     alias: 'i',
     type: String,
-    message: 'Wxapkg used to decrypt the Window platform.',
-    sort: ArgsSortMap.CONF,
-  },
-  decrypt: {
-    alias: 'd',
-    type: Boolean,
-    message: 'Need to decrypt Wxapkg on Windows platform.',
+    message: 'Wxapkg used to decrypt the Window platform. <wx1111222233334444>',
     sort: ArgsSortMap.CONF,
   },
   path: {
@@ -98,7 +92,7 @@ function buildHelper(config) {
   subroutineH && (subroutine = subroutineH(subroutine))
   optionsH && (options = optionsH(options))
   const params = { subroutine, options }
-  let helper = 'Usage:\n  yarn unpack [path]|[subroutine]|[options]\nSubroutine:\n  {{subroutine}}\nOptions:\n  {{options}}'
+  let helper = 'Usage:\n  wxupk [path]|[subroutine]|[options]\nSubroutine:\n  {{subroutine}}\nOptions:\n  {{options}}'
   helper = helper.replace(/\{\{([a-z]+)}}/g, (_, key) => params[key])
   return {
     ...params,

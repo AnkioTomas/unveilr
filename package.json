@@ -2,7 +2,7 @@
   "name": "wxapkg-unpacker",
   "displayName": "微信小程序反编译",
   "author": "r3x5ur",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "keywords": [
     "wxapkg",
     "unpack",
