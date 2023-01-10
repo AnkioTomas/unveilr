@@ -1,6 +1,6 @@
 const path = require('path')
 const safeColors = require('colors/safe')
-require('../packages/color-logger')
+const { Logger } = require('../packages/color-logger')
 const unPacker = require('../packages/unpacker')
 const { buildHelper, parserArgs, registeredArgs, banner, version, name } = require('./config')
 const exit = () => logger.timeEnd(name) || process.exit(0)
@@ -9,7 +9,7 @@ const bold = safeColors.bold.bind(safeColors)
 const blue = safeColors.blue.bind(safeColors)
 const green = safeColors.green.bind(safeColors)
 const cyan = safeColors.cyan.bind(safeColors)
-const printAndExit = (...args) => print(...args) && exit()
+const printAndExit = (...args) => print(...args) || exit()
 const printBanner = () => print(bold(blue(banner)))
 const handlerMap = {
   wxAppid: '',
@@ -18,25 +18,26 @@ const handlerMap = {
     printAndExit(buildHelper({ subroutineH: cyan, optionsH: green }).toString())
   },
   version() {
-    printAndExit(bold(green(version)))
+    printAndExit(bold(green('v' + version)))
   },
   path(value) {
     const { wxAppid } = this
     const unpack = filePath => {
+      this.cleanOld && logger.info('Clear old package is turned on.')
       unPacker.unpackWxapkg(filePath, {
-        cleanOld: this.cleanOld === true,
+        cleanOld: this.cleanOld,
         callback: exit,
       })
     }
     if (wxAppid) {
-      logger.debug(`Enabled decrypt mode. wxAppid: ${wxAppid}`)
+      logger.info(`Enabled decrypt mode. wxAppid: ${wxAppid}`)
       unPacker.decryptWxapkg({
         wxAppid,
         filePath: value,
         callback(result) {
           if (!result || result.length === 0) exit()
           const resultDir = path.dirname(result[0])
-          logger.debug('Decrypted successful save in', resultDir)
+          logger.info('Decrypted successful save in', resultDir)
           unpack(resultDir)
         },
       })
@@ -52,10 +53,15 @@ const handlerMap = {
     return true
   },
   loggerLevel(value) {
-    if (!'INFO|DEBUG|WARN|ERROR'.split('|').includes(value)) {
-      return logger.warn('logger level set fail! invalid value:', value)
+    value = value.toUpperCase()
+    if (!'DEBUG|INFO|WARN|ERROR'.split('|').includes(value)) {
+      return logger.warn('Logger level set fail! invalid value:', value)
     }
-    global.logger.setLevel(global.logger[value])
+    logger.info('Logger level:', value)
+    logger.setLevel(Logger[value])
+  },
+  formatCode(value) {
+    ;(global.formatCode = value) && logger.info('Code formatting is turned on.')
   },
 }
 

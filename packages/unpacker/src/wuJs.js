@@ -39,7 +39,6 @@ function splitJs(name, cb, mainDir) {
     }
     logger.debug('SplitJs: ' + name)
     vm.run(code)
-    logger.debug('SplitJs done.')
     if (!needDelList[name]) needDelList[name] = 8
     cb(needDelList)
   })

@@ -8,6 +8,7 @@ const banner = `
                       author @r3x5ur
 `
 const case2Hyphen = s => s.replace(/\B[A-Z]/g, c => '-' + c).toLowerCase()
+const _Boolean = v => v === true || v === 'true'
 const registeredSubroutine = {
   splitJs: 'Run alone Split and beautify weapp js file.',
   splitWxml: 'Run alone Restore wxml files.',
@@ -42,16 +43,23 @@ const registeredArgs = {
   },
   cleanOld: {
     alias: 'c',
-    type: Boolean,
+    type: _Boolean,
     message: 'Clear the previously unpacked before unpacking. <true|false> (default: true)',
     default: true,
+    sort: ArgsSortMap.CONF,
+  },
+  formatCode: {
+    alias: 'f',
+    type: _Boolean,
+    message: 'Whether to format the code, will affect some performance. <true|false> (default: false)',
+    default: false,
     sort: ArgsSortMap.CONF,
   },
   loggerLevel: {
     alias: 'l',
     type: String,
-    message: 'Set logger level <INFO|DEBUG|WARN|ERROR>. (default: DEBUG)',
-    default: 'DEBUG',
+    message: 'Set logger level <INFO|DEBUG|WARN|ERROR>. (default: INFO)',
+    default: 'INFO',
     sort: ArgsSortMap.CONF,
   },
   wxAppid: {

@@ -17,24 +17,23 @@ const PACKAGE_TYPE = {
 
 function header(buf) {
   let firstMark = buf.readUInt8(0)
-  logger.debug('firstMark: 0x' + firstMark.toString(16))
   let unknownInfo = buf.readUInt32BE(1)
-  logger.debug('unknownInfo: ', unknownInfo)
   let infoListLength = buf.readUInt32BE(5)
-  logger.debug('infoListLength: ', infoListLength)
   let dataLength = buf.readUInt32BE(9)
-  logger.debug('dataLength: ', dataLength)
   let lastMark = buf.readUInt8(13)
-  logger.debug('lastMark: 0x' + lastMark.toString(16))
   if (firstMark !== 0xbe || lastMark !== 0xed) throw Error('Magic number is not correct!')
+  // logger.info('firstMark: 0x' + firstMark.toString(16))
+  unknownInfo && logger.warn('UnknownInfo: ', unknownInfo)
+  // logger.info('infoListLength: ', infoListLength)
+  // logger.info('dataLength: ', dataLength)
+  // logger.info('lastMark: 0x' + lastMark.toString(16))
   return [infoListLength, dataLength]
 }
 
 function makeFileList(buf) {
-  logger.debug('File list info:')
   let fileCount = buf.readUInt32BE(0)
   let packageType, packageMain
-  logger.debug('fileCount: ', fileCount)
+  logger.info('Current package file count:', fileCount)
   let fileInfo = [],
     off = 4
   for (let i = 0; i < fileCount; i++) {
@@ -53,7 +52,7 @@ function makeFileList(buf) {
         if (path.basename(info.name) === type) {
           packageType = type
           packageMain = info.name
-          logger.debug(`current package type is: [${pn}]`)
+          logger.info(`Current package type is: [${pn}]`)
         }
       })
   }
@@ -61,13 +60,11 @@ function makeFileList(buf) {
 }
 
 function saveFile(dir, buf, list) {
-  logger.debug('Saving files...')
   for (let info of list)
     wu.save(path.resolve(dir, (info.name.startsWith('/') ? '.' : '') + info.name), buf.slice(info.off, info.off + info.size))
 }
 
 function packDone(dir, cb, order, packageType, packageMain) {
-  logger.debug('Unpack done.')
   let weappEvent = new wu.CntEvent(),
     needDelete = {}
   weappEvent.encount(4)
@@ -158,7 +155,6 @@ function packDone(dir, cb, order, packageType, packageMain) {
     wuJs.splitJs(path.resolve(dir, 'game.js'), () => {
       wu.addIO(() => {
         global.mainPackage = dir
-        logger.debug('Split and rewrite done.')
         cb()
       })
     })
@@ -173,7 +169,6 @@ function packDone(dir, cb, order, packageType, packageMain) {
           gameJSDir: path.dirname(gmPath),
           packageDir: dir,
         }
-        logger.debug('Split and rewrite done.')
         cb()
       })
     })
@@ -218,13 +213,11 @@ function packDone(dir, cb, order, packageType, packageMain) {
   }
 }
 
-function doFile(name, cb, order) {
+function doFile(name, cb, order, hook) {
+  name = typeof hook === 'function' ? hook(name) : name
+  logger.info('Unpack file ' + name)
   for (let ord of order) if (ord.startsWith('s=')) global.subPack = ord.slice(3)
-  logger.debug('Start unpack')
-  logger.debug('Unpack file ' + name)
   let dir = path.resolve(name, '..', path.basename(name, '.wxapkg'))
-  logger.debug('Target Dir:', dir)
-  logger.debug('Options:', order.toString())
   wu.get(
     name,
     buf => {

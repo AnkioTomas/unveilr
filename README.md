@@ -58,7 +58,8 @@ npm run wxupk --help
 ```
 3. 解包从安卓手机获取的wxapkg
 ```bash
-wxupk /path/to/wxapkg/dir/
+# 解包并格式化代码
+wxupk /path/to/wxapkg/dir/ -f
 ```
 4. 解包被加密的wxapkg, 一般是从Windows获取的 (需要提供[wxAppid](https://zhidao.baidu.com/question/712051619583432605.html))
 ```bash
@@ -70,7 +71,10 @@ wxupk /path/to/wxapkg/dir/ -i wx1111222233334444
 wxupk decrypt
 ```
 ## :sparkles:屏幕截图
-![image](https://user-images.githubusercontent.com/64947085/211479976-fb7d222e-5247-4261-8fb2-bd21c28225a6.png)
+
+![image](./images/helper.png)
+
+![image](./images/unpack.png)
 
 ## :sparkles:提交问题
 [ISSUES](https://github.com/r3x5ur/wxapkg-unpacker/issues)

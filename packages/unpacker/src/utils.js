@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const { platform } = require('os')
-const { jsBeautify } = require('../../js-beautify')
+const { beautify } = require('../../js-beautify')
 
 function listDir(dirname) {
   return fs.readdirSync(dirname).map(file => path.resolve(dirname, file))
@@ -74,12 +74,6 @@ function cleanAlreadyUnpacked(name) {
   return false
 }
 
-function beautify(content) {
-  const indent_size = 2
-  const tabChar = ' '
-  return jsBeautify(content, indent_size, tabChar)
-}
-
 function removeInvalidLine(filename, savePath) {
   savePath = savePath || filename
   const fileBuffer = readFileSync(filename, 'utf-8')
@@ -88,7 +82,7 @@ function removeInvalidLine(filename, savePath) {
 
 function removeInvalidLineCode(code) {
   const invalidRe = /\s+[a-z] = VM2_INTERNAL_STATE_DO_NOT_USE_OR_PROGRAM_WILL_FAIL\.handleException\([a-z]\);/g
-  return beautify(code.replace(invalidRe, ''))
+  return beautify(code.replace(invalidRe, '')).replace(/= >/g, '=>')
 }
 
 function beautifyJS(filePath, beautifiedNS) {
@@ -136,6 +130,7 @@ function isEncrypted(filePath) {
   const content = readFileSync(filePath, 'utf-8')
   return content.startsWith('V1MMWX')
 }
+
 function isWxAppid(appid) {
   return appid && /^wx[0-9a-z]{16}$/.test(appid)
 }
@@ -152,6 +147,7 @@ function rollbackLogger() {
     )
   }
 }
+
 rollbackLogger()
 module.exports = {
   deepListDir,

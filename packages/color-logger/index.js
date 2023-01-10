@@ -70,4 +70,5 @@ if (!global.logger) {
 }
 module.exports = {
   getLogger,
+  Logger,
 }

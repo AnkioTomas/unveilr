@@ -8,7 +8,7 @@ const { doFile } = require('./wuWxapkg')
  * @param {object} options
  * @param {boolean} [options.filterableWxFwk=true] - 是否过滤微信运行框架，大概有15M
  * @param {(name)=>string[]|void=} [options.beforeUnpack] - [生命周期钩子] 解包之前
- * @param {(name)=>string|void=} [options.beforeProcessed] - [生命周期钩子] 处理之前
+ * @param {(name)=>string|void=} [options.beforeProcess] - [生命周期钩子] 处理之前
  * @param {(name)=>void=} [options.processed] - [生命周期钩子] 处理结束
  * @param {()=>void=} [options.completed] - [生命周期钩子] 处理完成
  * @return void
@@ -19,8 +19,9 @@ function _unpackWxapkg(filePath, options) {
     const result = fn.apply(options, args)
     return result ? result : args[0]
   }
+
   options = options || {}
-  const { filterableWxFwk = true, beforeUnpack, beforeProcessed, completed, processed } = options
+  const { filterableWxFwk = true, beforeUnpack, beforeProcess, completed, processed } = options
   if (!fs.existsSync(filePath)) {
     logger.error(filePath + ' path not found!')
     invokeHook(completed)
@@ -44,15 +45,14 @@ function _unpackWxapkg(filePath, options) {
   let processedName = null
 
   function doNext() {
-    const name = invokeHook(beforeProcessed, filteredPackages.pop())
+    const name = filteredPackages.pop()
     if (!name) {
       invokeHook(processed, processedName)
       return invokeHook(completed, true)
     }
-    processed && invokeHook(processed, processedName)
+    processedName && invokeHook(processed, processedName)
     processedName = name
-    doFile(name, doNext, [])
-    console.log('AAA')
+    doFile(name, doNext, [], _name => invokeHook(beforeProcess, _name))
   }
 
   doNext()
@@ -100,7 +100,7 @@ function unpackWxapkg(filePath, options) {
    * */
   function handleMainPackage(mainPackage) {
     if (!mainPackage) return logger.warn('mainPackage not found!')
-    logger.debug('Move subpackage to main package...')
+    logger.debug('Move subpackage to main package.')
     processedList.forEach(p => {
       const unpackedDir = p.replace(utils.getFilenameExt(p, false), '')
       if (unpackedDir === mainPackage) return
@@ -111,7 +111,6 @@ function unpackWxapkg(filePath, options) {
       })
       fs.rmdirSync(unpackedDir, { recursive: true })
     })
-    logger.debug('Moved.')
   }
 
   /**
@@ -121,15 +120,15 @@ function unpackWxapkg(filePath, options) {
    * */
   function writeConfig(mainPackage) {
     if (!mainPackage) return logger.warn('mainPackage not found!')
-    const configJSON = `{
-        "description": "See https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html",
-        "setting": {
-          "urlCheck": false
-        }
-      }`
+    const conf = {
+      description: 'See https://developers.weixin.qq.com/miniprogram/dev/devtools/projectconfig.html',
+      setting: {
+        urlCheck: false,
+      },
+    }
+    const configJSON = JSON.stringify(conf, null, 2)
     logger.debug('Write config to project.private.config.json')
     utils.writeFileSync(path.resolve(mainPackage, 'project.private.config.json'), configJSON)
-    logger.debug('Done.')
   }
 
   /**
@@ -143,24 +142,30 @@ function unpackWxapkg(filePath, options) {
     const mainPackageGameJS = path.resolve(mainPackage, 'game.js')
     const content = 'require("./plugin");\n' + utils.readFileSync(mainPackageGameJS)
     utils.writeFileSync(mainPackageGameJS, content)
-    logger.debug('Done.')
   }
 
   return _unpackWxapkg(filePath, {
-    beforeProcessed(name) {
+    beforeProcess(name) {
+      logger.debug('===============================before-process=================================')
       if (options.cleanOld === false) return
       const oldPackage = utils.cleanAlreadyUnpacked(name)
       oldPackage && logger.debug('Already cleaned old package', oldPackage)
     },
     processed(name) {
-      if (name) {
-        logger.debug('Already unpacked:', name)
+      try {
+        logger.debug('Unpacked success:', name)
         processedList.push(name)
+        const mainPackage = global.mainPackage
+        const subPackageInfo = global.subPackageInfo
+        if (subPackageInfo) {
+          moveSubPackage(subPackageInfo)
+          delete global.subPackageInfo
+          return
+        }
+        if (mainPackage) return !seenSet.has(mainPackage) && seenSet.add(mainPackage)
+      } finally {
+        logger.debug('=================================processed===================================\n')
       }
-      const mainPackage = global.mainPackage
-      const subPackageInfo = global.subPackageInfo
-      if (mainPackage) return !seenSet.has(mainPackage) && seenSet.add(mainPackage)
-      if (subPackageInfo) return moveSubPackage(subPackageInfo)
     },
     completed() {
       const callback = options.callback || Function()
