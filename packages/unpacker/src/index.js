@@ -6,6 +6,7 @@ const { splitWxssCmd } = require('./wuWxss')
 const { splitWxapkgCmd } = require('./wuWxapkg')
 const { unpackCmd, unpackWxapkg } = require('./unpack')
 const { decryptCmd, decryptWxapkg } = require('./decrypt')
+const { formatCmd } = require('./format')
 
 module.exports = {
   ...utils,
@@ -18,4 +19,5 @@ module.exports = {
   decryptCmd,
   unpackWxapkg,
   decryptWxapkg,
+  formatCmd,
 }

@@ -183,7 +183,7 @@ function unpackWxapkg(filePath, options) {
 function unpackCmd() {
   const args = process.argv.slice(2)
   if (!args.length) {
-    logger.debug(`Usage: node ${path.basename(__filename)} <packedDIR|packedFile>`)
+    logger.warn(`Usage: node ${path.basename(__filename)} <packedDIR|packedFile>`)
     process.exit(0)
   }
   logger.time('Unpack')

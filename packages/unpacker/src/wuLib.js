@@ -202,7 +202,7 @@ function commandExecute(cb, helper, argv) {
     let nxt = iter.next()
     while (!nxt.done && nxt.value.startsWith('-')) nxt = iter.next()
     if (nxt.done) {
-      if (!called) logger.debug('\n\nCommand Line Helper:\n\n' + helper)
+      if (!called) logger.warn('\n\nCommand Line Helper:\n\n' + helper)
       else if (!faster) endTime()
     } else {
       called = true

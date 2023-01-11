@@ -79,7 +79,7 @@ function decryptWxapkg(options) {
 function decryptCmd() {
   const args = process.argv.slice(2)
   if (args.length < 2) {
-    logger.debug(`Usage: node ${path.basename(__filename)} -wxid=<wx1111222233334444> <encryptedDIR|encryptedFile>`)
+    logger.warn(`Usage: node ${path.basename(__filename)} -wxid=<wx1111222233334444> <encryptedDIR|encryptedFile>`)
     process.exit(0)
   }
   let [wxAppid, filePath] = args

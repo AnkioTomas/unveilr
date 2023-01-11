@@ -17,6 +17,7 @@ const registeredSubroutine = {
   splitWxapkg: 'Run alone Unpack a wxapkg file.',
   unpack: 'Run the new version of the unpacker separately.',
   decrypt: 'Run the decryptor alone.',
+  format: 'Run the format code alone.',
 }
 const ArgsSortMap = {
   // 执行并退出

@@ -74,15 +74,15 @@ function cleanAlreadyUnpacked(name) {
   return false
 }
 
-function removeInvalidLine(filename, savePath) {
+function removeInvalidLine(filename, savePath, force) {
   savePath = savePath || filename
   const fileBuffer = readFileSync(filename, 'utf-8')
-  writeFileSync(savePath, removeInvalidLineCode(fileBuffer))
+  writeFileSync(savePath, removeInvalidLineCode(fileBuffer, force))
 }
 
-function removeInvalidLineCode(code) {
-  const invalidRe = /\s+[a-z] = VM2_INTERNAL_STATE_DO_NOT_USE_OR_PROGRAM_WILL_FAIL\.handleException\([a-z]\);/g
-  return beautify(code.replace(invalidRe, '')).replace(/= >/g, '=>')
+function removeInvalidLineCode(code, force) {
+  const invalidRe = /\s*[a-z]\x20?=\x20?VM2_INTERNAL_STATE_DO_NOT_USE_OR_PROGRAM_WILL_FAIL\.handleException\([a-z]\);?/g
+  return beautify(code.replace(invalidRe, ''), force)
 }
 
 function beautifyJS(filePath, beautifiedNS) {
@@ -135,6 +135,11 @@ function isWxAppid(appid) {
   return appid && /^wx[0-9a-z]{16}$/.test(appid)
 }
 
+function isDirectory(filePath) {
+  if (!fs.existsSync(filePath)) throw Error('file not found: ' + filePath)
+  return fs.statSync(filePath).isDirectory()
+}
+
 function rollbackLogger() {
   if (!global.logger) {
     global.logger = new Proxy(
@@ -172,4 +177,5 @@ module.exports = {
   isWxAppid,
   rollbackLogger,
   existsSync: fs.existsSync,
+  isDirectory,
 }
