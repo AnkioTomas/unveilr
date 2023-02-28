@@ -246,6 +246,7 @@ function restoreSingle(ops, withScope = false) {
         else {
           if (!xa) a = a.slice(1, -1).trim()
           if (!xb) b = b.slice(1, -1).trim()
+          logger.debug(l, r)
           ans = enBrace(a + ',' + b, '{')
         }
         break

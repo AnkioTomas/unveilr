@@ -59,8 +59,7 @@ function doConfig(configFile, cb) {
           root = root.substring(1)
         }
         let newPages = []
-        const sub_pages = k.filter(item => item.startsWith(root))
-        for (let page of (subPackage.pages || sub_pages)) {
+        for (let page of subPackage.pages) {
           let items = page.replace(root, '')
           newPages.push(items)
           let subIndex = pages.indexOf(root + items)
@@ -74,7 +73,7 @@ function doConfig(configFile, cb) {
       }
       app.subPackages = subPackages
       app.pages = pages
-      logger.info('This small program uses subpackages, and the number of subpackages is: ' + app.subPackages.length)
+      logger.debug('这个小程序采用了分包,子包个数为: ' + app.subPackages.length)
     }
     if (e.navigateToMiniProgramAppIdList) app.navigateToMiniProgramAppIdList = e.navigateToMiniProgramAppIdList
     if (fs.existsSync(path.resolve(dir, 'workers.js'))) app.workers = getWorkerPath(path.resolve(dir, 'workers.js'))
