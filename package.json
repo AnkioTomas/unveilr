@@ -1,0 +1,43 @@
+{
+  "name": "minapp-unpacker",
+  "version": "0.0.1-alpha",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "eslint:comment": "使用 ESLint 检查并自动修复 src 目录下所有扩展名为 .ts 的文件",
+    "eslint": "eslint --fix src --ext .ts --max-warnings=0",
+    "dev:comment": "启动开发环境",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
+    "dev-test": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/test/index.ts"
+  },
+  "dependencies": {
+    "@babel/core": "^7.21.0",
+    "@babel/traverse": "^7.21.2",
+    "cheerio": "^1.0.0-rc.12",
+    "clear-console": "^1.1.0",
+    "colors": "^1.4.0",
+    "commander": "^10.0.0",
+    "crypto-js": "^4.1.1",
+    "css-tree": "^2.3.1",
+    "cssbeautify": "^0.3.1",
+    "escodegen": "2",
+    "esprima": "4",
+    "prettier": "^2.8.4",
+    "shelljs": "^0.8.5",
+    "typescript": "^4.9.5",
+    "vm2": "^3.9.14",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/babel__core": "^7.20.0",
+    "@types/babel__traverse": "^7.18.3",
+    "@types/crypto-js": "^4.1.1",
+    "@types/node": "^18.14.4",
+    "@types/shelljs": "^0.8.11",
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "eslint": "8.22.0",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^3.14.2"
+  }
+}
