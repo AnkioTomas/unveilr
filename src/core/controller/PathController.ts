@@ -10,7 +10,7 @@ import {
   unlinkSync,
   rmdirSync,
 } from 'fs'
-import { dirname, extname, join, resolve, basename } from 'path'
+import { sep, dirname, extname, join, resolve, basename } from 'path'
 import { grey, bold } from 'colors/safe'
 export type ProduciblePath = string | PathController
 export type Optional<T> = T | null
@@ -50,6 +50,16 @@ export class PathController {
     return resolve(this.path)
   }
 
+  get unixpath(): string {
+    if (sep === '/') return this.path
+    return this.path.replace(/\\/g, '/')
+  }
+
+  get absunixpath(): string {
+    if (sep === '/') return this.abspath
+    return this.abspath.replace(/\\/g, '/')
+  }
+
   get logpath(): string {
     const dirML = 80
     const s =
@@ -60,17 +70,17 @@ export class PathController {
   }
 
   get dirname(): string {
-    if (this.isDirectory) return this.abspath
-    if (this.isFile) return dirname(this.abspath)
-    return null
+    if (this.isDirectory) return this.path
+    if (this.isFile) return dirname(this.path)
+    return dirname(this.path)
   }
 
   get basename(): string {
-    return basename(this.abspath)
+    return basename(this.path)
   }
 
   get basenameWithout(): string {
-    return basename(this.abspath, this.suffix)
+    return basename(this.path, this.suffix)
   }
 
   read(options?: FSOptions): Buffer | string | Array<Buffer | string> {
@@ -135,7 +145,7 @@ export class PathController {
   }
 
   join(...paths: string[]): PathController {
-    return PathController.make(join(this.abspath, ...paths))
+    return PathController.make(join(this.path, ...paths))
   }
 
   static make(path?: ProduciblePath): PathController {

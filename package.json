@@ -12,7 +12,6 @@
   },
   "dependencies": {
     "@babel/core": "^7.21.0",
-    "@babel/traverse": "^7.21.2",
     "cheerio": "^1.0.0-rc.12",
     "clear-console": "^1.1.0",
     "colors": "^1.4.0",
