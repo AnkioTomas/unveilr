@@ -1,6 +1,6 @@
 import { registerGlobalException, clearConsole } from '@/utils'
 // import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
-// import { WxapkgExtractor } from '@core/extractor'
+import { WxapkgExtractor } from '@core/extractor'
 clearConsole()
 registerGlobalException()
 
@@ -9,9 +9,9 @@ registerGlobalException()
 // )
 //   .decrypt()
 //   .save()
-// new WxapkgExtractor({
-//   path: 'files/wx7095f7fa398a2f30-拆弹猫插件/__PLUGINCODE__.wxapkg',
-// }).extract()
+new WxapkgExtractor({
+  path: 'files/watermark.wxapkg',
+}).extract()
 
 // const p1 = 'C:/Users/zzdev/Desktop/test001'
 // const p2 = './test001'

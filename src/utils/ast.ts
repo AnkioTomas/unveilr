@@ -1,6 +1,8 @@
 import * as babel from '@babel/core'
 import type { BabelFileResult } from '@babel/core'
-import { PathController, ProduciblePath } from '@controller/PathController'
+import { isProduciblePath, PathController, ProduciblePath } from '@controller/PathController'
+import { traverse, Visitor } from '@babel/core'
+import { TraverseOptions } from '@babel/traverse'
 
 export function buildAST(path: ProduciblePath): BabelFileResult
 export function buildAST(code: string, filename: string): BabelFileResult
@@ -15,3 +17,15 @@ export function buildAST(v: unknown, filename?: string): BabelFileResult {
   const ast = babel.parseSync(code, { sourceFileName: filename })
   return new babel['File']({ filename }, { ast, code })
 }
+
+export type BuildParams = { code: string; filename: string }
+
+export function traverseAST(path: ProduciblePath, opt?: TraverseOptions): void
+export function traverseAST(builder: BuildParams, opt?: TraverseOptions): void
+export function traverseAST(file: BabelFileResult, opt?: TraverseOptions): void
+export function traverseAST(v: unknown, opt: TraverseOptions): void {
+  if (isProduciblePath(v)) return traverse(buildAST(v).ast, opt)
+  if (typeof v === 'object' && v['code'] && v['filename']) traverse(buildAST(v['code'], v['filename']).ast, opt)
+  return traverse((v as BabelFileResult).ast, opt)
+}
+export { Visitor }

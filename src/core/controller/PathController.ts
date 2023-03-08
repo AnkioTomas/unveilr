@@ -12,6 +12,7 @@ import {
 } from 'fs'
 import { sep, dirname, extname, join, resolve, basename } from 'path'
 import { grey, bold } from 'colors/safe'
+
 export type ProduciblePath = string | PathController
 export type Optional<T> = T | null
 export type FSOptions =
@@ -98,6 +99,10 @@ export class PathController {
     return this
   }
 
+  writeJSON(data: object): this {
+    return this.write(JSON.stringify(data, null, 2), 'utf8')
+  }
+
   copy(_target: ProduciblePath): PathController {
     // copy single path
     const target = PathController.make(_target)
@@ -128,24 +133,40 @@ export class PathController {
     return this
   }
 
-  deepListDir(): Optional<string[]> {
+  deepListDir(absolute?: boolean): Optional<string[]> {
     if (!this.isDirectory) return null
     const list: string[] = []
 
     function listFile(dir) {
-      readdirSync(dir).forEach(function (item) {
+      readdirSync(dir).forEach((item) => {
         const fullPath = join(dir, item)
         statSync(fullPath).isDirectory() ? listFile(fullPath) : list.push(fullPath)
       })
       return list
     }
 
-    listFile(this.abspath)
+    listFile(absolute ? this.abspath : this.path)
     return list
   }
 
   join(...paths: string[]): PathController {
     return PathController.make(join(this.path, ...paths))
+  }
+
+  whitout(suffix?: string): PathController {
+    return this.join('..', this.basenameWithout + (suffix || ''))
+  }
+
+  unix(): PathController {
+    return PathController.make(this.unixpath)
+  }
+
+  static unix(path: ProduciblePath): PathController {
+    return PathController.make(path).unix()
+  }
+
+  static whitout(path: ProduciblePath, suffix?: string): PathController {
+    return PathController.make(path).whitout(suffix)
   }
 
   static make(path?: ProduciblePath): PathController {

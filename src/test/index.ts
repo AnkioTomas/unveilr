@@ -5,7 +5,8 @@ import * as babel from '@babel/core'
 import { Visitor } from '@babel/traverse'
 import { buildAST } from '@utils/ast'
 import { AppConfigParser } from '@core/decompiler/wxapkg/AppConfigParser'
-export function traverse() {
+// import { md5 } from '@/utils'
+export function traverse1() {
   const file = buildAST('files/wx874eee9e6a120dff-租客/__APP__/app-wxss.js')
   const v: Visitor = {
     FunctionDeclaration(_path) {
@@ -28,5 +29,7 @@ export function traverse() {
     },
   })
 }
+
+// console.log(md5(Buffer.from('123456')))
 
 new AppConfigParser('files/_468736192_311/app-config.json').parse()
