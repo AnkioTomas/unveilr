@@ -1,4 +1,4 @@
-import { isProduciblePath, PathController, ProduciblePath } from '@controller/PathController'
+import { isProduciblePath, PathController, ProduciblePath } from '@core/controller'
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
 
 export function checkWxapkg<T extends Error>(path: ProduciblePath, throws?: string | T): boolean
@@ -13,14 +13,14 @@ export function checkWxapkg(v: unknown, throws?: unknown): boolean {
 
 export function checkWxapkgType(path: ProduciblePath): WxapkgType
 export function checkWxapkgType(list: string[], dir: ProduciblePath): WxapkgType
-export function checkWxapkgType(v: unknown, dir?: ProduciblePath): WxapkgType{
+export function checkWxapkgType(v: unknown, dir?: ProduciblePath): WxapkgType {
   let fileList: string[]
   if (isProduciblePath(v)) {
     const pCtrl = PathController.make(v)
     if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
     fileList = pCtrl.read() as string[]
     dir = dir || pCtrl.abspath
-  }else {
+  } else {
     fileList = v as string[]
   }
   const dirCtrl = PathController.make(dir)
@@ -49,10 +49,7 @@ export function checkWxapkgType(v: unknown, dir?: ProduciblePath): WxapkgType{
     return WxapkgType.GAME_SUBPACKAGE
   }
   // 插件
-  if (fileList.includes(WxapkgKeyFile.PLUGIN) && fileList.includes(WxapkgKeyFile.PLUGIN_JSON))
-    return WxapkgType.PLUGIN
+  if (fileList.includes(WxapkgKeyFile.PLUGIN) && fileList.includes(WxapkgKeyFile.PLUGIN_JSON)) return WxapkgType.PLUGIN
 
   throw Error(errorMessage)
 }
-
-

@@ -1,5 +1,5 @@
 import { BaseExtractor, ExtractorError } from './BaseExtractor'
-import { ProduciblePath } from '@controller/PathController'
+import { ProduciblePath } from '@core/controller'
 import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
 import { checkWxapkg } from '@core/utils/checkWxapkg'
 import { PackageSuffix } from '@/enum'

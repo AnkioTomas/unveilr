@@ -19,7 +19,6 @@
       "@utils/*": ["utils/*"],
       "@core/*": ["core/*"],
       "@enum/*": ["enum/*"],
-      "@controller/*": ["./core/controller/*"],
     }
   },
   "exclude": [

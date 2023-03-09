@@ -131,25 +131,26 @@ export class AppConfigParser extends BaseParser {
       })
 
       const appJSONCtrl = this.pathCtrl.join('..', WxapkgKeyFile.APP_JSON)
-      appJSONCtrl.writeJSON(
-        Object.assign(config, {
+      this.parseResult.push({
+        path: appJSONCtrl,
+        source: Object.assign(config, {
           tabBar,
           subPackages,
           ...global,
         }),
-      )
-      this.logger.debug(`Parsed ${WxapkgKeyFile.APP_JSON} save to ${appJSONCtrl.logpath}`)
+      })
       Object.keys(page).forEach((key) => {
         let pCtrl = PathController.make(key)
         if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
-        this.logger.debug(`Parsed page json save to ${pCtrl.logpath}`)
-        // pCtrl.mkdir().writeJSON(page[key])
+        this.parseResult.push({
+          path: pCtrl,
+          source: page[key],
+        })
       })
+      console.log(this.parseResult)
     } catch (e) {
       throw new ParserError('Parse failed! ' + e.message)
     }
     return this
   }
 }
-
-new AppConfigParser('files/_468736192_311/app-config.json').parse()

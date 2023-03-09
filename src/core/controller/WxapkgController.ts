@@ -1,4 +1,4 @@
-import { PathController, ProduciblePath } from '@controller/PathController'
+import { PathController, ProduciblePath } from '@core/controller'
 import { PackageSuffix, WxapkgType } from '@/enum'
 import { Logger } from 'winston'
 import { WxapkgExtractor, WxapkgExtractorOptions } from '@core/extractor'
