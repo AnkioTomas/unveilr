@@ -1,5 +1,5 @@
 import { Logger } from 'winston'
-import { getLogger } from '@utils/logger'
+import { getLogger } from '@/utils'
 
 export function registerGlobalException(logger?: Logger) {
   logger = logger || getLogger()

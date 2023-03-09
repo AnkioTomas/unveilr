@@ -1,6 +1,6 @@
 import { registerGlobalException, clearConsole } from '@/utils'
 // import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
-import { WxapkgExtractor } from '@core/extractor'
+import { WxapkgExtractor } from '@/core'
 clearConsole()
 registerGlobalException()
 

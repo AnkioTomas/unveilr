@@ -1,6 +1,6 @@
 import * as babel from '@babel/core'
 import type { BabelFileResult } from '@babel/core'
-import { isProduciblePath, PathController, ProduciblePath } from '@controller/PathController'
+import { isProduciblePath, PathController, ProduciblePath } from '@core/controller'
 import { traverse, Visitor } from '@babel/core'
 import { TraverseOptions } from '@babel/traverse'
 

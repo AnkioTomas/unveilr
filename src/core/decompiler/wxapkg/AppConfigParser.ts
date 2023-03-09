@@ -1,5 +1,5 @@
-import { BaseParser, ParserError } from '@core/decompiler/wxapkg/BaseParser'
-import { PathController, ProduciblePath } from '@controller/PathController'
+import { BaseParser, ParserError } from './BaseParser'
+import { PathController, ProduciblePath } from '@core/controller'
 import { md5, traverseAST } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
 
@@ -130,23 +130,26 @@ export class AppConfigParser extends BaseParser {
         page[key] = { window: result[key] }
       })
 
-      this.pathCtrl.join('..', WxapkgKeyFile.APP_JSON).writeJSON(
+      const appJSONCtrl = this.pathCtrl.join('..', WxapkgKeyFile.APP_JSON)
+      appJSONCtrl.writeJSON(
         Object.assign(config, {
           tabBar,
           subPackages,
           ...global,
         }),
       )
-      console.log(page)
-      // Object.keys(page).forEach((key) => {
-      //   let pCtrl = PathController.make(key)
-      //   if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
-      //   console.log(pCtrl.unixpath)
-      //   // pCtrl.mkdir().writeJSON(page[key])
-      // })
+      this.logger.debug(`Parsed ${WxapkgKeyFile.APP_JSON} save to ${appJSONCtrl.logpath}`)
+      Object.keys(page).forEach((key) => {
+        let pCtrl = PathController.make(key)
+        if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
+        this.logger.debug(`Parsed page json save to ${pCtrl.logpath}`)
+        // pCtrl.mkdir().writeJSON(page[key])
+      })
     } catch (e) {
       throw new ParserError('Parse failed! ' + e.message)
     }
     return this
   }
 }
+
+new AppConfigParser('files/_468736192_311/app-config.json').parse()

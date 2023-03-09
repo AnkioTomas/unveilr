@@ -1,4 +1,4 @@
-import { ProduciblePath, PathController } from '@controller/PathController'
+import { ProduciblePath, PathController } from '@core/controller'
 import { getLogger } from '@/utils'
 import { Logger } from 'winston'
 
