@@ -13,9 +13,21 @@ export class WxssParser extends BaseParser {
       case WxapkgType.APP_V1:
         {
           const source = this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME_HTML).read('utf8') as string
-          const result = source.match(/<script>(?<source>[\s\S]+)<\/script>/m)
+          const matchScripts = (source: string): string => {
+            const matchRegex = /<script>(?<source>[\s\S]+?)<\/script>/m
+            const matchResult = []
+            const _matchAll = (str: string) => {
+              const r = str.match(matchRegex)
+              if (!r || !r.groups) return
+              matchResult.push(r.groups.source.trim())
+              _matchAll(str.replace(matchRegex, ''))
+            }
+            _matchAll(source)
+            return matchResult.filter(Boolean).join(';\n')
+          }
+          const result = matchScripts(source)
           if (!result) throw new ParserError(`Directory ${this.pathCtrl.logpath} not a valid package`)
-          this.source = result.groups.source.trim()
+          this.source = result
         }
         break
       case WxapkgType.APP_V2:
@@ -48,7 +60,20 @@ export class WxssParser extends BaseParser {
         CallExpression(path) {
           const callee = path.node.callee
           if (callee.type === 'Identifier' && callee.name === 'setCssToHead') {
-            console.log(path.getSource())
+            // console.log()
+            path.getSource()
+          }
+        },
+        MemberExpression(path) {
+          const node = path.node
+          if (
+            node.object.type === 'Identifier' &&
+            node.property.type === 'StringLiteral' &&
+            node.object.name === '__COMMON_STYLESHEETS__'
+          ) {
+            // 对应节点
+            console.log(node.property.value)
+            // console.log(path.getOpposite().getSource())
           }
         },
       },
@@ -57,4 +82,6 @@ export class WxssParser extends BaseParser {
   }
 }
 
-new WxssParser('files/watermark').parse()
+if (require.main === module) {
+  new WxssParser('files/watermark').parse()
+}
