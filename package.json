@@ -18,13 +18,11 @@
     "commander": "^10.0.0",
     "crypto-js": "^4.1.1",
     "css-tree": "^2.3.1",
-    "cssbeautify": "^0.3.1",
     "escodegen": "2",
     "esprima": "4",
     "prettier": "^2.8.4",
     "shelljs": "^0.8.5",
-    "typescript": "^4.9.5",
-    "vm2": "^3.9.14",
+    "threads": "^1.7.0",
     "winston": "^3.8.2"
   },
   "devDependencies": {
@@ -39,6 +37,7 @@
     "@typescript-eslint/parser": "^5.54.0",
     "eslint": "8.22.0",
     "ts-node-dev": "^2.0.0",
-    "tsconfig-paths": "^3.14.2"
+    "tsconfig-paths": "^3.14.2",
+    "typescript": "^4.9.5"
   }
 }

@@ -1,5 +1,5 @@
 import { BaseExtractor, ExtractorError } from './BaseExtractor'
-import { ProduciblePath } from '@core/controller'
+import { isProduciblePath, ProduciblePath } from '@core/controller'
 import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
 import { checkWxapkg } from '@core/utils/checkWxapkg'
 import { PackageSuffix } from '@/enum'
@@ -21,13 +21,13 @@ export type WxapkgExtractorOptions =
       wxAppId?: string
       parentDir?: ProduciblePath
     }
-  | string
+  | ProduciblePath
 export class WxapkgExtractor extends BaseExtractor {
   readonly wxAppId: string
   readonly parentDir: ProduciblePath
   savePath: string
   constructor(options: WxapkgExtractorOptions) {
-    if (typeof options === 'string') {
+    if (isProduciblePath(options)) {
       super(options)
     } else {
       const { path, parentDir, wxAppId } = options
@@ -71,35 +71,36 @@ export class WxapkgExtractor extends BaseExtractor {
       })
   }
 
-  saveFiles(files: WxapkgFileInfo[], buf: Buffer) {
+  async saveFiles(files: WxapkgFileInfo[], buf: Buffer) {
     this.logger.debug(`Starting save files`)
-    files.forEach((file) => {
-      const target = this.pathCtrl.join('..', this.pathCtrl.basenameWithout, file.name)
+    for (const file of files) {
+      const targetDir = this.pathCtrl.whitout()
+      const target = targetDir.join(file.name)
       target.mkdir()
-      target.write(buf.subarray(file.start, file.end))
+      await target.write(buf.subarray(file.start, file.end))
       this.logger.debug(`Created ${target.logpath}`)
-    })
+    }
   }
-  _extract(buf: Buffer): string {
+  async _extract(buf: Buffer): Promise<string> {
     const isEncrypted = buf.subarray(0, 6).toString('hex') === '56314d4d5758'
     if (isEncrypted) {
       this.logger.debug(`File ${this.pathCtrl.logpath} encrypted, Starting decrypt `)
-      return this._extract(new WxapkgDecryptor(this.pathCtrl, this.wxAppId).decrypt().result)
+      const buffer = await WxapkgDecryptor.decryptResult(this.pathCtrl, this.wxAppId)
+      return this._extract(buffer)
     }
     this.logger.debug(`Starting extract ${this.pathCtrl.logpath}`)
     const { dataLength, infoLength } = this.getFileHeader(buf.subarray(0, 14))
     this.logger.debug(`Header info length ${infoLength}`)
     this.logger.debug(`Header data length ${dataLength}`)
     const files = this.getFileByRaw(buf.subarray(14, infoLength + 14))
-    this.saveFiles(files, buf)
-    this.savePath = this.pathCtrl.join('..', this.pathCtrl.basenameWithout).abspath
+    await this.saveFiles(files, buf)
+    this.savePath = this.pathCtrl.whitout().abspath
     this.logger.debug(`Extracted save to ${this.savePath}`)
   }
 
-  extract(): this {
+  async extract(): Promise<void> {
     super.extract()
-    const buf = this.pathCtrl.read() as Buffer
-    this._extract(buf)
-    return this
+    const buf = await this.pathCtrl.read()
+    await this._extract(buf)
   }
 }

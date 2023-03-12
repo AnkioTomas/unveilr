@@ -22,10 +22,9 @@ export class BaseDecryptor {
     return this.pathCtrl.isFile && this.pathCtrl.suffixWithout === this.suffix
   }
 
-  decrypt(): this {
+  decrypt(): void {
     if (!this.decipherable) {
       throw new DecryptorError(`File ${this.pathCtrl.logpath} cannot be decrypted!`)
     }
-    return this
   }
 }

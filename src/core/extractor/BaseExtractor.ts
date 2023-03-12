@@ -22,10 +22,9 @@ export class BaseExtractor {
     return this.pathCtrl.isFile && this.pathCtrl.suffixWithout === this.suffix
   }
 
-  extract(): this {
+  extract(): void {
     if (!this.extractable) {
       throw new ExtractorError(`File ${this.pathCtrl.logpath} cannot be extracted!`)
     }
-    return this
   }
 }

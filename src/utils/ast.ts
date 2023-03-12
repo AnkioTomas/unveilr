@@ -4,45 +4,52 @@ import { isProduciblePath, PathController, ProduciblePath } from '@core/controll
 import { traverse, Visitor } from '@babel/core'
 import { TraverseOptions } from '@babel/traverse'
 
-export function buildAST(path: ProduciblePath): BabelFileResult
-export function buildAST(code: string, filename: string): BabelFileResult
+export async function buildAST(path: ProduciblePath): Promise<BabelFileResult>
+export async function buildAST(code: string, filename: string): Promise<BabelFileResult>
 
-export function buildAST(v: unknown, filename?: string): BabelFileResult {
+export async function buildAST(v: unknown, filename?: string): Promise<BabelFileResult> {
   let code: string = v as string
   if (!filename) {
     const pCtrl = PathController.make(v as ProduciblePath)
     filename = pCtrl.abspath
-    code = pCtrl.read('utf8') as string
+    code = await pCtrl.read('utf8')
   }
-  const ast = babel.parseSync(code, { sourceFileName: filename })
+  const ast = await babel.parseAsync(code, { sourceFileName: filename })
   return new babel['File']({ filename }, { ast, code })
 }
 
 export type BuildParams = { code: string; filename?: string }
 
-export function traverseAST(path: ProduciblePath, opt?: TraverseOptions): void
-export function traverseAST(builder: BuildParams, opt?: TraverseOptions): void
-export function traverseAST(file: BabelFileResult, opt?: TraverseOptions): void
-export function traverseAST(v: unknown, opt: TraverseOptions): void {
-  if (isProduciblePath(v)) return traverse(buildAST(v).ast, opt)
-  if (typeof v === 'object' && v['code'] && (v['filename'] = v['filename'] || '.'))
-    traverse(buildAST(v['code'], v['filename']).ast, opt)
+export async function traverseAST(path: ProduciblePath, opt?: TraverseOptions): Promise<void>
+export async function traverseAST(builder: BuildParams, opt?: TraverseOptions): Promise<void>
+export async function traverseAST(file: BabelFileResult, opt?: TraverseOptions): Promise<void>
+export async function traverseAST(v: unknown, opt: TraverseOptions): Promise<void> {
+  if (isProduciblePath(v)) {
+    console.time('buildAST')
+    const file = await buildAST(v)
+    console.timeEnd('buildAST')
+    return traverse(file.ast, opt)
+  }
+  if (typeof v === 'object' && v['code'] && (v['filename'] = v['filename'] || '.')) {
+    console.time('buildAST')
+    const file = await buildAST(v['code'], v['filename'])
+    console.timeEnd('buildAST')
+    return traverse(file.ast, opt)
+  }
   return traverse((v as BabelFileResult).ast, opt)
 }
 export { Visitor }
 
 export function parseJSONFromJSCode(code: string) {
   // 防止恶意代码
-  traverseAST(
-    { code },
-    {
-      CallExpression() {
-        throw Error('This code snippet is not safe')
-      },
-      AssignmentExpression() {
-        throw Error('This code snippet is not safe')
-      },
+  const file = new babel['File']({ filename: '.' }, { ast: babel.parseSync(code), code })
+  traverse(file.ast, {
+    CallExpression(path) {
+      throw Error(`This code snippet is not safe: ${path.getSource().bgRed.bold}`)
     },
-  )
+    AssignmentExpression(path) {
+      throw Error(`This code snippet is not safe: ${path.getSource().bgRed.bold}`)
+    },
+  })
   return eval(code)
 }

@@ -1,57 +1,64 @@
-import { BaseParser, ParserError } from './BaseParser'
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
-import { checkWxapkgType, TraverseController, ProduciblePath, PathController } from '@/core'
 import { parseJSONFromJSCode } from '@/utils'
-import { transformStyle } from '@core/utils/transformStyle'
+import {
+  checkWxapkgType,
+  matchScripts,
+  TraverseController,
+  ProduciblePath,
+  PathController,
+  WorkerController,
+} from '@/core'
+import { BaseParser, ParsedInfo, ParserError } from './BaseParser'
 export class WxssParser extends BaseParser {
-  constructor(path: ProduciblePath, private readonly pkgType?: WxapkgType) {
+  private isLoaded: boolean
+  private pkgType: WxapkgType
+  constructor(path: ProduciblePath, pkgType?: WxapkgType) {
     super(path)
     if (!this.pathCtrl.isDirectory) throw new ParserError(`Path ${this.pathCtrl.logpath} is not a directory!`)
-    this.pkgType = pkgType || checkWxapkgType(this.pathCtrl)
+    this.pkgType = pkgType
+    this.isLoaded = false
+  }
+  private async init() {
+    if (!this.pkgType) this.pkgType = await checkWxapkgType(this.pathCtrl)
+    await this.readSource()
+    this.isLoaded = true
+  }
+
+  private async readSource() {
     switch (this.pkgType) {
       case WxapkgType.APP_V1:
         {
-          const source = this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME_HTML).read('utf8') as string
-          const matchScripts = (source: string): string => {
-            const matchRegex = /<script>(?<source>[\s\S]+?)<\/script>/m
-            const matchResult = []
-            const _matchAll = (str: string) => {
-              const r = str.match(matchRegex)
-              if (!r || !r.groups) return
-              matchResult.push(r.groups.source.trim())
-              _matchAll(str.replace(matchRegex, ''))
-            }
-            _matchAll(source)
-            return matchResult.filter(Boolean).join(';\n')
-          }
+          const source = await this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME_HTML).read('utf8')
           const result = matchScripts(source)
           if (!result) throw new ParserError(`Directory ${this.pathCtrl.logpath} not a valid package`)
           this.source = result
         }
         break
       case WxapkgType.APP_V2:
-        this.source = this.pathCtrl.join(WxapkgKeyFile.APP_WXSS).read('utf8') as string
+        this.source = await this.pathCtrl.join(WxapkgKeyFile.APP_WXSS).read('utf8')
         break
       case WxapkgType.APP_V3:
         this.source = [
-          this.pathCtrl.join(WxapkgKeyFile.APP_WXSS).read('utf8') as string,
-          this.pathCtrl.join(WxapkgKeyFile.WEBVIEW_APP).read('utf8') as string,
+          await this.pathCtrl.join(WxapkgKeyFile.APP_WXSS).read('utf8'),
+          await this.pathCtrl.join(WxapkgKeyFile.WEBVIEW_APP).read('utf8'),
         ].join(';\n')
         break
       case WxapkgType.APP_SUBPACKAGE_V1:
-        this.source = this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8') as string
+        this.source = await this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8')
         break
       case WxapkgType.APP_SUBPACKAGE_V2:
         this.source = [
-          this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8') as string,
-          this.pathCtrl.join(WxapkgKeyFile.WEBVIEW_APP).read('utf8') as string,
+          await this.pathCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8'),
+          await this.pathCtrl.join(WxapkgKeyFile.WEBVIEW_APP).read('utf8'),
         ].join(';\n')
         break
       default:
         throw new ParserError(`WxssParser not supported for type: ${this.pkgType}`)
     }
   }
-  private dumpResult(data: { [key: string]: unknown }): this {
+
+  private async dumpResult(data: { [key: string]: unknown }): Promise<void> {
+    const wCtrl = new WorkerController<ParsedInfo>('../workers/transformStyle')
     Object.entries(data).forEach(([k, v]) => {
       if (!Array.isArray(v)) return
       const source = v
@@ -70,17 +77,16 @@ export class WxssParser extends BaseParser {
           }
         })
         .join('')
-      this.parseResult.push({
-        source: transformStyle(source),
-        path: this.pathCtrl.join(k),
-      })
+      wCtrl.addTask((thread) => thread['transformStyle'](source, k))
     })
-    return this
+    await wCtrl.start((result) => this.parseResult.push(result), true)
   }
-  parse(_source?: Buffer): this {
+  async parse(_source?: Buffer): Promise<void> {
+    if (!this.isLoaded) await this.init()
     super.parse(_source)
     const traverse = new TraverseController({ code: this.source })
-    traverse
+    console.time('traverse')
+    await traverse
       .addVisitors({
         //  读取 setCssToHead 函数
         CallExpression(this: TraverseController, path) {
@@ -125,12 +131,8 @@ export class WxssParser extends BaseParser {
         },
       })
       .traverse()
-    this.dumpResult(traverse.getItem('styleFragments'))
-    this.dumpResult(traverse.getItem('commonStyles'))
-    return this
+    console.timeEnd('traverse')
+    await this.dumpResult(traverse.getItem('styleFragments'))
+    await this.dumpResult(traverse.getItem('commonStyles'))
   }
-}
-
-if (require.main === module) {
-  new WxssParser('files/wx874eee9e6a120dff-租客/__APP__').parse().save()
 }

@@ -1,15 +1,21 @@
-import { BaseParser, ParserError } from './BaseParser'
-import { PathController, ProduciblePath } from '@core/controller'
+import { PathController, ProduciblePath } from '@/core'
+import { ParserError, BaseParser } from './BaseParser'
 import { md5, traverseAST } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
 
 export class AppConfigParser extends BaseParser {
+  private savePath: PathController
+  /**
+   * @param{PathController} path 需要传入 app-config.json 的路径构造器
+   * */
   constructor(path: ProduciblePath) {
     super(path)
   }
-  parse(): this {
+  async parse(): Promise<void> {
     super.parse()
     try {
+      const dirCtrl = PathController.make(this.pathCtrl.dirname)
+      this.savePath = dirCtrl
       const config = {
         ...JSON.parse(this.source),
         pop<T>(key, _default?: T): T {
@@ -46,21 +52,20 @@ export class AppConfigParser extends BaseParser {
       const extAppid = config.pop('extAppid')
       const ext = config.pop('ext')
       if (extAppid && ext) {
-        const logPath = this.pathCtrl.join('ext.json').writeJSON({ extEnable: true, extAppid, ext }).logpath
+        const logPath = dirCtrl.join('ext.json').writeJSONSync({ extEnable: true, extAppid, ext }).logpath
         this.logger.info(`Ext save to ${logPath}`)
       }
 
       // tabBar
       const tabBar = config.pop('tabBar')
+      const ignoreSuffixes = 'html,wxss,json'
       if (tabBar && Array.isArray(tabBar.list)) {
         const hashMap: { [key: string]: string }[] = Object.create(null)
-        this.pathCtrl
-          .join('..')
-          .deepListDir()
-          .forEach((p) => {
-            const pCtrl = PathController.unix(p)
-            hashMap[md5(pCtrl.read() as Buffer)] = pCtrl.path.replace(this.pathCtrl.dirname + '/', '')
-          })
+        dirCtrl.deepListDir().forEach((p) => {
+          const pCtrl = PathController.unix(p)
+          if (ignoreSuffixes.includes(pCtrl.suffixWithout)) return
+          hashMap[md5(pCtrl.readSync())] = pCtrl.crop(dirCtrl).unixpath
+        })
         tabBar.list.forEach((item) => {
           item.pagePath = PathController.make(item.pagePath).whitout().unixpath
           if (item.iconData) {
@@ -102,9 +107,9 @@ export class AppConfigParser extends BaseParser {
 
       // usingComponents -> json
       const service = this.pathCtrl.join('..', WxapkgKeyFile.APP_SERVICE)
-      if (!service.exists) return this
+      if (!service.exists) return
       const result = Object.create(null)
-      traverseAST(service, {
+      await traverseAST(service, {
         AssignmentExpression(path) {
           const left = path.node.left
           if (
@@ -147,10 +152,14 @@ export class AppConfigParser extends BaseParser {
           source: page[key],
         })
       })
-      console.log(this.parseResult)
     } catch (e) {
       throw new ParserError('Parse failed! ' + e.message)
     }
-    return this
+  }
+
+  async save(v?: boolean | ProduciblePath, isClean?: boolean): Promise<void> {
+    if (typeof v === 'boolean') return super.save(v)
+    v = v || this.savePath
+    return super.save(v, isClean)
   }
 }

@@ -5,20 +5,20 @@ export function checkWxapkg<T extends Error>(path: ProduciblePath, throws?: stri
 export function checkWxapkg<T extends Error>(buff: Buffer, throws?: string | T): boolean
 
 export function checkWxapkg(v: unknown, throws?: unknown): boolean {
-  const buf = (isProduciblePath(v) ? PathController.make(v).read() : v) as Buffer
+  const buf = (isProduciblePath(v) ? PathController.make(v).readSync() : v) as Buffer
   const invalid = buf.readUInt8(0) === 0xbe && buf.readUInt8(13) === 0xed
   if (throws && !invalid) throw typeof throws === 'string' ? Error(throws) : throws
   return invalid
 }
 
-export function checkWxapkgType(path: ProduciblePath): WxapkgType
-export function checkWxapkgType(list: string[], dir: ProduciblePath): WxapkgType
-export function checkWxapkgType(v: unknown, dir?: ProduciblePath): WxapkgType {
+export async function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>
+export async function checkWxapkgType(list: string[], dir: ProduciblePath): Promise<WxapkgType>
+export async function checkWxapkgType(v: unknown, dir?: ProduciblePath): Promise<WxapkgType> {
   let fileList: string[]
   if (isProduciblePath(v)) {
     const pCtrl = PathController.make(v)
     if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
-    fileList = pCtrl.read() as string[]
+    fileList = await pCtrl.readdir()
     dir = dir || pCtrl.abspath
   } else {
     fileList = v as string[]
@@ -31,7 +31,7 @@ export function checkWxapkgType(v: unknown, dir?: ProduciblePath): WxapkgType {
   if (fileList.includes(WxapkgKeyFile.PAGE_FRAME_HTML)) return WxapkgType.APP_V1
   // 可能是微信小程序主包也可能是微信小程序分包
   if (fileList.includes(WxapkgKeyFile.PAGE_FRAME)) {
-    const pfText = dirCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8') as string
+    const pfText = await dirCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8')
     // 微信小程序主包
     if (pfText.length < 100) {
       if (pfText.includes('__pageFrameJsStartTime__')) return WxapkgType.APP_V2

@@ -18,6 +18,7 @@ export class WxapkgDecryptor extends BaseDecryptor {
   readonly salt: string
   readonly iv: string
   private decryptedBuffer: Buffer
+
   constructor(options: WxapkgDecryptorOptions)
   constructor(path: ProduciblePath, wxAppId?: string, target?: ProduciblePath)
   constructor(path: WxapkgDecryptorOptions | ProduciblePath, wxAppId?: string, target?: ProduciblePath) {
@@ -55,22 +56,17 @@ export class WxapkgDecryptor extends BaseDecryptor {
     this.wxAppId = _result[0]
     this.logger.info(`From ${this.pathCtrl.logpath} detected wxAppId: ${this.wxAppId.blue.bold}`)
   }
+
   checkWxAppId() {
     if (!this.wxAppId || !/^wx[a-z\d]{16}$/.test(this.wxAppId)) {
       throw new DecryptorError(`wxAppId ${this.wxAppId || ''} must be a valid wxAppId`)
     }
   }
 
-  // 有参数直接读取buffer中的内容
-  decrypt(buffer: Buffer): this
-  //  没参数直接读取当前路径
-  decrypt(): this
-
-  decrypt(buffer?: Buffer): this {
+  async decrypt(buffer?: Buffer): Promise<void> {
     super.decrypt()
-    buffer = buffer || (this.pathCtrl.read() as Buffer)
+    buffer = buffer || (await this.pathCtrl.read())
     this._decrypt(buffer)
-    return this
   }
 
   private _decrypt(buffer: Buffer) {
@@ -89,11 +85,20 @@ export class WxapkgDecryptor extends BaseDecryptor {
       throw new DecryptorError('Decryption failed! ' + e.message)
     }
   }
-  save(target?: ProduciblePath) {
+
+  async save(target?: ProduciblePath): Promise<void> {
     target = target ? PathController.make(target) : this.target
     if (!target) throw new DecryptorError('If you want to save please provide target!')
     if (!this.result) throw new DecryptorError('There is no decryption result yet!')
-    this.target.write(this.result)
+    await target.write(this.result)
     this.logger.debug(`Decryption save to ${target.logpath}`)
+  }
+
+  static async decryptResult(options: WxapkgDecryptorOptions): Promise<Buffer>
+  static async decryptResult(path: ProduciblePath, wxAppId?: string, target?: ProduciblePath): Promise<Buffer>
+  static async decryptResult(o: WxapkgDecryptorOptions | ProduciblePath, wxAppId?: string): Promise<Buffer> {
+    const inst = isProduciblePath(o) ? new WxapkgDecryptor(o, wxAppId) : new WxapkgDecryptor(o)
+    await inst.decrypt()
+    return inst.result
   }
 }

@@ -10,18 +10,33 @@ import {
   unlinkSync,
   rmdirSync,
 } from 'fs'
+import { readdir, readFile, writeFile } from 'fs/promises'
 import { sep, dirname, extname, join, resolve, basename, relative } from 'path'
 import { grey, bold } from 'colors/safe'
+import { ObjectEncodingOptions, OpenMode } from 'node:fs'
+import { Abortable } from 'node:events'
 
 export type ProduciblePath = string | PathController
 export type Optional<T> = T | null
-export type FSOptions =
-  | {
-      encoding?: BufferEncoding
-      flag?: string | undefined
-      absolutePath?: boolean
-    }
+export type ReadDirStringOption =
+  | (ObjectEncodingOptions & {
+      withFileTypes?: false | undefined
+    })
   | BufferEncoding
+  | null
+export type ReadBufferOption =
+  | ({
+      encoding?: null | undefined
+      flag?: OpenMode | undefined
+    } & Abortable)
+  | null
+export type ReadStringOption =
+  | (ObjectEncodingOptions &
+      Abortable & {
+        flag?: OpenMode | undefined
+      })
+  | BufferEncoding
+  | null
 
 export class PathController {
   readonly path: string
@@ -57,8 +72,7 @@ export class PathController {
   }
 
   get absunixpath(): string {
-    if (sep === '/') return this.abspath
-    return this.abspath.replace(/\\/g, '/')
+    return PathController.make(this.abspath).unixpath
   }
 
   get logpath(): string {
@@ -88,23 +102,40 @@ export class PathController {
     return PathController.make(relative(this.path, PathController.make(p).path))
   }
 
-  read(options?: FSOptions): Buffer | string | Array<Buffer | string> {
-    if (this.isDirectory) {
-      const isAbs = options && options['absolutePath']
-      options && delete options['absolutePath']
-      const list = readdirSync(this.path, options)
-      return isAbs ? list.map((t) => resolve(this.abspath, t)) : list
-    } else if (this.isFile) return readFileSync(this.path, options)
-    else return null
+  async readdir(opt?: ReadDirStringOption, absolutePath?: boolean): Promise<string[]> {
+    if (!this.isDirectory) return null
+    const list = await readdir(this.path, opt)
+    return absolutePath ? list.map((v) => resolve(this.abspath, v)) : list
   }
 
-  write(data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions): this {
+  async read(opt?: ReadBufferOption): Promise<Buffer>
+  async read(opt?: ReadStringOption): Promise<string>
+  async read(opt?: unknown): Promise<Buffer | string> {
+    if (!this.isFile) return null
+    return await readFile(this.path, opt)
+  }
+
+  readSync(opt?: ReadBufferOption): Buffer
+  readSync(opt?: ReadStringOption): string
+  readSync(opt?: unknown): Buffer | string {
+    return readFileSync(this.path, opt)
+  }
+
+  async write(data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions): Promise<this> {
+    await writeFile(this.abspath, data, options)
+    return this
+  }
+  writeSync(data: string | NodeJS.ArrayBufferView, options?: WriteFileOptions): this {
     writeFileSync(this.abspath, data, options)
     return this
   }
 
-  writeJSON(data: object): this {
+  async writeJSON(data: object): Promise<this> {
     return this.write(JSON.stringify(data, null, 2), 'utf8')
+  }
+
+  writeJSONSync(data: object): this {
+    return this.writeSync(JSON.stringify(data, null, 2), 'utf8')
   }
 
   copy(_target: ProduciblePath): PathController {
@@ -163,6 +194,11 @@ export class PathController {
 
   unix(): PathController {
     return PathController.make(this.unixpath)
+  }
+
+  crop(path: ProduciblePath): PathController {
+    const newPath = this.unixpath.replace(PathController.make(path).unixpath + '/', '')
+    return PathController.make(newPath)
   }
 
   static unix(path: ProduciblePath): PathController {

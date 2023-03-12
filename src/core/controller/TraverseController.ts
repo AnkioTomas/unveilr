@@ -21,9 +21,8 @@ export class TraverseController {
     return this
   }
 
-  traverse(opt?: Pick<TraverseOptions, 'scope' | 'noScope'>): this {
-    traverseAST(this.fileBuilder, { ...this.visitors, ...opt })
-    return this
+  async traverse(opt?: Pick<TraverseOptions, 'scope' | 'noScope'>): Promise<void> {
+    return traverseAST(this.fileBuilder, { ...this.visitors, ...opt })
   }
 
   _mergeVisitors(...source: Visitor[]): Visitor {
