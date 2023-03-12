@@ -10,7 +10,7 @@ import {
   unlinkSync,
   rmdirSync,
 } from 'fs'
-import { sep, dirname, extname, join, resolve, basename } from 'path'
+import { sep, dirname, extname, join, resolve, basename, relative } from 'path'
 import { grey, bold } from 'colors/safe'
 
 export type ProduciblePath = string | PathController
@@ -82,6 +82,10 @@ export class PathController {
 
   get basenameWithout(): string {
     return basename(this.path, this.suffix)
+  }
+
+  relative(p: ProduciblePath): PathController {
+    return PathController.make(relative(this.path, PathController.make(p).path))
   }
 
   read(options?: FSOptions): Buffer | string | Array<Buffer | string> {

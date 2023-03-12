@@ -10,7 +10,7 @@ registerGlobalException()
 //   .decrypt()
 //   .save()
 new WxapkgExtractor({
-  path: 'files/watermark.wxapkg',
+  path: 'files/wx874eee9e6a120dff-租客/__APP__.wxapkg',
 }).extract()
 
 // const p1 = 'C:/Users/zzdev/Desktop/test001'

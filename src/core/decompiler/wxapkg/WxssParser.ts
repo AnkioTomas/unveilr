@@ -1,9 +1,8 @@
 import { BaseParser, ParserError } from './BaseParser'
-import { ProduciblePath } from '@core/controller'
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
-import { checkWxapkgType } from '@/core'
-import { traverseAST } from '@/utils'
-
+import { checkWxapkgType, TraverseController, ProduciblePath, PathController } from '@/core'
+import { parseJSONFromJSCode } from '@/utils'
+import { transformStyle } from '@core/utils/transformStyle'
 export class WxssParser extends BaseParser {
   constructor(path: ProduciblePath, private readonly pkgType?: WxapkgType) {
     super(path)
@@ -52,36 +51,86 @@ export class WxssParser extends BaseParser {
         throw new ParserError(`WxssParser not supported for type: ${this.pkgType}`)
     }
   }
+  private dumpResult(data: { [key: string]: unknown }): this {
+    Object.entries(data).forEach(([k, v]) => {
+      if (!Array.isArray(v)) return
+      const source = v
+        .map((el) => {
+          if (!Array.isArray(el)) return el
+          // [1] 是个分割符
+          if (el.length === 1 && el[0] === 1) return ''
+          switch (el[0]) {
+            case 0: // 属性值单位 rpx
+              return el[1] + 'rpx'
+            case 2: // 导入
+              return `@import "${PathController.make(k).relative(el[1]).unixpath}";\n`
+            default:
+              this.logger.warn(`Unprocessed data found: ${JSON.stringify(el)}`)
+              return ''
+          }
+        })
+        .join('')
+      this.parseResult.push({
+        source: transformStyle(source),
+        path: this.pathCtrl.join(k),
+      })
+    })
+    return this
+  }
   parse(_source?: Buffer): this {
     super.parse(_source)
-    traverseAST(
-      { filename: 'noop.js', code: this.source },
-      {
-        CallExpression(path) {
+    const traverse = new TraverseController({ code: this.source })
+    traverse
+      .addVisitors({
+        //  读取 setCssToHead 函数
+        CallExpression(this: TraverseController, path) {
           const callee = path.node.callee
           if (callee.type === 'Identifier' && callee.name === 'setCssToHead') {
-            // console.log()
-            path.getSource()
+            const args = path.get('arguments')
+            if (!args.length || (args.length === 1 && args[0].getSource() === '[]')) return
+            // 第二项是错误信息
+            if (args.length === 3) args.splice(1, 1)
+            const [sources, _path] = args.map((p) => {
+              const data = parseJSONFromJSCode(p.getSource())
+              return data.path ? data.path : data
+            })
+            this.changeItem<{ [key: string]: unknown }>(
+              'styleFragments',
+              (v) => {
+                v[_path] = sources
+                return v
+              },
+              {},
+            )
           }
         },
-        MemberExpression(path) {
+        // 读取 __COMMON_STYLESHEETS__
+        MemberExpression(this: TraverseController, path) {
           const node = path.node
           if (
             node.object.type === 'Identifier' &&
             node.property.type === 'StringLiteral' &&
             node.object.name === '__COMMON_STYLESHEETS__'
           ) {
-            // 对应节点
-            console.log(node.property.value)
-            // console.log(path.getOpposite().getSource())
+            const p = node.property.value
+            this.changeItem<{ [key: string]: unknown }>(
+              'commonStyles',
+              (v) => {
+                v[p] = parseJSONFromJSCode(path.getOpposite().getSource())
+                return v
+              },
+              {},
+            )
           }
         },
-      },
-    )
+      })
+      .traverse()
+    this.dumpResult(traverse.getItem('styleFragments'))
+    this.dumpResult(traverse.getItem('commonStyles'))
     return this
   }
 }
 
 if (require.main === module) {
-  new WxssParser('files/watermark').parse()
+  new WxssParser('files/wx874eee9e6a120dff-租客/__APP__').parse().save()
 }

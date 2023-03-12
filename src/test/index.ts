@@ -4,7 +4,9 @@
 import * as babel from '@babel/core'
 import { Visitor } from '@babel/traverse'
 import { buildAST } from '@utils/ast'
-import { AppConfigParser } from '@core/decompiler/wxapkg/AppConfigParser'
+// import { AppConfigParser } from '@core/decompiler/wxapkg/AppConfigParser'
+// import { PathController } from '@/core'
+
 // import { md5 } from '@/utils'
 export function traverse1() {
   const file = buildAST('files/wx874eee9e6a120dff-租客/__APP__/app-wxss.js')
@@ -32,4 +34,12 @@ export function traverse1() {
 
 // console.log(md5(Buffer.from('123456')))
 
-new AppConfigParser('files/_468736192_311/app-config.json').parse()
+// new AppConfigParser('files/_468736192_311/app-config.json').parse()
+// const p1 = './page/admin/index.wxss' // 主 被导入的
+// const p2 = './page/page-controller/index.wxss'
+
+// console.log(PathController.make(p2).relative(p1).unixpath)
+
+// 存入pop出来的名字 [index.wxss]
+// p2 往前退 ./page/page-controller/ 判断是不是用一个文件夹
+// p1, p2 求

@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@babel/core": "^7.21.0",
-    "cheerio": "^1.0.0-rc.12",
     "clear-console": "^1.1.0",
     "colors": "^1.4.0",
     "commander": "^10.0.0",
@@ -32,7 +31,9 @@
     "@types/babel__core": "^7.20.0",
     "@types/babel__traverse": "^7.18.3",
     "@types/crypto-js": "^4.1.1",
+    "@types/css-tree": "^2.3.1",
     "@types/node": "^18.14.4",
+    "@types/prettier": "^2.7.2",
     "@types/shelljs": "^0.8.11",
     "@typescript-eslint/eslint-plugin": "^5.54.0",
     "@typescript-eslint/parser": "^5.54.0",
