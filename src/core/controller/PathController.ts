@@ -169,7 +169,7 @@ export class PathController {
   }
 
   deepListDir(absolute?: boolean): Optional<string[]> {
-    if (!this.isDirectory) return null
+    if (!this.isDirectory) return []
     const list: string[] = []
 
     function listFile(dir) {

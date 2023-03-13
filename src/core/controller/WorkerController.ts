@@ -49,10 +49,11 @@ export class WorkerController<T extends ModuleMethods, R> {
   }
 
   async forEach(callback: EachCallback<T, R>): Promise<void> {
-    for (let i = 0; i < this.results.length; i++) {
-      const task = this.results[i]
-      callback(await task, i, this.results)
-    }
+    await Promise.all(
+      this.results.map((task, index) => {
+        return task.then((result) => callback(result, index, this.results))
+      }),
+    )
     this.results = []
   }
 }

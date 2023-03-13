@@ -53,7 +53,7 @@ export class BaseParser {
       let type
       if (typeof item.source === 'string') {
         await path.write(item.source)
-        type = 'Source'
+        type = `Source-${path.suffixWithout}`
       } else if (item.source instanceof Buffer) {
         await path.write(item.source)
         type = 'Binary'

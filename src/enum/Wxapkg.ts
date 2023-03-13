@@ -5,11 +5,12 @@ export enum WxapkgKeyFile {
   PAGE_FRAME_HTML = 'page-frame.html',
   APP_WXSS = 'app-wxss.js',
   APPSERVICE_APP = 'appservice.app.js',
+  COMMON_APP = 'common.app.js',
+  WEBVIEW_APP = 'webview.app.js',
   APP_JSON = 'app.json',
   APP = 'app.js',
   WORKERS = 'workers.js',
   PAGE_FRAME = 'page-frame.js',
-  WEBVIEW_APP = 'webview.app.js',
 
   GAME = 'game.js',
   GAME_JSON = 'game.json',
@@ -46,6 +47,5 @@ export enum WxapkgType {
   // 微信小游戏分包
   GAME_SUBPACKAGE = 'GAME_SUBPACKAGE',
   // 插件
-  PLUGIN = 'PLUGIN'
+  PLUGIN = 'PLUGIN',
 }
-

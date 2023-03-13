@@ -59,6 +59,22 @@ export class WxssParser extends BaseParser {
       default:
         throw new ParserError(`WxssParser not supported for type: ${this.pkgType}`)
     }
+    // 解析 html 文件中 setCssToHead 函数附带的样式表
+    const htmlSources: string[] = []
+    await Promise.all(
+      this.pathCtrl
+        .deepListDir()
+        .map((p) => {
+          const ctrl = PathController.make(p)
+          if (ctrl.suffixWithout.toUpperCase() !== 'html') return
+          return ctrl.read('utf8').then((s) => {
+            if (!s) return
+            htmlSources.push(matchScripts(s))
+          })
+        })
+        .filter(Boolean),
+    )
+    this.source = htmlSources.join(';\n') + this.source
   }
 
   private makeTasks(data: ValueOf<DataType>): Tasks {
