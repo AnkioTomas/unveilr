@@ -1,5 +1,5 @@
-import { isProduciblePath, PathController, ProduciblePath } from '@core/controller'
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
+import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 
 export function checkWxapkg<T extends Error>(path: ProduciblePath, throws?: string | T): boolean
 export function checkWxapkg<T extends Error>(buff: Buffer, throws?: string | T): boolean

@@ -43,3 +43,25 @@
 // 存入pop出来的名字 [index.wxss]
 // p2 往前退 ./page/page-controller/ 判断是不是用一个文件夹
 // p1, p2 求
+import { traverseAppServiceWorker } from '@core/workers/traverseAppService'
+
+const wCtrl = traverseAppServiceWorker(12)
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl.addTask((r) => r.traverseAppService('files/_468736192_311/app-service.js'))
+wCtrl
+  .start((r) => {
+    console.log(r)
+  }, true)
+  .then()
+
+// tCtrl.traverse().catch(console.error)

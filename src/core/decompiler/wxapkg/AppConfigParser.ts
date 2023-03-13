@@ -1,7 +1,7 @@
-import { PathController, ProduciblePath } from '@/core'
 import { ParserError, BaseParser } from './BaseParser'
 import { md5, traverseAST } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
+import { PathController, ProduciblePath } from '@core/controller/PathController'
 
 export class AppConfigParser extends BaseParser {
   private savePath: PathController

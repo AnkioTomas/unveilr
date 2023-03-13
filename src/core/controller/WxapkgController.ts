@@ -1,10 +1,10 @@
-import { PathController, ProduciblePath } from '@core/controller'
 // import { PackageSuffix, WxapkgType } from '@/enum'
 import { Logger } from 'winston'
 // import { WxapkgExtractor, WxapkgExtractorOptions } from '@core/extractor'
 // import { checkWxapkgType } from '@core/utils/checkWxapkg'
 // import { blue, bold } from 'colors/safe'
 import { getLogger } from '@utils/logger'
+import { PathController, ProduciblePath } from '@core/controller/PathController'
 
 export interface WxapkgControllerOptions {
   path: ProduciblePath

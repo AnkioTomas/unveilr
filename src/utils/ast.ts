@@ -1,8 +1,7 @@
 import * as babel from '@babel/core'
-import type { BabelFileResult } from '@babel/core'
-import { isProduciblePath, PathController, ProduciblePath } from '@core/controller'
-import { traverse, Visitor } from '@babel/core'
+import { traverse, Visitor, BabelFileResult } from '@babel/core'
 import { TraverseOptions } from '@babel/traverse'
+import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 
 export async function buildAST(path: ProduciblePath): Promise<BabelFileResult>
 export async function buildAST(code: string, filename: string): Promise<BabelFileResult>
@@ -25,15 +24,11 @@ export async function traverseAST(builder: BuildParams, opt?: TraverseOptions): 
 export async function traverseAST(file: BabelFileResult, opt?: TraverseOptions): Promise<void>
 export async function traverseAST(v: unknown, opt: TraverseOptions): Promise<void> {
   if (isProduciblePath(v)) {
-    console.time('buildAST')
     const file = await buildAST(v)
-    console.timeEnd('buildAST')
     return traverse(file.ast, opt)
   }
   if (typeof v === 'object' && v['code'] && (v['filename'] = v['filename'] || '.')) {
-    console.time('buildAST')
     const file = await buildAST(v['code'], v['filename'])
-    console.timeEnd('buildAST')
     return traverse(file.ast, opt)
   }
   return traverse((v as BabelFileResult).ast, opt)

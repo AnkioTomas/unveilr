@@ -1,8 +1,8 @@
 import { BaseExtractor, ExtractorError } from './BaseExtractor'
-import { isProduciblePath, ProduciblePath } from '@core/controller'
 import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
 import { checkWxapkg } from '@core/utils/checkWxapkg'
 import { PackageSuffix } from '@/enum'
+import { isProduciblePath, ProduciblePath } from '@core/controller/PathController'
 
 export interface WxapkgFileHeader {
   infoLength: number

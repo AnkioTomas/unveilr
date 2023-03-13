@@ -1,23 +1,27 @@
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
-import { parseJSONFromJSCode } from '@/utils'
-import {
-  checkWxapkgType,
-  matchScripts,
-  TraverseController,
-  ProduciblePath,
-  PathController,
-  WorkerController,
-} from '@/core'
-import { BaseParser, ParsedInfo, ParserError } from './BaseParser'
+import { BaseParser, ParserError } from './BaseParser'
+import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { checkWxapkgType } from '@core/utils/checkWxapkg'
+import { matchScripts } from '@core/utils/matchScripts'
+import { traverseWxss } from '@core/workers/traverseWxss'
+import { transformStyleWorker } from '@core/workers/transformStyle'
+
+type PromiseInnerType<T extends Promise<unknown>> = T extends Promise<infer P> ? P : never
+type ValueOf<T extends object> = T[keyof T]
+type DataType = PromiseInnerType<ReturnType<typeof traverseWxss>>['data']
+type Tasks = Parameters<ReturnType<typeof transformStyleWorker>['addTask']>
+
 export class WxssParser extends BaseParser {
   private isLoaded: boolean
   private pkgType: WxapkgType
+
   constructor(path: ProduciblePath, pkgType?: WxapkgType) {
     super(path)
     if (!this.pathCtrl.isDirectory) throw new ParserError(`Path ${this.pathCtrl.logpath} is not a directory!`)
     this.pkgType = pkgType
     this.isLoaded = false
   }
+
   private async init() {
     if (!this.pkgType) this.pkgType = await checkWxapkgType(this.pathCtrl)
     await this.readSource()
@@ -57,9 +61,8 @@ export class WxssParser extends BaseParser {
     }
   }
 
-  private async dumpResult(data: { [key: string]: unknown }): Promise<void> {
-    const wCtrl = new WorkerController<ParsedInfo>('../workers/transformStyle')
-    Object.entries(data).forEach(([k, v]) => {
+  private makeTasks(data: ValueOf<DataType>): Tasks {
+    return Object.entries(data).map(([k, v]) => {
       if (!Array.isArray(v)) return
       const source = v
         .map((el) => {
@@ -77,62 +80,20 @@ export class WxssParser extends BaseParser {
           }
         })
         .join('')
-      wCtrl.addTask((thread) => thread['transformStyle'](source, k))
+      return (task) => task.transformStyle(source, k)
     })
-    await wCtrl.start((result) => this.parseResult.push(result), true)
   }
+
   async parse(_source?: Buffer): Promise<void> {
     if (!this.isLoaded) await this.init()
     super.parse(_source)
-    const traverse = new TraverseController({ code: this.source })
-    console.time('traverse')
-    await traverse
-      .addVisitors({
-        //  读取 setCssToHead 函数
-        CallExpression(this: TraverseController, path) {
-          const callee = path.node.callee
-          if (callee.type === 'Identifier' && callee.name === 'setCssToHead') {
-            const args = path.get('arguments')
-            if (!args.length || (args.length === 1 && args[0].getSource() === '[]')) return
-            // 第二项是错误信息
-            if (args.length === 3) args.splice(1, 1)
-            const [sources, _path] = args.map((p) => {
-              const data = parseJSONFromJSCode(p.getSource())
-              return data.path ? data.path : data
-            })
-            this.changeItem<{ [key: string]: unknown }>(
-              'styleFragments',
-              (v) => {
-                v[_path] = sources
-                return v
-              },
-              {},
-            )
-          }
-        },
-        // 读取 __COMMON_STYLESHEETS__
-        MemberExpression(this: TraverseController, path) {
-          const node = path.node
-          if (
-            node.object.type === 'Identifier' &&
-            node.property.type === 'StringLiteral' &&
-            node.object.name === '__COMMON_STYLESHEETS__'
-          ) {
-            const p = node.property.value
-            this.changeItem<{ [key: string]: unknown }>(
-              'commonStyles',
-              (v) => {
-                v[p] = parseJSONFromJSCode(path.getOpposite().getSource())
-                return v
-              },
-              {},
-            )
-          }
-        },
-      })
-      .traverse()
-    console.timeEnd('traverse')
-    await this.dumpResult(traverse.getItem('styleFragments'))
-    await this.dumpResult(traverse.getItem('commonStyles'))
+    // 单个任务不需要使用Worker
+    const {
+      data: { styleFragments, commonStyles },
+    } = await traverseWxss({ code: this.source })
+    const tCtrl = transformStyleWorker()
+    tCtrl.addTask(...this.makeTasks(styleFragments), ...this.makeTasks(commonStyles))
+    await tCtrl.start((r) => this.parseResult.push(r as Required<typeof r>))
+    await tCtrl.terminate()
   }
 }

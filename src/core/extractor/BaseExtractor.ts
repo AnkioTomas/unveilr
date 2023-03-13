@@ -1,6 +1,6 @@
-import { ProduciblePath, PathController } from '@core/controller'
 import { getLogger } from '@/utils'
 import { Logger } from 'winston'
+import { PathController, ProduciblePath } from '@core/controller/PathController'
 
 export class ExtractorError extends Error {
   constructor(msg) {

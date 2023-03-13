@@ -1,29 +1,37 @@
-import { Pool, spawn, Thread, Worker } from 'threads'
+import { ModuleThread, Pool, spawn, Thread, Worker } from 'threads'
 import { QueuedTask, TaskRunFunction } from 'threads/dist/master/pool-types'
 import { cpus } from 'os'
+import { ModuleMethods } from 'threads/dist/types/master'
+import { PathController } from '@core/controller/PathController'
 
-export type EachCallback<R> = (result?: R, index?: number, results?: Array<QueuedTask<Thread, R>>) => void
-export class WorkerController<ReturnType> {
-  results: Array<QueuedTask<Thread, ReturnType>>
-  private tasks: Array<TaskRunFunction<Thread, ReturnType>>
-  readonly workerPath: string
-  readonly poolSize: number
+export type EachCallback<T extends ModuleMethods, R> = (
+  result?: R,
+  index?: number,
+  results?: Array<QueuedTask<ModuleThread<T>, R>>,
+) => void
+export class WorkerController<T extends ModuleMethods, R> {
+  results: Array<QueuedTask<ModuleThread<T>, R>>
+  private tasks: Array<TaskRunFunction<ModuleThread<T>, R>>
+  private readonly workerPath: string
+  private readonly poolSize: number
   private pool: Pool<Thread>
-  constructor(workerPath: string, poolSize?: number) {
+  constructor(workerPath: string | NodeModule, poolSize?: number) {
     this.tasks = []
     this.results = []
-    this.workerPath = workerPath
+    const _relative = (p: string) => PathController.make(__dirname).relative(p).unixpath
+    this.workerPath = typeof workerPath === 'string' ? workerPath : _relative(workerPath.id)
     this.poolSize = poolSize || cpus().length
   }
 
-  async start(callback: EachCallback<ReturnType>, terminate?: boolean): Promise<void>
+  async start(callback: EachCallback<T, R>, terminate?: boolean): Promise<void>
   async start(terminate?: boolean): Promise<void>
-  async start(v?: EachCallback<ReturnType> | boolean, _terminate?: boolean): Promise<void> {
+  async start(v?: EachCallback<T, R> | boolean, _terminate?: boolean): Promise<void> {
     let callback,
       terminate = _terminate
     if (typeof v === 'function') {
       callback = v
     } else terminate = Boolean(v)
+    if (!this.tasks.length) return
     this.pool = Pool(() => spawn(new Worker(this.workerPath)), this.poolSize)
     this.results = this.tasks.map((task) => this.pool.queue(task))
     await this.pool.completed()
@@ -31,7 +39,7 @@ export class WorkerController<ReturnType> {
     callback && (await this.forEach(callback))
     terminate && (await this.terminate())
   }
-  addTask(...runners: TaskRunFunction<Thread, ReturnType>[]) {
+  addTask(...runners: TaskRunFunction<ModuleThread<T>, R>[]) {
     runners.forEach((runner) => this.tasks.push(runner))
   }
 
@@ -40,7 +48,7 @@ export class WorkerController<ReturnType> {
     delete this.pool
   }
 
-  async forEach(callback: EachCallback<ReturnType>): Promise<void> {
+  async forEach(callback: EachCallback<T, R>): Promise<void> {
     for (let i = 0; i < this.results.length; i++) {
       const task = this.results[i]
       callback(await task, i, this.results)

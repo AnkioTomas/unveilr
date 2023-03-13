@@ -1,6 +1,6 @@
-import { isProduciblePath, PathController, ProduciblePath } from '@core/controller'
 import { getLogger } from '@/utils'
 import { Logger } from 'winston'
+import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 
 export class ParserError extends Error {
   constructor(message: string) {
