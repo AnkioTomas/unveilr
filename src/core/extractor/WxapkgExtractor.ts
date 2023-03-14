@@ -25,7 +25,7 @@ export type WxapkgExtractorOptions =
 export class WxapkgExtractor extends BaseExtractor {
   readonly wxAppId: string
   readonly parentDir: ProduciblePath
-  savePath: string
+  constructor(path: ProduciblePath)
   constructor(options: WxapkgExtractorOptions) {
     if (isProduciblePath(options)) {
       super(options)
@@ -70,17 +70,6 @@ export class WxapkgExtractor extends BaseExtractor {
         }
       })
   }
-
-  async saveFiles(files: WxapkgFileInfo[], buf: Buffer) {
-    this.logger.debug(`Starting save files`)
-    for (const file of files) {
-      const targetDir = this.pathCtrl.whitout()
-      const target = targetDir.join(file.name)
-      target.mkdir()
-      await target.write(buf.subarray(file.start, file.end))
-      this.logger.debug(`Created ${target.logpath}`)
-    }
-  }
   async _extract(buf: Buffer): Promise<string> {
     const isEncrypted = buf.subarray(0, 6).toString('hex') === '56314d4d5758'
     if (isEncrypted) {
@@ -93,9 +82,15 @@ export class WxapkgExtractor extends BaseExtractor {
     this.logger.debug(`Header info length ${infoLength}`)
     this.logger.debug(`Header data length ${dataLength}`)
     const files = this.getFileByRaw(buf.subarray(14, infoLength + 14))
-    await this.saveFiles(files, buf)
-    this.savePath = this.pathCtrl.whitout().abspath
-    this.logger.debug(`Extracted save to ${this.savePath}`)
+    this.logger.debug(`Starting save extracted files`)
+    files.forEach((file) => {
+      const { name, start, end } = file
+      const path = name.startsWith('/') ? name.slice(1) : name
+      const buffer = buf.subarray(start, end)
+      this.saver.add({ path, buffer })
+    })
+    if (this.parentDir) this.saver.saveDirectory = this.parentDir
+    await this.saver.save(true)
   }
 
   async extract(): Promise<void> {

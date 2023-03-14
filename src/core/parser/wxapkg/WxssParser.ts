@@ -1,5 +1,5 @@
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
-import { BaseParser, ParserError } from './BaseParser'
+import { BaseParser, ParserError } from '../BaseParser'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
 import { checkWxapkgType } from '@core/utils/checkWxapkg'
 import { matchScripts } from '@core/utils/matchScripts'
@@ -14,7 +14,7 @@ type Tasks = Parameters<ReturnType<typeof transformStyleWorker>['addTask']>
 export class WxssParser extends BaseParser {
   private isLoaded: boolean
   private pkgType: WxapkgType
-
+  private source: string
   constructor(path: ProduciblePath, pkgType?: WxapkgType) {
     super(path)
     if (!this.pathCtrl.isDirectory) throw new ParserError(`Path ${this.pathCtrl.logpath} is not a directory!`)
@@ -100,16 +100,15 @@ export class WxssParser extends BaseParser {
     })
   }
 
-  async parse(_source?: Buffer): Promise<void> {
+  async parse(): Promise<void> {
     if (!this.isLoaded) await this.init()
-    super.parse(_source)
     // 单个任务不需要使用Worker
     const {
       data: { styleFragments, commonStyles },
     } = await traverseWxss({ code: this.source })
     const tCtrl = transformStyleWorker()
     tCtrl.addTask(...this.makeTasks(styleFragments), ...this.makeTasks(commonStyles))
-    await tCtrl.start((r) => this.parseResult.push(r as Required<typeof r>))
+    await tCtrl.start((r) => this.saver.add(r as Required<typeof r>))
     await tCtrl.terminate()
   }
 }

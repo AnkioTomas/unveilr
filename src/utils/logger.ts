@@ -1,10 +1,17 @@
 import { bold, grey, yellow } from 'colors/safe'
 import { createLogger, format, Logger, transports } from 'winston'
 const { combine, timestamp, printf, colorize } = format
-
+const defaultOptions = {
+  level: 'debug',
+  name: 'Main',
+}
+export function setLoggerOptions(level?: string, name?: string) {
+  defaultOptions.name = name
+  defaultOptions.level = level
+}
 export function getLogger(name?: string, level?: string): Logger {
   return createLogger({
-    level: level || 'debug',
+    level: level || defaultOptions.level,
     levels: {
       error: 0,
       warn: 1,
@@ -25,10 +32,14 @@ export function getLogger(name?: string, level?: string): Logger {
       }),
       colorize({ all: true }),
     ),
-    defaultMeta: { scope: name || 'Main' },
+    defaultMeta: { scope: name || defaultOptions.name },
     transports: [new transports.Console({ stderrLevels: ['error'] })],
   })
 }
-
-const logger = getLogger()
-export default logger
+export const logger = getLogger()
+export class BaseLogger {
+  readonly logger: Logger
+  constructor(name?: string) {
+    this.logger = getLogger(name || this.constructor.name)
+  }
+}

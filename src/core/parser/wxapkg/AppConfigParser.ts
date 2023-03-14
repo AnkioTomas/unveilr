@@ -1,10 +1,9 @@
-import { ParserError, BaseParser } from './BaseParser'
+import { ParserError, BaseParser } from '../BaseParser'
 import { md5, traverseAST } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
 
 export class AppConfigParser extends BaseParser {
-  private savePath: PathController
   /**
    * @param{PathController} path 需要传入 app-config.json 的路径构造器
    * */
@@ -12,12 +11,10 @@ export class AppConfigParser extends BaseParser {
     super(path)
   }
   async parse(): Promise<void> {
-    super.parse()
     try {
-      const dirCtrl = PathController.make(this.pathCtrl.dirname)
-      this.savePath = dirCtrl
+      const dirCtrl = PathController.dir(this.pathCtrl)
       const config = {
-        ...JSON.parse(this.source),
+        ...JSON.parse(await this.pathCtrl.read('utf8')),
         pop<T>(key, _default?: T): T {
           const result = config[key]
           delete config[key]
@@ -136,9 +133,9 @@ export class AppConfigParser extends BaseParser {
       })
 
       const appJSONCtrl = this.pathCtrl.join('..', WxapkgKeyFile.APP_JSON)
-      this.parseResult.push({
+      this.saver.add({
         path: appJSONCtrl,
-        source: Object.assign(config, {
+        buffer: Object.assign(config, {
           tabBar,
           subPackages,
           ...global,
@@ -147,19 +144,13 @@ export class AppConfigParser extends BaseParser {
       Object.keys(page).forEach((key) => {
         let pCtrl = PathController.make(key)
         if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
-        this.parseResult.push({
+        this.saver.add({
           path: pCtrl,
-          source: page[key],
+          buffer: page[key],
         })
       })
     } catch (e) {
       throw new ParserError('Parse failed! ' + e.message)
     }
-  }
-
-  async save(v?: boolean | ProduciblePath, isClean?: boolean): Promise<void> {
-    if (typeof v === 'boolean') return super.save(v)
-    v = v || this.savePath
-    return super.save(v, isClean)
   }
 }

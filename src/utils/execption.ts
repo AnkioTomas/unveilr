@@ -1,11 +1,30 @@
-import { Logger } from 'winston'
-import { getLogger } from '@/utils'
+import { BaseLogger } from '@/utils'
 
-export function registerGlobalException(logger?: Logger) {
-  logger = logger || getLogger()
-  const ignores = 'exit,cancel,pass'.split(',')
-  const handler = (e: Error | string) => (ignores.includes(String(e)) ? '' : logger.error(e))
-  process.on('uncaughtException', handler)
-  process.on('unhandledRejection', handler)
-  logger.debug('Global exception interception is enabled')
+class GlobalExceptionCaught extends BaseLogger {
+  constructor() {
+    super()
+    const ignores = 'exit,cancel,pass'.split(',')
+    const handler = (e: Error | string) => (ignores.includes(String(e)) ? '' : this.logger.error(e))
+    process.on('uncaughtException', handler)
+    process.on('unhandledRejection', handler)
+    this.logger.debug('Global exception interception is enabled')
+  }
+}
+
+export function registerGlobalException() {
+  return new GlobalExceptionCaught()
+}
+
+export class BaseError extends Error {
+  constructor(msg: string) {
+    super(msg)
+    this.name = this.constructor.name
+    Error.captureStackTrace && Error.captureStackTrace(this, this.constructor)
+  }
+  static make(msg: string) {
+    return new this(msg)
+  }
+  static throw(msg: string) {
+    throw new this(msg)
+  }
 }

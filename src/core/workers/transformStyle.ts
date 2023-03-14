@@ -5,7 +5,7 @@ import { WorkerController } from '@core/controller/WorkerController'
 
 export type TransformStyleExposed = { transformStyle: typeof transformStyle }
 export type TransformStyleResult = {
-  source: string
+  buffer: string
   path?: string
 }
 const transformStyleModule = module
@@ -106,7 +106,7 @@ export function transformStyle(style: string, path?: string): TransformStyleResu
     }
   })
   return {
-    source: format(generate(ast), { parser: 'css' }),
+    buffer: format(generate(ast), { parser: 'css' }),
     path,
   }
 }

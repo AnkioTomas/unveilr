@@ -1,21 +1,16 @@
-import { getLogger } from '@/utils'
-import { Logger } from 'winston'
+import { BaseError, BaseLogger } from '@/utils'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { Saver } from '@core/utils/Saveable'
 
-export class DecryptorError extends Error {
-  constructor(msg) {
-    super(msg)
-    this.name = 'DecryptorError'
-  }
-}
-
-export class BaseDecryptor {
+export class DecryptorError extends BaseError {}
+export class BaseDecryptor extends BaseLogger {
   readonly pathCtrl: PathController
-  readonly logger: Logger
   protected suffix: string
+  readonly saver: Saver
   constructor(path: ProduciblePath) {
+    super()
     this.pathCtrl = PathController.make(path)
-    this.logger = getLogger('Decryptor')
+    this.saver = new Saver(this.pathCtrl.dirname)
   }
 
   get decipherable() {
@@ -24,7 +19,7 @@ export class BaseDecryptor {
 
   decrypt(): void {
     if (!this.decipherable) {
-      throw new DecryptorError(`File ${this.pathCtrl.logpath} cannot be decrypted!`)
+      throw DecryptorError.make(`File ${this.pathCtrl.logpath} cannot be decrypted!`)
     }
   }
 }

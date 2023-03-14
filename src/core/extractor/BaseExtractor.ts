@@ -1,21 +1,16 @@
-import { getLogger } from '@/utils'
-import { Logger } from 'winston'
+import { BaseError, BaseLogger } from '@/utils'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { Saver } from '@core/utils/Saveable'
 
-export class ExtractorError extends Error {
-  constructor(msg) {
-    super(msg)
-    this.name = 'ExtractorError'
-  }
-}
-
-export class BaseExtractor {
+export class ExtractorError extends BaseError {}
+export class BaseExtractor extends BaseLogger {
   readonly pathCtrl: PathController
-  readonly logger: Logger
   protected suffix: string
+  protected saver: Saver
   constructor(path: ProduciblePath) {
+    super()
     this.pathCtrl = PathController.make(path)
-    this.logger = getLogger('Extractor')
+    this.saver = new Saver(this.pathCtrl.whitout())
   }
 
   get extractable() {
@@ -24,7 +19,7 @@ export class BaseExtractor {
 
   extract(): void {
     if (!this.extractable) {
-      throw new ExtractorError(`File ${this.pathCtrl.logpath} cannot be extracted!`)
+      ExtractorError.throw(`File ${this.pathCtrl.logpath} cannot be extracted!`)
     }
   }
 }

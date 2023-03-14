@@ -11,7 +11,7 @@ import {
   rmdirSync,
 } from 'fs'
 import { readdir, readFile, writeFile } from 'fs/promises'
-import { sep, dirname, extname, join, resolve, basename, relative } from 'path'
+import { sep, dirname, extname, join, resolve, basename, relative, isAbsolute } from 'path'
 import { grey, bold } from 'colors/safe'
 import { ObjectEncodingOptions, OpenMode } from 'node:fs'
 import { Abortable } from 'node:events'
@@ -96,6 +96,10 @@ export class PathController {
 
   get basenameWithout(): string {
     return basename(this.path, this.suffix)
+  }
+
+  get isAbs() {
+    return isAbsolute(this.path)
   }
 
   relative(p: ProduciblePath): PathController {
@@ -201,6 +205,10 @@ export class PathController {
     return PathController.make(newPath)
   }
 
+  toString(): string {
+    return this.logpath
+  }
+
   static unix(path: ProduciblePath): PathController {
     return PathController.make(path).unix()
   }
@@ -212,6 +220,10 @@ export class PathController {
   static make(path?: ProduciblePath): PathController {
     path = path || ''
     return path instanceof PathController ? path : new PathController(path)
+  }
+
+  static dir(path: ProduciblePath): PathController {
+    return PathController.make(PathController.make(path).dirname)
   }
 }
 

@@ -46,5 +46,5 @@ export function parseJSONFromJSCode(code: string) {
       throw Error(`This code snippet is not safe: ${path.getSource().bgRed.bold}`)
     },
   })
-  return eval(code)
+  return JSON.parse(Function('sandbox', `return JSON.stringify(${code})`)({ JSON }))
 }

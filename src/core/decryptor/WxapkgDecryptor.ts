@@ -86,12 +86,13 @@ export class WxapkgDecryptor extends BaseDecryptor {
     }
   }
 
-  async save(target?: ProduciblePath): Promise<void> {
-    target = target ? PathController.make(target) : this.target
-    if (!target) throw new DecryptorError('If you want to save please provide target!')
-    if (!this.result) throw new DecryptorError('There is no decryption result yet!')
-    await target.write(this.result)
-    this.logger.debug(`Decryption save to ${target.logpath}`)
+  async save(target?: ProduciblePath): Promise<number> {
+    return this.saver
+      .add({
+        path: target || this.target,
+        buffer: this.result,
+      })
+      .save(true)
   }
 
   static async decryptResult(options: WxapkgDecryptorOptions): Promise<Buffer>
