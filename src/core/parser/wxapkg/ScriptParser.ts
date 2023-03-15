@@ -35,11 +35,9 @@ export class ScriptParser extends BaseParser {
   async parse(): Promise<void> {
     this.getScripts()
     const wCtrl = traverseScriptWorker()
-    this.scripts.forEach((p) => {
-      wCtrl.addTask((r) => r.traverseScript(p))
+    this.scripts.forEach((p) => wCtrl.addTask((r) => r.traverseScript(p)))
+    await wCtrl.start(({ data }) => {
+      Object.entries(data.scripts).forEach(([path, buffer]) => this.saver.add({ path, buffer }))
     })
-    // await wCtrl.forEach((r) => this.saver.add(r.data))
-    await wCtrl.start(true)
   }
 }
-new ScriptParser('files/wxa8da525af05281f3-boos直聘/__APP__').parse()

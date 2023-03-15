@@ -1,23 +1,30 @@
 import { bold, grey, yellow } from 'colors/safe'
 import { createLogger, format, Logger, transports } from 'winston'
 const { combine, timestamp, printf, colorize } = format
-const defaultOptions = {
+const levels = {
+  error: 0,
+  warn: 1,
+  info: 2,
+  debug: 3,
+}
+export type LoggerLevel = keyof typeof levels
+export interface LoggerConfig {
+  level: LoggerLevel
+  name: string
+}
+
+const config: LoggerConfig = {
   level: 'debug',
   name: 'Main',
 }
-export function setLoggerOptions(level?: string, name?: string) {
-  defaultOptions.name = name
-  defaultOptions.level = level
+export function setLoggerConfig(_config: Partial<LoggerConfig>) {
+  Object.assign(config, _config)
 }
+
 export function getLogger(name?: string, level?: string): Logger {
   return createLogger({
-    level: level || defaultOptions.level,
-    levels: {
-      error: 0,
-      warn: 1,
-      info: 2,
-      debug: 3,
-    },
+    level: level || config.level,
+    levels,
     format: combine(
       timestamp({ format: 'HH:mm:ss' }),
       printf((info) => {
@@ -32,7 +39,7 @@ export function getLogger(name?: string, level?: string): Logger {
       }),
       colorize({ all: true }),
     ),
-    defaultMeta: { scope: name || defaultOptions.name },
+    defaultMeta: { scope: name || config.name },
     transports: [new transports.Console({ stderrLevels: ['error'] })],
   })
 }

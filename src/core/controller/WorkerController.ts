@@ -3,12 +3,14 @@ import { QueuedTask, TaskRunFunction } from 'threads/dist/master/pool-types'
 import { cpus } from 'os'
 import { ModuleMethods } from 'threads/dist/types/master'
 import { PathController } from '@core/controller/PathController'
+import { BaseError } from '@/utils'
 
 export type EachCallback<T extends ModuleMethods, R> = (
   result?: R,
   index?: number,
   results?: Array<QueuedTask<ModuleThread<T>, R>>,
 ) => void
+export class WorkerError extends BaseError {}
 export class WorkerController<T extends ModuleMethods, R> {
   results: Array<QueuedTask<ModuleThread<T>, R>>
   private tasks: Array<TaskRunFunction<ModuleThread<T>, R>>
@@ -44,6 +46,7 @@ export class WorkerController<T extends ModuleMethods, R> {
   }
 
   async terminate() {
+    if (!this.pool) WorkerError.throw('The worker pool has not started yet, please start it first')
     await this.pool.terminate()
     delete this.pool
   }

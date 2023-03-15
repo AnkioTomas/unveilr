@@ -1,4 +1,4 @@
-import { registerGlobalException, clearConsole, setLoggerOptions } from '@/utils'
+import { registerGlobalException, clearConsole, setLoggerConfig } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
 import { PathController } from '@core/controller/PathController'
 import { WxapkgExtractor } from '@core/extractor/WxapkgExtractor'
@@ -7,7 +7,7 @@ import { WxssParser } from '@core/parser/wxapkg/WxssParser'
 
 async function main(p: string) {
   clearConsole()
-  setLoggerOptions('info')
+  setLoggerConfig({ level: 'debug' })
   registerGlobalException()
   const path = PathController.make(p)
   await new WxapkgExtractor(path).extract()

@@ -1,7 +1,7 @@
 import { parse, generate, walk, CssNode, Raw, TypeSelector, List, ListItem, Declaration, Value } from 'css-tree'
-import { format } from 'prettier'
 import { expose, isWorkerRuntime } from 'threads/worker'
 import { WorkerController } from '@core/controller/WorkerController'
+import { reformat } from '@utils/reformat'
 
 export type TransformStyleExposed = { transformStyle: typeof transformStyle }
 export type TransformStyleResult = {
@@ -106,7 +106,7 @@ export function transformStyle(style: string, path?: string): TransformStyleResu
     }
   })
   return {
-    buffer: format(generate(ast), { parser: 'css' }),
+    buffer: reformat(generate(ast), { parser: 'css' }),
     path,
   }
 }

@@ -7,7 +7,7 @@ export class Saver extends BaseLogger {
   private baseDir: PathController
   private saveList: SaverItem[]
   private saveCount: number
-  static DoNotWriteToDisk = true
+  static DoNotWriteToDisk = false
   static _alerted = false
   constructor(baseDir?: ProduciblePath) {
     super()
