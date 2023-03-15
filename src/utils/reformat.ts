@@ -1,25 +1,13 @@
 import { BuiltInParserName, format, Options } from 'prettier'
 
 export type ReformatConfig = Record<BuiltInParserName, boolean>
-const config: ReformatConfig = {
-  'babel-flow': false,
-  'babel-ts': false,
-  'json-stringify': false,
-  angular: false,
+const config: Partial<ReformatConfig> = {
   babel: false,
   css: false,
-  espree: false,
-  flow: false,
-  glimmer: false,
-  graphql: false,
   html: false,
   json: false,
   json5: false,
-  less: false,
-  lwc: false,
   markdown: false,
-  mdx: false,
-  meriyah: false,
   scss: false,
   typescript: false,
   vue: false,
