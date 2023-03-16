@@ -4,6 +4,7 @@ import { PathController } from '@core/controller/PathController'
 import { WxapkgExtractor } from '@core/extractor/WxapkgExtractor'
 import { AppConfigParser } from '@core/parser/wxapkg/AppConfigParser'
 import { WxssParser } from '@core/parser/wxapkg/WxssParser'
+import { ScriptParser } from '@core/parser/wxapkg/ScriptParser'
 
 async function main(p: string) {
   clearConsole()
@@ -17,5 +18,7 @@ async function main(p: string) {
   appConfParser.parse().then(() => appConfParser.save())
   const cssParser = new WxssParser(packagePath)
   cssParser.parse().then(() => cssParser.save())
+  const scriptParser = new ScriptParser(packagePath)
+  scriptParser.parse().then(() => scriptParser.save())
 }
-main('files/wx874eee9e6a120dff-租客/__APP__.wxapkg').then()
+main('files/wxa8da525af05281f3-boos直聘/__APP__.wxapkg').then()

@@ -1,12 +1,37 @@
-import { BaseParser } from '../BaseParser'
+import { BaseParser, ParserError } from '../BaseParser'
 import { ProduciblePath } from '@core/controller/PathController'
 import { traverseWxml } from '@core/workers/traverseWxml'
+import { traverseAST } from '@/utils'
 
 export class WxmlParser extends BaseParser {
   constructor(path: ProduciblePath) {
     super(path)
   }
+  static compiler: string
+  static async getCompiler(path: ProduciblePath): Promise<string> {
+    if (this.compiler) return this.compiler
+    let source = ''
+    try {
+      await traverseAST(path, {
+        CallExpression(path) {
+          const args = path.get('arguments')
+          if (args.length !== 3 || args[1].getSource() !== '"__g"') return
+          const obj = args[2]
+          if (!obj.isObjectExpression()) return
 
+          const o = obj.get('properties.3.value')
+          source = (Array.isArray(o) ? o : [o])[0].getSource()
+          throw 'exit'
+        },
+      })
+    } catch (e) {
+      if (e !== 'exit') {
+        ParserError.throw(e)
+      }
+    }
+    this.compiler = source
+    return source
+  }
   async parse(): Promise<void> {
     const code = `function gz$gwx_XC_3_1(){
 if( __WXML_GLOBAL__.ops_cached.$gwx_XC_3_1)return __WXML_GLOBAL__.ops_cached.$gwx_XC_3_1
@@ -86,5 +111,9 @@ Z([3,' 说明：如您家人或朋友存在被代办情况，您可查询并为�
 }
 
 if (require.main === module) {
-  new WxmlParser('files/_468736192_311/app-wxss.js').parse()
+  const path = 'files/_468736192_311/common.app.js'
+  WxmlParser.getCompiler(path).then((source) => {
+    console.log(source)
+  })
+  // new WxmlParser('files/_468736192_311/app-wxss.js').parse()
 }
