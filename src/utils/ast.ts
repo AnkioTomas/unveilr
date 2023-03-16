@@ -35,7 +35,7 @@ export async function traverseAST(v: unknown, opt: TraverseOptions): Promise<voi
 }
 export { Visitor }
 
-export function parseJSONFromJSCode(code: string) {
+export function parseJSONFromJSCode(code: string, context?: object) {
   // 防止恶意代码
   const file = new babel['File']({ filename: '.' }, { ast: babel.parseSync(code), code })
   traverse(file.ast, {
@@ -46,5 +46,10 @@ export function parseJSONFromJSCode(code: string) {
       throw Error(`This code snippet is not safe: ${path.getSource().bgRed.bold}`)
     },
   })
-  return JSON.parse(Function('sandbox', `return JSON.stringify(${code})`)({ JSON }))
+  const fn = Function('context', `with(context){return JSON.stringify(${code})}`)
+  try {
+    return JSON.parse(fn({ JSON, ...context }))
+  } catch (e) {
+    console.log(fn.toString())
+  }
 }
