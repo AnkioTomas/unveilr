@@ -133,6 +133,4 @@ dist
 files/
 
 .idea
-
-lib/parser/
 /src/lib/parser/
