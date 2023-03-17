@@ -7,6 +7,6 @@ export interface parserV2Options {
   zArrMap: { [id: string]: Array<unknown> }
 }
 
-export function parserWxmlV1(code: string, dir: string): Promise<ParserResult>
+export function parserWxml(code: string, dir: string): Promise<ParserResult>
 
 export function parserWxmlV2(options: parserV2Options): Promise<ParserResult>
