@@ -133,4 +133,4 @@ dist
 files/
 
 .idea
-/src/lib/wxml-parser/
+src/lib/wxml-parser
