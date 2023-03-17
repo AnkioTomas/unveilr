@@ -21,4 +21,4 @@ async function main(p: string) {
   const scriptParser = new ScriptParser(packagePath)
   scriptParser.parse().then(() => scriptParser.save())
 }
-main('files/wxa8da525af05281f3-boos直聘/__APP__.wxapkg').then()
+main('files/wxa8da525af05281f3-boos/__APP__.wxapkg').then()
