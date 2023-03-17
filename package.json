@@ -19,8 +19,6 @@
     "commander": "^10.0.0",
     "crypto-js": "^4.1.1",
     "css-tree": "^2.3.1",
-    "escodegen": "2",
-    "esprima": "4",
     "prettier": "^2.8.4",
     "shelljs": "^0.8.5",
     "threads": "^1.7.0",
