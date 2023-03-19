@@ -1,8 +1,9 @@
 import { BaseExtractor, ExtractorError } from './BaseExtractor'
 import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
-import { checkWxapkg } from '@core/utils/checkWxapkg'
-import { PackageSuffix } from '@/enum'
-import { isProduciblePath, ProduciblePath } from '@core/controller/PathController'
+import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@core/utils/checkWxapkg'
+import { PackageSuffix, WxapkgType } from '@/enum'
+import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
+import { Saver } from '@core/utils/Saver'
 
 export interface WxapkgFileHeader {
   infoLength: number
@@ -15,29 +16,36 @@ export interface WxapkgFileInfo {
   end: number
 }
 
-export type WxapkgExtractorOptions =
-  | {
-      path: ProduciblePath
-      wxAppId?: string
-      parentDir?: ProduciblePath
-    }
-  | ProduciblePath
+export interface WxapkgExtractorOptions {
+  path: ProduciblePath
+  wxAppId?: string
+  saveDir?: ProduciblePath
+}
 export class WxapkgExtractor extends BaseExtractor {
   readonly wxAppId: string
-  readonly parentDir: ProduciblePath
+  private saver: Saver
+  private wxapkgType: WxapkgType
   constructor(path: ProduciblePath)
-  constructor(options: WxapkgExtractorOptions) {
-    if (isProduciblePath(options)) {
-      super(options)
+  constructor(options: WxapkgExtractorOptions)
+  constructor(v: WxapkgExtractorOptions | ProduciblePath) {
+    if (isProduciblePath(v)) {
+      super(v)
     } else {
-      const { path, parentDir, wxAppId } = options
+      const { path, saveDir, wxAppId } = v
       super(path)
-      this.parentDir = parentDir
+      this.setSaver(saveDir)
       this.wxAppId = wxAppId
     }
     this.suffix = PackageSuffix.WXAPKG
   }
-
+  setSaver(saveDir: ProduciblePath | undefined) {
+    saveDir = saveDir || this.pathCtrl.whitout()
+    if (!this.saver) {
+      this.saver = new Saver(saveDir)
+      return
+    }
+    this.saver.saveDirectory = saveDir
+  }
   getFileHeader(buf: Buffer): WxapkgFileHeader {
     checkWxapkg(buf, new ExtractorError(`File ${this.pathCtrl.logpath} is an invalid package!`))
     const unknownInfo = buf.readUInt32BE(1)
@@ -89,13 +97,25 @@ export class WxapkgExtractor extends BaseExtractor {
       const buffer = buf.subarray(start, end)
       this.saver.add({ path, buffer })
     })
-    if (this.parentDir) this.saver.saveDirectory = this.parentDir
+    const list = files.map((file) => PathController.make(file.name).basename)
+    this.wxapkgType = await checkWxapkgType(list)
+  }
+  async save() {
     await this.saver.save(true)
   }
 
-  async extract(): Promise<void> {
+  async extract(save?: boolean): Promise<WxapkgType> {
     super.extract()
     const buf = await this.pathCtrl.read()
+    if (!checkMacEncryption(buf)) {
+      const target = 'https://github.com/TinyNiko/mac_wxapkg_decrypt'
+      ExtractorError.throw(
+        `Package ${this.pathCtrl.logpath} is an encrypted package for Mac, please use ${target} to decrypt it before using it`,
+      )
+    }
     await this._extract(buf)
+    if (!this.wxapkgType) this.logger.warn(`Parsed packages are not supported`)
+    save && (await this.save())
+    return this.wxapkgType
   }
 }

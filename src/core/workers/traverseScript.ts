@@ -12,7 +12,7 @@ type DataType = {
 type VisitorThis = TraverseController<DataType>
 export type TraverseScriptReturnType = TraverseControllerResult<DataType>
 const traverseScriptModule = module
-const traverseScript = makeTraverseControllerWorker<DataType>({
+export const traverseScript = makeTraverseControllerWorker<DataType>({
   CallExpression(this: VisitorThis, path) {
     const callee = path.node.callee
     if (callee.type === 'Identifier' && callee.name === 'define') {

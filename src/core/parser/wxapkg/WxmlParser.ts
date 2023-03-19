@@ -2,10 +2,13 @@ import { BaseParser, ParserError } from '../BaseParser'
 import { ProduciblePath } from '@core/controller/PathController'
 import { traverseWxml } from '@core/workers/traverseWxml'
 import { traverseAST } from '@/utils'
+import { Saver } from '@core/utils/Saver'
+import { parserWxml } from '@/lib/wxml-parser-js'
 
 export class WxmlParser extends BaseParser {
-  constructor(path: ProduciblePath) {
-    super(path)
+  private sources: string
+  constructor(saver: Saver) {
+    super(saver)
   }
   static compiler: string
   static async getCompiler(path: ProduciblePath): Promise<string> {
@@ -107,6 +110,20 @@ Z([3,' 说明：如您家人或朋友存在被代办情况，您可查询并为�
 }`
     await traverseWxml({ code })
     return void 0
+  }
+
+  async parseV1() {
+    const result = await parserWxml(this.sources, this.saver.saveDirectory.path)
+    Object.entries(result).forEach(([path, buffer]) => {
+      this.saver.add({
+        path,
+        buffer,
+      })
+    })
+  }
+
+  setSource(sources: string) {
+    this.sources = sources
   }
 }
 

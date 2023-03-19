@@ -115,4 +115,4 @@ export function transformStyleWorker(poolSize?: number) {
   return new WorkerController<TransformStyleExposed, TransformStyleResult>(transformStyleModule, poolSize)
 }
 export default transformStyleModule
-isWorkerRuntime() && expose({ transformStyle })
+// isWorkerRuntime() && expose({ transformStyle })

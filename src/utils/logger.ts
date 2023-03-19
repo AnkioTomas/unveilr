@@ -43,7 +43,6 @@ export function getLogger(name?: string, level?: string): Logger {
     transports: [new transports.Console({ stderrLevels: ['error'] })],
   })
 }
-export const logger = getLogger()
 export class BaseLogger {
   readonly logger: Logger
   constructor(name?: string) {

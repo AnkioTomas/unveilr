@@ -10,7 +10,7 @@ import {
   unlinkSync,
   rmdirSync,
 } from 'fs'
-import { readdir, readFile, writeFile } from 'fs/promises'
+import { readdir, readFile, writeFile, unlink } from 'fs/promises'
 import { sep, dirname, extname, join, resolve, basename, relative, isAbsolute } from 'path'
 import { grey, bold } from 'colors/safe'
 import { ObjectEncodingOptions, OpenMode } from 'node:fs'
@@ -40,20 +40,29 @@ export type ReadStringOption =
 
 export class PathController {
   readonly path: string
-  readonly exists: boolean = false
-  readonly isDirectory: boolean = false
-  readonly isFile: boolean = false
+  exists = false
+  isDirectory = false
+  isFile = false
 
   constructor(path?: string) {
     this.path = path || ''
-    this.exists = existsSync(this.path)
-    if (this.exists) {
-      const stat = statSync(this.path)
-      this.isDirectory = stat.isDirectory()
-      this.isFile = stat.isFile()
-    }
+    this.reload()
   }
 
+  reload() {
+    this.exists = existsSync(this.path)
+    if (this.exists) {
+      try {
+        const stat = statSync(this.path)
+        this.isDirectory = stat.isDirectory()
+        this.isFile = stat.isFile()
+      } catch (e) {
+        if (e.errno === -4058) this.exists = false
+        this.isDirectory = false
+        this.isFile = false
+      }
+    }
+  }
   get suffix(): string {
     return extname(this.path)
   }
@@ -169,9 +178,17 @@ export class PathController {
     if (this.exists) return this
     const _path = self ? this.path : dirname(this.path)
     mkdirSync(_path, { recursive: true })
+    this.reload()
     return this
   }
-
+  async unlink(): Promise<void> {
+    await unlink(this.abspath)
+    // this.reload()
+  }
+  unlinkSync(): void {
+    unlinkSync(this.abspath)
+    this.reload()
+  }
   deepListDir(absolute?: boolean): Optional<string[]> {
     if (!this.isDirectory) return []
     const list: string[] = []

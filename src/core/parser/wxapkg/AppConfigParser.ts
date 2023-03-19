@@ -1,35 +1,54 @@
 import { ParserError, BaseParser } from '../BaseParser'
-import { md5, traverseAST } from '@/utils'
+import { md5 } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { Visitor } from '@babel/core'
+import { AppConfigServiceSubject, S2Observable, TVSubject } from '@core/parser/wxapkg/types'
+import { Saver } from '@core/utils/Saver'
+import { filter } from 'observable-fns'
 
-export class AppConfigParser extends BaseParser {
-  /**
-   * @param{PathController} path 需要传入 app-config.json 的路径构造器
-   * */
-  constructor(path: ProduciblePath) {
-    super(path)
+interface pageInfo {
+  [key: string]: {
+    window: { usingComponents: { [key: string]: unknown }; [key: string]: unknown }
   }
-  async parse(): Promise<void> {
+}
+export class AppConfigParser extends BaseParser {
+  private serviceSource: string
+  private sources: string
+  isGame = false
+
+  constructor(saver: Saver) {
+    super(saver)
+  }
+  async parse(observable: S2Observable<TVSubject>): Promise<void> {
     try {
-      const dirCtrl = PathController.dir(this.pathCtrl)
+      if (this.isGame) return this.parseGame()
+      const dirCtrl = this.saver.saveDirectory
       const config = {
-        ...JSON.parse(await this.pathCtrl.read('utf8')),
+        ...JSON.parse(this.sources),
         pop<T>(key, _default?: T): T {
           const result = config[key]
           delete config[key]
           return result || _default
         },
       }
-
       // 处理入口
       const entryPagePath = PathController.make(config.pop('entryPagePath'))
       const pages: string[] = config.pop('pages')
       const global = config.pop('global')
       const epp = entryPagePath.whitout().unixpath
+      const seenPage = new Set()
+      const save = (path: ProduciblePath, buffer: string | object) => {
+        const filename = PathController.make(path).unixpath
+        if (seenPage.has(filename)) return
+        seenPage.add(filename)
+        this.saver.add({
+          path,
+          buffer,
+        })
+      }
       pages.splice(pages.indexOf(epp), 1)
       pages.unshift(epp)
-
       // 处理分包路径
       const subPackages: { [key: string]: unknown }[] = config.pop('subPackages')
       if (subPackages) {
@@ -44,7 +63,6 @@ export class AppConfigParser extends BaseParser {
         })
         this.logger.info(`AppConfigParser detected ${subPackages.length.toString().blue.bold} subpackages`)
       }
-
       // 处理 ext.json
       const extAppid = config.pop('extAppid')
       const ext = config.pop('ext')
@@ -52,7 +70,6 @@ export class AppConfigParser extends BaseParser {
         const logPath = dirCtrl.join('ext.json').writeJSONSync({ extEnable: true, extAppid, ext }).logpath
         this.logger.info(`Ext save to ${logPath}`)
       }
-
       // tabBar
       const tabBar = config.pop('tabBar')
       const ignoreSuffixes = 'html,wxss,json'
@@ -81,15 +98,9 @@ export class AppConfigParser extends BaseParser {
           }
         })
       }
-
-      interface pageInfo {
-        [key: string]: {
-          window: { usingComponents: { [key: string]: unknown }; [key: string]: unknown }
-        }
-      }
-
       // usingComponents
       const page: pageInfo = config.pop('page')
+      config.pop('renderer')
       Object.keys(page).forEach((key) => {
         const usingComponents = page[key].window.usingComponents
         if (!usingComponents || !Object.keys(usingComponents).length) return
@@ -101,56 +112,72 @@ export class AppConfigParser extends BaseParser {
           page[file].window.component = true
         })
       })
-
+      const result = Object.assign(config, {
+        tabBar,
+        subPackages,
+        ...global,
+        pages,
+      })
+      save(WxapkgKeyFile.APP_JSON, result)
       // usingComponents -> json
-      const service = this.pathCtrl.join('..', WxapkgKeyFile.APP_SERVICE)
-      if (!service.exists) return
-      const result = Object.create(null)
-      await traverseAST(service, {
-        AssignmentExpression(path) {
-          const left = path.node.left
-          if (
-            left &&
-            left.type === 'MemberExpression' &&
-            left.object.type === 'Identifier' &&
-            left.object.name === '__wxAppCode__' &&
-            left.property.type === 'StringLiteral' &&
-            left.property.value.endsWith('.json')
-          ) {
-            const key = left.property.value
-            path.traverse({
-              ObjectExpression(p) {
-                if (p.parentKey === 'right') {
-                  result[key] = JSON.parse(p.getSource())
-                }
-              },
-            })
-          }
-        },
-      })
-      Object.keys(result).forEach((key) => {
-        page[key] = { window: result[key] }
-      })
-
-      const appJSONCtrl = this.pathCtrl.join('..', WxapkgKeyFile.APP_JSON)
-      this.saver.add({
-        path: appJSONCtrl,
-        buffer: Object.assign(config, {
-          tabBar,
-          subPackages,
-          ...global,
-        }),
+      if (!this.serviceSource) ParserError.throw(`Service source not found!`)
+      observable.pipe<S2Observable<AppConfigServiceSubject>>(filter((v) => v.AppConfigService)).subscribe((value) => {
+        Object.entries(value.AppConfigService).forEach((args) => save(...args))
       })
       Object.keys(page).forEach((key) => {
         let pCtrl = PathController.make(key)
         if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
-        this.saver.add({
-          path: pCtrl,
-          buffer: page[key],
-        })
+        save(pCtrl, page[key]['window'])
       })
     } catch (e) {
       throw new ParserError('Parse failed! ' + e.message)
+    }
+  }
+  parseGame() {
+    const config = JSON.parse(this.sources)
+    const subPackages = config['subPackages']
+    subPackages && this.logger.info(`AppConfigParser detected ${subPackages.length.toString().blue.bold} subpackages`)
+    this.saver.add({
+      path: WxapkgKeyFile.GAME_JSON,
+      buffer: this.sources,
+    })
+  }
+
+  setServiceSource(source: string) {
+    this.serviceSource = source
+  }
+  setSources(sources: string) {
+    this.sources = sources
+  }
+  setIsGame(isGame: boolean) {
+    this.isGame = isGame
+  }
+  static visitor(subject: AppConfigServiceSubject): Visitor {
+    return {
+      AssignmentExpression(path) {
+        const left = path.node.left
+        if (
+          left &&
+          left.type === 'MemberExpression' &&
+          left.object.type === 'Identifier' &&
+          left.object.name === '__wxAppCode__' &&
+          left.property.type === 'StringLiteral' &&
+          left.property.value.endsWith('.json')
+        ) {
+          const key = left.property.value
+          path.traverse({
+            ObjectExpression(p) {
+              if (p.parentKey === 'right') {
+                subject.next({
+                  AppConfigService: {
+                    [key]: p.getSource(),
+                  },
+                })
+              }
+            },
+          })
+        }
+      },
     }
   }
 }

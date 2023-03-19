@@ -1,6 +1,10 @@
 import { WxapkgKeyFile, WxapkgType } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 
+export function checkMacEncryption(buf: Buffer): boolean {
+  const encryptedForMac = 'WAPkgEncryptedTagForMac'
+  return buf.subarray(-encryptedForMac.length).toString() !== encryptedForMac
+}
 export function checkWxapkg<T extends Error>(path: ProduciblePath, throws?: string | T): boolean
 export function checkWxapkg<T extends Error>(buff: Buffer, throws?: string | T): boolean
 
@@ -12,44 +16,29 @@ export function checkWxapkg(v: unknown, throws?: unknown): boolean {
 }
 
 export async function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>
-export async function checkWxapkgType(list: string[], dir: ProduciblePath): Promise<WxapkgType>
-export async function checkWxapkgType(v: unknown, dir?: ProduciblePath): Promise<WxapkgType> {
+export async function checkWxapkgType(list: string[]): Promise<WxapkgType>
+export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<WxapkgType | null> {
   let fileList: string[]
   if (isProduciblePath(v)) {
     const pCtrl = PathController.make(v)
     if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
     fileList = await pCtrl.readdir()
-    dir = dir || pCtrl.abspath
   } else {
     fileList = v as string[]
   }
-  const dirCtrl = PathController.make(dir)
-  if (!dirCtrl.isDirectory) throw Error(`Path ${dir} is not a directory`)
-
-  const errorMessage = `Directory ${dir} not a correct package!`
-  // 微信小程序主包 V1
+  // APP_V1
   if (fileList.includes(WxapkgKeyFile.PAGE_FRAME_HTML)) return WxapkgType.APP_V1
-  // 可能是微信小程序主包也可能是微信小程序分包
-  if (fileList.includes(WxapkgKeyFile.PAGE_FRAME)) {
-    const pfText = await dirCtrl.join(WxapkgKeyFile.PAGE_FRAME).read('utf8')
-    // 微信小程序主包
-    if (pfText.length < 100) {
-      if (pfText.includes('__pageFrameJsStartTime__')) return WxapkgType.APP_V2
-      if (pfText.includes('This file is left intentionally blank')) return WxapkgType.APP_V3
-      throw Error(errorMessage)
-    }
-    // 微信小程序分包
-    if (pfText.includes('__wxAppData')) return WxapkgType.APP_SUBPACKAGE_V2
-    if (pfText.includes('__subPageFrameStartTime__')) return WxapkgType.APP_SUBPACKAGE_V1
-    throw Error(errorMessage)
-  }
-  // 微信小游戏
-  if (fileList.includes(WxapkgKeyFile.GAME)) {
-    if (fileList.includes(WxapkgKeyFile.APP_CONFIG)) return WxapkgType.GAME
-    return WxapkgType.GAME_SUBPACKAGE
-  }
-  // 插件
+  // APP_V3/APP_SUBPACKAGE_V2
+  if (fileList.includes(WxapkgKeyFile.COMMON_APP))
+    return fileList.includes(WxapkgKeyFile.APP_WXSS) ? WxapkgType.APP_V3 : WxapkgType.APP_SUBPACKAGE_V2
+  // APP_V2/APP_SUBPACKAGE_V1
+  if (fileList.includes(WxapkgKeyFile.PAGE_FRAME))
+    return fileList.includes(WxapkgKeyFile.APP_WXSS) ? WxapkgType.APP_V2 : WxapkgType.APP_SUBPACKAGE_V1
+  // GAME/GAME_SUBPACKAGE
+  if (fileList.includes(WxapkgKeyFile.GAME))
+    return fileList.includes(WxapkgKeyFile.APP_CONFIG) ? WxapkgType.GAME : WxapkgType.GAME_SUBPACKAGE
+  // PLUGIN
   if (fileList.includes(WxapkgKeyFile.PLUGIN) && fileList.includes(WxapkgKeyFile.PLUGIN_JSON)) return WxapkgType.PLUGIN
-
-  throw Error(errorMessage)
+  // not found
+  return null
 }

@@ -20,9 +20,9 @@ export class Saver extends BaseLogger {
     }
   }
   set saveDirectory(dir: ProduciblePath) {
-    this.baseDir = PathController.make(dir instanceof PathController ? dir.dirname : dir)
+    this.baseDir = PathController.make(dir)
   }
-  get saveDirectory() {
+  get saveDirectory(): PathController {
     return this.baseDir
   }
   get count() {
@@ -89,6 +89,10 @@ export class Saver extends BaseLogger {
       this.logger.warn(`Path ${item.path} not allow write type: ${typeof buffer}`)
       retPromise = flush('writeUtf8')
     }
+    // if (pCtrl.suffixWithout === 'json') {
+    //   console.log(pCtrl.logpath, type)
+    //   console.log(buffer)
+    // }
     type && this.logger.debug(`File ${type} save to ${target.logpath}`)
     this.saveCount++
     return retPromise

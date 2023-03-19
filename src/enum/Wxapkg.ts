@@ -26,17 +26,7 @@ export enum WxapkgType {
    * 相关数据就保存在此文件中
    * */
   APP_V1 = 'APP_V1',
-  /**
-   * 包含文件 {@link WxapkgKeyFile.PAGE_FRAME} <br/>
-   * 其内容为 `var __pageFrameJsStartTime__ = Date.now();`
-   * 相关数据保存在 {@link WxapkgKeyFile.APP_WXSS} 中
-   * */
   APP_V2 = 'APP_V2',
-  /**
-   * 包含文件 {@link WxapkgKeyFile.PAGE_FRAME} <br/>
-   * 其内容为 `/*This file is left intentionally blank*!/`
-   * 相关数据保存在 {@link WxapkgKeyFile.APP_WXSS} 中, 但是结构好像不同
-   * */
   APP_V3 = 'APP_V3',
   /** 对标 {@link APP_V1},{@link APP_V2}*/
   APP_SUBPACKAGE_V1 = 'APP_SUBPACKAGE_V1',
