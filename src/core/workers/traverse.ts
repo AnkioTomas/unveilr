@@ -1,5 +1,5 @@
 import { expose } from 'threads/worker'
-import { isWorkerRuntime } from '@core/utils/isWorkerRuntime'
+import { isWorkerRuntime } from '@utils/isWorkerRuntime'
 import { Observable, Subject } from 'threads/observable'
 import { TraverseVisitorKeys, TraverseVisitorMap, TVSubjectType } from '@core/parser/wxapkg/types'
 import { AppConfigParser } from '@core/parser/wxapkg/AppConfigParser'
@@ -12,9 +12,9 @@ const subject = new Subject<TVSubjectType>()
 const visitors: Partial<TraverseVisitorMap> = {}
 const visitorsFn: Record<TraverseVisitorKeys, (subject1: typeof subject) => Visitor> = {
   AppConfigService: AppConfigParser.visitor,
-  WxssParser: WxssParser.visitor1,
-  WxssParserCommon: WxssParser.visitor2,
-  WxssParserCommon2: WxssParser.visitor3,
+  WxssParser: WxssParser.visitorSetCssToHead,
+  WxssParserCommon: WxssParser.visitorCommonStyle,
+  WxssParserCommon2: WxssParser.visitorCArray,
   ScriptParser: ScriptParser.visitor,
 }
 

@@ -1,9 +1,9 @@
 import { BaseExtractor, ExtractorError } from './BaseExtractor'
 import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
-import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@core/utils/checkWxapkg'
+import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@utils/checkWxapkg'
 import { PackageSuffix, WxapkgType } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
 
 export interface WxapkgFileHeader {
   infoLength: number
@@ -55,7 +55,6 @@ export class WxapkgExtractor extends BaseExtractor {
       dataLength: buf.readUInt32BE(9),
     }
   }
-
   getFileByRaw(buf: Buffer): WxapkgFileInfo[] {
     const fileCount = buf.readUInt32BE(0)
     this.logger.debug(`Read file count ${fileCount}`)
@@ -78,7 +77,7 @@ export class WxapkgExtractor extends BaseExtractor {
         }
       })
   }
-  async _extract(buf: Buffer): Promise<string> {
+  async _extract(buf: Buffer): Promise<void> {
     const isEncrypted = buf.subarray(0, 6).toString('hex') === '56314d4d5758'
     if (isEncrypted) {
       this.logger.debug(`File ${this.pathCtrl.logpath} encrypted, Starting decrypt `)

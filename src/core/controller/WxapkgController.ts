@@ -2,17 +2,17 @@ import { WxapkgKeyFile, WxapkgType } from '@/enum'
 import { WxapkgExtractor, WxapkgExtractorOptions } from '@core/extractor/WxapkgExtractor'
 import { BaseLogger } from '@utils/logger'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
-import { BaseError } from '@/utils'
 import { WxssParser } from '@core/parser/wxapkg/WxssParser'
 import { WxmlParser } from '@core/parser/wxapkg/WxmlParser'
 import { ScriptParser } from '@core/parser/wxapkg/ScriptParser'
 import { AppConfigParser } from '@core/parser/wxapkg/AppConfigParser'
-import { matchScripts } from '@core/utils/matchScripts'
+import { matchScripts } from '@utils/matchScripts'
 import { ParserLike, TraverseVisitorKeys } from '@core/parser/wxapkg/types'
 import { createExposed, traverseModule } from '@core/workers/traverse'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
 import { WorkerController } from '@core/controller/WorkerController'
 import { unlink } from '@utils/unlink'
+import { BaseError } from '@utils/exceptions'
 
 export class WxapkgError extends BaseError {}
 export type ParsersKey = TraverseVisitorKeys | 'WxmlParserV1'
@@ -59,8 +59,9 @@ export class WxapkgController extends BaseLogger {
   getSourceDir(): PathController {
     const result = this.saveDir.deepListDir().find((path) => {
       const baseName = PathController.make(path).basename
-      return baseName === WxapkgKeyFile.PAGE_FRAME || baseName === WxapkgKeyFile.GAME
+      return baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME
     })
+    if (!result) WxapkgError.throw(`Source code path not found, may not be a supported package`)
     return PathController.dir(result)
   }
 
@@ -71,13 +72,14 @@ export class WxapkgController extends BaseLogger {
     if (this.isNotSupported(type)) {
       this.logger.error(`Currently, parsing the view structure of ${type.bgRed.white.bold} is not supported`)
     }
+    if (type === WxapkgType.FRAMEWORK) return this.logger.warn(`Running the framework does not require unpacking`)
     this.setSaverInfo(type)
     this.setParsers(type)
     await this.extractor.save()
 
     // 1. 根据不同的包类型给不同的解析器设置解析内容
     const list = (await this.setParserAndContents(type)).filter((item) => item.source)
-    if (!list.length) this.logger.warn(`No data to parse`)
+    if (!list.length) this.logger.warn(`File ${this.pathCtrl.logpath} no data to parse`)
     type Exposed = ReturnType<typeof createExposed>
     const eachExposed = (visitors: ParsersKey[], exposed: Exposed) => {
       const seen = new Set()

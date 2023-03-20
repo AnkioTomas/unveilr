@@ -15,7 +15,6 @@
   },
   "dependencies": {
     "@babel/core": "^7.21.0",
-    "clear-console": "^1.1.0",
     "colors": "^1.4.0",
     "commander": "^10.0.0",
     "crypto-js": "^4.1.1",

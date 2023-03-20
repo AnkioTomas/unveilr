@@ -1,8 +1,8 @@
 import { BaseDecryptor, DecryptorError } from '@core/decryptor/BaseDecryptor'
-import { decryptBuffer } from '@/utils'
-import { checkWxapkg } from '@core/utils/checkWxapkg'
+import { checkWxapkg } from '@utils/checkWxapkg'
 import { PackageSuffix } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
+import { decryptBuffer } from '@utils/crypto'
 
 export interface WxapkgDecryptorOptions {
   path: ProduciblePath

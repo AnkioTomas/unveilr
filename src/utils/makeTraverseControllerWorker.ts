@@ -1,8 +1,8 @@
 import { TraverseController } from '@core/controller/TraverseController'
 import { Visitor } from '@babel/traverse'
 import { BabelFileResult } from '@babel/core'
-import { BuildParams } from '@/utils'
 import { ProduciblePath } from '@core/controller/PathController'
+import { BuildParams } from '@utils/ast'
 
 export type TraverseControllerResult<R> = {
   data: R

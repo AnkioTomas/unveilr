@@ -1,9 +1,9 @@
 import { expose } from 'threads/worker'
-import { isWorkerRuntime } from '@core/utils/isWorkerRuntime'
-import { makeTraverseControllerWorker, TraverseControllerResult } from '@core/utils/makeTraverseControllerWorker'
+import { isWorkerRuntime } from '@utils/isWorkerRuntime'
+import { makeTraverseControllerWorker, TraverseControllerResult } from '@utils/makeTraverseControllerWorker'
 import { TraverseController } from '@core/controller/TraverseController'
 import { WorkerController } from '@core/controller/WorkerController'
-import { parseJSONFromJSCode } from '@/utils'
+import { parseJSONFromJSCode } from '@utils/ast'
 
 type DataType = {
   wxmlFragments: {

@@ -1,5 +1,6 @@
 import { PathController, ProduciblePath } from '@core/controller/PathController'
-import { BaseError, BaseLogger } from '@/utils'
+import { BaseLogger } from '@utils/logger'
+import { BaseError } from '@utils/exceptions'
 export class SavingError extends BaseError {}
 export type SaverItem = { path: ProduciblePath } & { buffer: string | Buffer | object }
 

@@ -1,10 +1,9 @@
 import { BaseParser, ParserError } from '../BaseParser'
 import { ProduciblePath } from '@core/controller/PathController'
 import { traverseWxml } from '@core/workers/traverseWxml'
-import { traverseAST } from '@/utils'
-import { Saver } from '@core/utils/Saver'
-import * as wp from '../../../lib/wxml-parser-js'
-const { parserWxml } = wp
+import { Saver } from '@utils/classes/Saver'
+import { parserWxml } from '@utils/wxmlParserJs'
+import { traverseAST } from '@utils/ast'
 
 export class WxmlParser extends BaseParser {
   private sources: string

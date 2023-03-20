@@ -1,4 +1,4 @@
-import { BaseLogger } from '@/utils'
+import { BaseLogger } from '@utils/logger'
 
 class GlobalExceptionCaught extends BaseLogger {
   constructor() {
@@ -21,9 +21,11 @@ export class BaseError extends Error {
     this.name = this.constructor.name
     Error.captureStackTrace && Error.captureStackTrace(this, this.constructor)
   }
+
   static make(msg: string) {
     return new this(msg)
   }
+
   static throw(msg: string) {
     throw new this(msg)
   }

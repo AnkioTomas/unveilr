@@ -1,4 +1,6 @@
-import { clearConsole, initializeColors, registerGlobalException } from '@/utils'
+import { registerGlobalException } from '@utils/exceptions'
+import { initializeColors } from '@utils/colors'
+import { clearConsole } from '@utils/clearConsole'
 
 export interface AppConfig {
   disableColors: boolean

@@ -20,7 +20,6 @@ export default {
           module: 'ES2015',
           declaration: false,
         },
-        exclude: ['node_modules'],
       },
     }),
     commonjs(),

@@ -26,6 +26,7 @@ export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<Wxa
   } else {
     fileList = v as string[]
   }
+  if (fileList.every((filename) => filename.startsWith('WA'))) return WxapkgType.FRAMEWORK
   // APP_V1
   if (fileList.includes(WxapkgKeyFile.PAGE_FRAME_HTML)) return WxapkgType.APP_V1
   // APP_V3/APP_SUBPACKAGE_V2

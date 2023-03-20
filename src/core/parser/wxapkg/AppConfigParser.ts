@@ -1,11 +1,11 @@
 import { ParserError, BaseParser } from '../BaseParser'
-import { md5 } from '@/utils'
 import { WxapkgKeyFile } from '@/enum'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
 import { Visitor } from '@babel/core'
 import { AppConfigServiceSubject, S2Observable, TVSubject } from '@core/parser/wxapkg/types'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
+import { md5 } from '@utils/crypto'
 
 interface pageInfo {
   [key: string]: {
@@ -130,7 +130,7 @@ export class AppConfigParser extends BaseParser {
         save(pCtrl, page[key]['window'])
       })
     } catch (e) {
-      throw new ParserError('Parse failed! ' + e.message)
+      ParserError.throw('Parse failed! ' + e.message)
     }
   }
   parseGame() {

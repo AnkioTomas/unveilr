@@ -1,5 +1,6 @@
-import { BaseError, BaseLogger } from '@/utils'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
+import { BaseError } from '@utils/exceptions'
+import { BaseLogger } from '@utils/logger'
 
 export class ParserError extends BaseError {}
 export abstract class BaseParser extends BaseLogger {

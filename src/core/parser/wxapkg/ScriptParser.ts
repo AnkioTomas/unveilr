@@ -2,7 +2,7 @@ import { BaseParser } from '../BaseParser'
 import { Visitor } from '@babel/core'
 import { reformat } from '@utils/reformat'
 import { S2Observable, ScriptParserSubject, TVSubject } from '@core/parser/wxapkg/types'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 
 export class ScriptParser extends BaseParser {

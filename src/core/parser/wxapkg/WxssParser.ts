@@ -1,6 +1,6 @@
 import { BaseParser } from '../BaseParser'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
-import { matchScripts } from '@core/utils/matchScripts'
+import { matchScripts } from '@utils/matchScripts'
 import {
   Dict,
   S2Observable,
@@ -10,12 +10,14 @@ import {
   WxssParserSubject,
 } from '@core/parser/wxapkg/types'
 import { Visitor } from '@babel/core'
-import { getLogger, md5, parseJSONFromJSCode } from '@/utils'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 import { transformStyle } from '@core/workers/transformStyle'
 import { unlink } from '@utils/unlink'
 import { WxapkgKeyFile } from '@/enum'
+import { md5 } from '@utils/crypto'
+import { getLogger } from '@utils/logger'
+import { parseJSONFromJSCode } from '@utils/ast'
 
 function makeCStyleName(index: number): string {
   return `./__unveilr_wxss__/unveilr.${md5(index.toString()).slice(-6)}.wxss`
@@ -99,7 +101,7 @@ export class WxssParser extends BaseParser {
       .subscribe((data) => addSaver(data.WxssParser))
   }
   //  读取 `setCssToHead` 函数
-  static visitor1(subject: WxssParserSubject): Visitor {
+  static visitorSetCssToHead(subject: WxssParserSubject): Visitor {
     return {
       CallExpression(path) {
         const callee = path.node.callee
@@ -122,7 +124,7 @@ export class WxssParser extends BaseParser {
     }
   }
   // 读取 `__COMMON_STYLESHEETS__`
-  static visitor2(subject: WxssParserCommonSubject): Visitor {
+  static visitorCommonStyle(subject: WxssParserCommonSubject): Visitor {
     return {
       MemberExpression(path) {
         const node = path.node
@@ -143,7 +145,7 @@ export class WxssParser extends BaseParser {
   }
 
   // 读取 `_C` 数组
-  static visitor3(subject: WxssParserCommon2Subject): Visitor {
+  static visitorCArray(subject: WxssParserCommon2Subject): Visitor {
     return {
       VariableDeclarator(path) {
         const id = path.get('id')

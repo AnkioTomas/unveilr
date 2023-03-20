@@ -1,6 +1,7 @@
-import { BaseError, BaseLogger } from '@/utils'
 import { PathController, ProduciblePath } from '@core/controller/PathController'
-import { Saver } from '@core/utils/Saver'
+import { Saver } from '@utils/classes/Saver'
+import { BaseError } from '@utils/exceptions'
+import { BaseLogger } from '@utils/logger'
 
 export class DecryptorError extends BaseError {}
 export class BaseDecryptor extends BaseLogger {

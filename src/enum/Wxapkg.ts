@@ -38,4 +38,6 @@ export enum WxapkgType {
   GAME_SUBPACKAGE = 'GAME_SUBPACKAGE',
   // 插件
   PLUGIN = 'PLUGIN',
+  // runtime framework
+  FRAMEWORK = 'FRAMEWORK',
 }

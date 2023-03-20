@@ -1,7 +1,7 @@
 import { TraverseOptions, Visitor } from '@babel/traverse'
 import { BabelFileResult } from '@babel/core'
-import { BuildParams, traverseAST } from '@/utils'
 import { ProduciblePath } from '@core/controller/PathController'
+import { BuildParams, traverseAST } from '@utils/ast'
 
 export class TraverseController<DataType extends object = object> {
   visitors: Visitor

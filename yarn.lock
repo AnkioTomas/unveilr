@@ -867,11 +867,6 @@ cipher-base@^1.0.0, cipher-base@^1.0.1, cipher-base@^1.0.3:
     inherits "^2.0.1"
     safe-buffer "^5.0.1"
 
-clear-console@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/clear-console/-/clear-console-1.1.0.tgz#9873a5fe9d763da3dd1c0f434095fabed7d444b4"
-  integrity sha512-bbSzBRZ4Pe7TZXmvWf2+CY2i+ssk+wulCex4Mqi1SZgiPp0ce5TiTJmiWoroJLKwaLhdFdLHkDrophk9KkA6eg==
-
 clone@~0.1.9:
   version "0.1.19"
   resolved "https://registry.yarnpkg.com/clone/-/clone-0.1.19.tgz#613fb68639b26a494ac53253e15b1a6bd88ada85"
