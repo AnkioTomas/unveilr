@@ -3,7 +3,8 @@ import { ProduciblePath } from '@core/controller/PathController'
 import { traverseWxml } from '@core/workers/traverseWxml'
 import { traverseAST } from '@/utils'
 import { Saver } from '@core/utils/Saver'
-import { parserWxml } from '@/lib/wxml-parser-js'
+import * as wp from '../../../lib/wxml-parser-js'
+const { parserWxml } = wp
 
 export class WxmlParser extends BaseParser {
   private sources: string

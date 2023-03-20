@@ -1,4 +1,5 @@
-import { expose, isWorkerRuntime } from 'threads/worker'
+import { expose } from 'threads/worker'
+import { isWorkerRuntime } from '@core/utils/isWorkerRuntime'
 import { makeTraverseControllerWorker, TraverseControllerResult } from '@core/utils/makeTraverseControllerWorker'
 import { TraverseController } from '@core/controller/TraverseController'
 import { WorkerController } from '@core/controller/WorkerController'

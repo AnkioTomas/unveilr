@@ -1,5 +1,5 @@
+// import { expose, isWorkerRuntime } from 'threads/worker'
 import { parse, generate, walk, CssNode, Raw, TypeSelector, List, ListItem, Declaration, Value } from 'css-tree'
-import { expose, isWorkerRuntime } from 'threads/worker'
 import { WorkerController } from '@core/controller/WorkerController'
 import { reformat } from '@utils/reformat'
 
@@ -111,7 +111,7 @@ export function transformStyle(style: string, path?: string): TransformStyleResu
   }
 }
 export function transformStyleWorker(poolSize?: number) {
-  if (isWorkerRuntime()) return
+  // if (isWorkerRuntime()) return
   return new WorkerController<TransformStyleExposed, TransformStyleResult>(transformStyleModule, poolSize)
 }
 export default transformStyleModule
