@@ -1,0 +1,21 @@
+name: Manual Trigger
+on:
+  # 手动触发事件
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'
+        required: true
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+
+jobs:
+  printInputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "Log level: ${{ github.event.inputs.logLevel }}"
+          echo "Tags: ${{ github.event.inputs.tags }}"
+          echo "Inputs: ${{ toJson(github.event.inputs) }}"
+          echo ${{ secrets.NPM_AUTH_TOKEN }}
