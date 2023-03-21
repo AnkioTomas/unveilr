@@ -1,6 +1,6 @@
 export function matchScripts(source: string): string {
   const matchRegex = /<script>(?<source>[\s\S]+?)<\/script>/m
-  const matchResult = []
+  const matchResult: string[] = []
   const _matchAll = (str: string) => {
     const r = str.match(matchRegex)
     if (!r || !r.groups) return

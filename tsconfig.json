@@ -12,7 +12,7 @@
     "stripInternal": true,
     "pretty": true,
     "declaration": true,
-    "outDir": "lib",
+    "outDir": "dist",
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],
@@ -21,7 +21,7 @@
       "@enum/*": ["enum/*"]
     }
   },
-  "exclude": ["lib", "node_modules", "/**/*.d.ts"],
+  "exclude": ["node_modules", "/**/*.d.ts"],
   "ts-node": {
     "transpileOnly": true,
     "require": ["tsconfig-paths/register"]

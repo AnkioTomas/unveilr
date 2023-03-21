@@ -3,6 +3,8 @@ import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import { uglify } from 'rollup-plugin-uglify'
+import packages from './package.json'
+
 // import { babel } from '@rollup/plugin-babel'
 // import builtins from 'rollup-plugin-node-builtins'
 // import staticFs from 'babel-plugin-static-fs'
@@ -10,9 +12,13 @@ import { uglify } from 'rollup-plugin-uglify'
 export default {
   input: 'src/index.ts',
   output: {
-    file: 'dist/index.js',
+    dir: 'dist',
     format: 'cjs',
+    manualChunks(id) {
+      if (id.includes('wxml-parser-js')) return 'parser'
+    },
   },
+  external: Object.keys(packages['dependencies']),
   plugins: [
     typescript({
       tsconfigOverride: {

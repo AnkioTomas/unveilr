@@ -1,12 +1,19 @@
 {
-  "name": "minapp-unpacker",
+  "name": "unveilr",
+  "author": "r3x5ur",
   "version": "0.0.1-alpha",
-  "main": "index.js",
+  "main": "dist/index.js",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/r3x5ur/unveilr"
+  },
+  "bugs": "https://github.com/r3x5ur/unveilr/issues",
+  "engines": {
+    "node": ">=12.0.0"
+  },
   "scripts": {
-    "eslint:comment": "使用 ESLint 检查并自动修复 src 目录下所有扩展名为 .ts 的文件",
     "eslint": "eslint --fix src --ext .ts --max-warnings=0",
-    "dev:comment": "启动开发环境",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
     "dev-test": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/test/index.ts",
     "ts-node": "ts-node -r tsconfig-paths/register --transpile-only",
@@ -46,5 +53,10 @@
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^3.14.2",
     "typescript": "^4.9.5"
-  }
+  },
+  "bin": {
+    "unveilr": "bin/index.js",
+    "uvr": "bin/index.js"
+  },
+  "files": []
 }

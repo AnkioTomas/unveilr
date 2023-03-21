@@ -9,8 +9,9 @@ import {
   copyFileSync,
   unlinkSync,
   rmdirSync,
+  rmSync,
 } from 'fs'
-import { readdir, readFile, writeFile, unlink } from 'fs/promises'
+import { readdir, readFile, writeFile, unlink, rm } from 'fs/promises'
 import { sep, dirname, extname, join, resolve, basename, relative, isAbsolute } from 'path'
 import { grey, bold } from 'colors/safe'
 import { ObjectEncodingOptions, OpenMode } from 'node:fs'
@@ -49,7 +50,7 @@ export class PathController {
     this.reload()
   }
 
-  reload() {
+  reload(): this {
     this.exists = existsSync(this.path)
     if (this.exists) {
       try {
@@ -62,6 +63,7 @@ export class PathController {
         this.isFile = false
       }
     }
+    return this
   }
   get suffix(): string {
     return extname(this.path)
@@ -220,6 +222,13 @@ export class PathController {
   crop(path: ProduciblePath): PathController {
     const newPath = this.unixpath.replace(PathController.make(path).unixpath + '/', '')
     return PathController.make(newPath)
+  }
+
+  async rmrf() {
+    await rm(this.abspath, { recursive: true, force: true })
+  }
+  rmrfSync() {
+    rmSync(this.abspath, { recursive: true, force: true })
   }
 
   toString(): string {

@@ -57,10 +57,13 @@ export class WxapkgController extends BaseLogger {
     )
   }
   getSourceDir(): PathController {
-    const result = this.saveDir.deepListDir().find((path) => {
-      const baseName = PathController.make(path).basename
-      return baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME
-    })
+    const result = this.saveDir
+      .reload()
+      .deepListDir()
+      .find((path) => {
+        const baseName = PathController.make(path).basename
+        return baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME
+      })
     if (!result) WxapkgError.throw(`Source code path not found, may not be a supported package`)
     return PathController.dir(result)
   }
@@ -76,7 +79,6 @@ export class WxapkgController extends BaseLogger {
     this.setSaverInfo(type)
     this.setParsers(type)
     await this.extractor.save()
-
     // 1. 根据不同的包类型给不同的解析器设置解析内容
     const list = (await this.setParserAndContents(type)).filter((item) => item.source)
     if (!list.length) this.logger.warn(`File ${this.pathCtrl.logpath} no data to parse`)
