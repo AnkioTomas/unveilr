@@ -4,11 +4,6 @@ import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import { uglify } from 'rollup-plugin-uglify'
 import packages from './package.json'
-
-// import { babel } from '@rollup/plugin-babel'
-// import builtins from 'rollup-plugin-node-builtins'
-// import staticFs from 'babel-plugin-static-fs'
-// import obfuscator from 'rollup-plugin-obfuscator'
 export default {
   input: 'src/index.ts',
   output: {
