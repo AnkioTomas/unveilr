@@ -1,8 +1,10 @@
 # This workflow will print some information
 
 name: test-username
-
 on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron:  '*/1 * * * *'
   workflow_call:
     inputs:
       username:
@@ -16,7 +18,5 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Print the input name to STDOUT
-        run: echo The username is ${{ inputs.username }}
       - name: Print the AuthKey
         run: echo ${{ secrets.NPM_AUTH_TOKEN }}
