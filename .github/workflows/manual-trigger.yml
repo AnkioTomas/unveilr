@@ -1,0 +1,14 @@
+name: Manual Trigger
+on:
+  # 手动触发事件
+  workflow_dispatch:
+    inputs:
+      tags:
+        description: 'Test scenario tags'
+
+jobs:
+  printInputs:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          echo "NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}" | base64
