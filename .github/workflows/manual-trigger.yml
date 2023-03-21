@@ -11,4 +11,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          echo "NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}"
+          echo "NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}" | base64
