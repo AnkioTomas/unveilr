@@ -1,7 +1,19 @@
 {
   "name": "unveilr",
   "author": "r3x5ur",
-  "version": "0.0.1-alpha",
+  "version": "2.0.0-alpha",
+  "displayName": "小程序反编译",
+  "keywords": [
+    "wxapkg",
+    "unpack",
+    "微信小程序",
+    "微信小游戏",
+    "反编译",
+    "unveilr",
+    "抖音小程序",
+    "抖音小游戏"
+  ],
+  "description": "将小程序包反编译成源码，小程序安全利器",
   "main": "dist/index.js",
   "license": "MIT",
   "repository": {
@@ -47,6 +59,7 @@
     "@typescript-eslint/parser": "^5.54.0",
     "eslint": "8.22.0",
     "rollup": "^3.19.1",
+    "rollup-plugin-license": "^3.0.1",
     "rollup-plugin-typescript2": "^0.34.1",
     "rollup-plugin-uglify": "^6.0.4",
     "ts-node-dev": "^2.0.0",
@@ -57,5 +70,12 @@
     "unveilr": "bin/index.js",
     "uvr": "bin/index.js"
   },
-  "files": []
+  "files": [
+    "bin/",
+    "dist/",
+    "images/",
+    "package.json",
+    "*.md",
+    "LICENSE"
+  ]
 }

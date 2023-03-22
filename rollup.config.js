@@ -1,19 +1,26 @@
+import { rmSync } from 'fs'
 import json from '@rollup/plugin-json'
 import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
-import { uglify } from 'rollup-plugin-uglify'
 import packages from './package.json'
+import { uglify } from 'rollup-plugin-uglify'
+import license from 'rollup-plugin-license'
+import { join } from 'path'
+
+const output = {
+  dir: 'dist',
+  format: 'cjs',
+  manualChunks(id) {
+    if (id.includes('wxml-parser-js')) return 'parser'
+  },
+}
+const external = Object.keys(packages['dependencies'])
+rmSync(output.dir, { recursive: true, force: true })
 export default {
   input: 'src/index.ts',
-  output: {
-    dir: 'dist',
-    format: 'cjs',
-    manualChunks(id) {
-      if (id.includes('wxml-parser-js')) return 'parser'
-    },
-  },
-  external: Object.keys(packages['dependencies']),
+  output,
+  external,
   plugins: [
     typescript({
       tsconfigOverride: {
@@ -27,6 +34,19 @@ export default {
     nodeResolve(),
     json(),
     uglify(),
+    license({
+      banner: {
+        commentStyle: 'ignored',
+        content:
+          '<%= pkg.name %> v<%= pkg.version %>\n' +
+          '(c) 2023 <%= pkg.author %>\n' +
+          'Released under the <%= pkg.license %> License.',
+      },
+      thirdParty: {
+        output: join(__dirname, 'dist', 'dependencies.txt'),
+        includePrivate: true, // Default is false.
+      },
+    }),
   ],
   cache: false,
   strictDeprecations: true,
