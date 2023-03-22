@@ -6,13 +6,18 @@ import { initializeColors } from '@utils/colors'
 import { WxapkgController } from '@core/controller/WxapkgController'
 import { PathController } from '@core/controller/PathController'
 
-export async function main(p: string) {
+export async function main() {
   clearConsole()
   initializeColors()
-  setLoggerConfig({ level: 'debug' })
-  setUnlinkConfig(false)
+  setLoggerConfig({ level: 'info' })
+  setUnlinkConfig(true)
   registerGlobalException()
-  PathController.whitout(p).rmrfSync()
-  await new WxapkgController(p).exploit()
+  const dir = PathController.make('files')
+  dir.readdir().then((list) => {
+    const ctrl = new WxapkgController(list.filter((p) => p.endsWith('.wxapkg')).map((p) => dir.join(p)))
+    return ctrl.exploit()
+  })
 }
-// main('files/x')
+if (require.main === module) {
+  main().then()
+}

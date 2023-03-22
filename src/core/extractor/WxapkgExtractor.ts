@@ -1,7 +1,7 @@
 import { BaseExtractor, ExtractorError } from './BaseExtractor'
 import { WxapkgDecryptor } from '@core/decryptor/WxapkgDecryptor'
 import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@utils/checkWxapkg'
-import { PackageSuffix, WxapkgType } from '@/enum'
+import { PackageSuffix, WxapkgKeyFile, WxapkgType } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 import { Saver } from '@utils/classes/Saver'
 
@@ -22,9 +22,10 @@ export interface WxapkgExtractorOptions {
   saveDir?: ProduciblePath
 }
 export class WxapkgExtractor extends BaseExtractor {
-  readonly wxAppId: string
+  private wxAppId: string
   private saver: Saver
   private wxapkgType: WxapkgType
+  private sourcePath: string
   constructor(path: ProduciblePath)
   constructor(options: WxapkgExtractorOptions)
   constructor(v: WxapkgExtractorOptions | ProduciblePath) {
@@ -45,6 +46,9 @@ export class WxapkgExtractor extends BaseExtractor {
       return
     }
     this.saver.saveDirectory = saveDir
+  }
+  setWxAppId(appid: string) {
+    this.wxAppId = appid
   }
   getFileHeader(buf: Buffer): WxapkgFileHeader {
     checkWxapkg(buf, new ExtractorError(`File ${this.pathCtrl.logpath} is an invalid package!`))
@@ -95,12 +99,32 @@ export class WxapkgExtractor extends BaseExtractor {
       const path = name.startsWith('/') ? name.slice(1) : name
       const buffer = buf.subarray(start, end)
       this.saver.add({ path, buffer })
+      // 获取源码目录
+      const baseName = PathController.make(path).basename
+      if (baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME) {
+        this.sourcePath = PathController.dir(path).path
+      }
     })
     const list = files.map((file) => PathController.make(file.name).basename)
     this.wxapkgType = await checkWxapkgType(list)
   }
   async save() {
     await this.saver.save(true)
+  }
+  get saveDirectory() {
+    return this.saver.saveDirectory
+  }
+  getSourceDir(): PathController {
+    const result = this.saver.saveDirectory
+      .join(this.sourcePath || '.')
+      .reload()
+      .deepListDir()
+      .find((path) => {
+        const baseName = PathController.make(path).basename
+        return baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME
+      })
+    if (!result) ExtractorError.throw(`Source code path not found, may not be a supported package`)
+    return PathController.dir(result)
   }
 
   async extract(save?: boolean): Promise<WxapkgType> {
