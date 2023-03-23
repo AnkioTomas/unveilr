@@ -4,7 +4,7 @@ import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import packages from './package.json'
-import { uglify } from 'rollup-plugin-uglify'
+import { terser } from 'rollup-plugin-terser'
 import license from 'rollup-plugin-license'
 import { join } from 'path'
 
@@ -33,7 +33,7 @@ export default {
     commonjs(),
     nodeResolve(),
     json(),
-    uglify(),
+    terser(),
     license({
       banner: {
         commentStyle: 'ignored',
