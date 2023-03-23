@@ -13,6 +13,7 @@ const output = {
   format: 'cjs',
   manualChunks(id) {
     if (id.includes('wxml-parser-js')) return 'parser'
+    if (id.includes('traverse.ts')) return 'traverse'
   },
 }
 const external = Object.keys(packages['dependencies'])

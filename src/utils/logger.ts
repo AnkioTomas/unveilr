@@ -46,6 +46,7 @@ export function getLogger(name?: string, level?: string): Logger {
 export class BaseLogger {
   readonly logger: Logger
   constructor(name?: string) {
-    this.logger = getLogger(name || this.constructor.name)
+    name = name || this.constructor.name
+    this.logger = getLogger(name.length < 4 ? 'Core' : name)
   }
 }

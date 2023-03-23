@@ -13,6 +13,7 @@
     "pretty": true,
     "declaration": true,
     "outDir": "dist",
+    "resolveJsonModule": true,
     "baseUrl": "./src",
     "paths": {
       "@/*": ["./*"],

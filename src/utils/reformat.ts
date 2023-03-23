@@ -13,8 +13,8 @@ const config: Partial<ReformatConfig> = {
   vue: false,
   yaml: false,
 }
-export function setReformatConfig(_config: Partial<ReformatConfig>) {
-  Object.assign(config, _config)
+export function setReformatConfig(_config: boolean) {
+  Object.keys(config).forEach((key) => (config[key] = Boolean(_config)))
 }
 
 export function reformat(source: string, options: Options): string {

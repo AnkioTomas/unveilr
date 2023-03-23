@@ -1,14 +1,14 @@
 // import { expose, isWorkerRuntime } from 'threads/worker'
 import { parse, generate, walk, CssNode, Raw, TypeSelector, List, ListItem, Declaration, Value } from 'css-tree'
-import { WorkerController } from '@core/controller/WorkerController'
+// import { WorkerController } from '@core/controller/WorkerController'
 import { reformat } from '@utils/reformat'
 
-export type TransformStyleExposed = { transformStyle: typeof transformStyle }
+// export type TransformStyleExposed = { transformStyle: typeof transformStyle }
 export type TransformStyleResult = {
   buffer: string
   path?: string
 }
-const transformStyleModule = module
+// const transformStyleModule = module
 export function transformStyle(style: string, path?: string): TransformStyleResult {
   const ast = parse(style)
   walk(ast, function (node) {
@@ -110,9 +110,9 @@ export function transformStyle(style: string, path?: string): TransformStyleResu
     path,
   }
 }
-export function transformStyleWorker(poolSize?: number) {
-  // if (isWorkerRuntime()) return
-  return new WorkerController<TransformStyleExposed, TransformStyleResult>(transformStyleModule, poolSize)
-}
-export default transformStyleModule
+// export function transformStyleWorker(poolSize?: number) {
+//   // if (isWorkerRuntime()) return
+//   return new WorkerController<TransformStyleExposed, TransformStyleResult>(transformStyleModule, poolSize)
+// }
+// export default transformStyleModule
 // isWorkerRuntime() && expose({ transformStyle })

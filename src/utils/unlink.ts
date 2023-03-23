@@ -5,7 +5,7 @@ const config = {
 }
 
 export function setUnlinkConfig(_config: boolean) {
-  Object.assign(config, { isEnabled: _config })
+  Object.assign(config, { isEnabled: Boolean(_config) })
 }
 
 export function unlinkSync(path: ProduciblePath) {

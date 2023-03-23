@@ -75,7 +75,7 @@
     "dist/",
     "images/",
     "package.json",
-    "*.md",
+    "README.md",
     "LICENSE"
   ]
 }
