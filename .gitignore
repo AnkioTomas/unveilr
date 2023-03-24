@@ -130,7 +130,6 @@ dist
 .pnp.*
 
 
+.idea/
 files/
-
-.idea
-src/lib/wxml-parser
+release/

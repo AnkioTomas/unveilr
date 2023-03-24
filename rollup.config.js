@@ -1,4 +1,3 @@
-import { rmSync } from 'fs'
 import json from '@rollup/plugin-json'
 import commonjs from '@rollup/plugin-commonjs'
 import nodeResolve from '@rollup/plugin-node-resolve'
@@ -7,8 +6,9 @@ import packages from './package.json'
 import { terser } from 'rollup-plugin-terser'
 import license from 'rollup-plugin-license'
 import { join } from 'path'
+import clear from 'rollup-plugin-clear'
 
-const output = {
+export const output = {
   dir: 'dist',
   format: 'cjs',
   manualChunks(id) {
@@ -17,12 +17,14 @@ const output = {
   },
 }
 const external = Object.keys(packages['dependencies'])
-rmSync(output.dir, { recursive: true, force: true })
 export default {
   input: 'src/index.ts',
   output,
   external,
   plugins: [
+    clear({
+      targets: [output.dir],
+    }),
     typescript({
       tsconfigOverride: {
         compilerOptions: {
@@ -45,7 +47,6 @@ export default {
       },
       thirdParty: {
         output: join(__dirname, 'dist', 'dependencies.txt'),
-        includePrivate: true, // Default is false.
       },
     }),
   ],

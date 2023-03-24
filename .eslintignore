@@ -2,4 +2,6 @@ lib
 node_modules
 dist
 bin
+scripts
 rollup.config.js
+

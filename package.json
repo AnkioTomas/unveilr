@@ -27,10 +27,10 @@
   "scripts": {
     "eslint": "eslint --fix src --ext .ts --max-warnings=0",
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
-    "dev-test": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/test/index.ts",
-    "ts-node": "ts-node -r tsconfig-paths/register --transpile-only",
     "run": "ts-node -r tsconfig-paths/register --transpile-only src/index.ts",
-    "build": "npx rollup -c --bundleConfigAsCjs"
+    "ts-node": "ts-node -r tsconfig-paths/register --transpile-only",
+    "build": "npx rollup -c --bundleConfigAsCjs",
+    "pkg": "node scripts/pkg.js"
   },
   "dependencies": {
     "@babel/core": "^7.21.3",
@@ -57,8 +57,11 @@
     "@types/shelljs": "^0.8.11",
     "@typescript-eslint/eslint-plugin": "^5.56.0",
     "@typescript-eslint/parser": "^5.54.0",
+    "compressing": "^1.8.0",
     "eslint": "8.22.0",
+    "pkg": "^5.8.1",
     "rollup": "^3.19.1",
+    "rollup-plugin-clear": "^2.0.7",
     "rollup-plugin-license": "^3.0.1",
     "rollup-plugin-terser": "^7.0.2",
     "rollup-plugin-typescript2": "^0.34.1",
