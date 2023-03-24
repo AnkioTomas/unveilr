@@ -7,8 +7,12 @@
 [![https://img.shields.io/npm/v/wxapkg-unpacker.svg](https://img.shields.io/npm/v/wxapkg-unpacker.svg)][npm]
 [![unveilr](https://img.shields.io/npm/dt/wxapkg-unpacker.svg)][npm]
 ### 项目重构中 预计 3月底发布 2.0 版本
-### 先上一个测试版 [unveilr@2.0.0-alpha.0]()
+### 先上一个测试版 [unveilr@2.0.0-alpha.0](https://github.com/r3x5ur/unveilr/releases/tag/v2.0.0-alpha.0)
 - `APP_V3,APP_SUBPACKAGE_V2`,不支持解析 `wxml`
+### 怎么使用
+- 下载对应操作系统的可执行文件
+- 运行 `unveilr@[version]-[platform][.exe] --help`
+- 根据提示使用就行了
 
 [//]: # (### 暂时可以使用[1.0.x版本]&#40;https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2&#41;)
 ### [:bulb:提交问题](https://github.com/r3x5ur/wxapkg-unpacker/issues)
