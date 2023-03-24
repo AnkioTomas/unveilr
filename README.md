@@ -7,11 +7,14 @@
 [![https://img.shields.io/npm/v/wxapkg-unpacker.svg](https://img.shields.io/npm/v/wxapkg-unpacker.svg)][npm]
 [![unveilr](https://img.shields.io/npm/dt/wxapkg-unpacker.svg)][npm]
 ### 项目重构中 预计 3月底发布 2.0 版本
-### 暂时可以使用[1.0.x版本](https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2)
-### [:bulb:提交问题](https://github.com/r3x5ur/wxapkg-unpacker/issues) 
+### 先上一个测试版 [unveilr@2.0.0-alpha.0]()
+- `APP_V3,APP_SUBPACKAGE_V2`,不支持解析 `wxml`
+
+[//]: # (### 暂时可以使用[1.0.x版本]&#40;https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2&#41;)
+### [:bulb:提交问题](https://github.com/r3x5ur/wxapkg-unpacker/issues)
 ### [:triangular_flag_on_post:社区讨论](https://github.com/r3x5ur/unveilr/discussions)
-### [:memo:更改日志](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CHANGELOG.md) 
-### [:money_with_wings:赞助](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CONTRIBUTING.md) 
+### [:memo:更改日志](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CHANGELOG.md)
+### [:money_with_wings:赞助](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CONTRIBUTING.md)
 
 
 [repo]:https://github.com/r3x5ur/unveilr

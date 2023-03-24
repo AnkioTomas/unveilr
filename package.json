@@ -1,7 +1,7 @@
 {
   "name": "unveilr",
   "author": "r3x5ur",
-  "version": "2.0.0-alpha",
+  "version": "2.0.0-alpha.0",
   "displayName": "小程序反编译",
   "keywords": [
     "wxapkg",
