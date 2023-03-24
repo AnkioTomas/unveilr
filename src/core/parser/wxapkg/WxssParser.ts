@@ -12,7 +12,7 @@ import {
 import { Visitor } from '@babel/core'
 import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
-import { transformStyle } from '@core/workers/transformStyle'
+import { transformStyle } from '@utils/transformStyle'
 import { unlink } from '@utils/unlink'
 import { WxapkgKeyFile } from '@/enum'
 import { md5 } from '@utils/crypto'
@@ -143,7 +143,6 @@ export class WxssParser extends BaseParser {
       },
     }
   }
-
   // 读取 `_C` 数组
   static visitorCArray(subject: WxssParserCommon2Subject): Visitor {
     return {

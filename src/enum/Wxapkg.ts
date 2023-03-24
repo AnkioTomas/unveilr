@@ -4,11 +4,8 @@ export enum WxapkgKeyFile {
   APP_SERVICE = 'app-service.js',
   PAGE_FRAME_HTML = 'page-frame.html',
   APP_WXSS = 'app-wxss.js',
-  APPSERVICE_APP = 'appservice.app.js',
   COMMON_APP = 'common.app.js',
-  WEBVIEW_APP = 'webview.app.js',
   APP_JSON = 'app.json',
-  APP = 'app.js',
   WORKERS = 'workers.js',
   PAGE_FRAME = 'page-frame.js',
 
