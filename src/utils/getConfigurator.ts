@@ -11,9 +11,9 @@ export function getConfigurator(dev?: boolean): CliConfigurator {
     },
     wx: {
       format: true,
-      clean: false,
+      clean: true,
       parse: true,
-      packages: ['files/麦当劳wxapkg/_50463589_89.wxapkg'],
+      packages: ['files'],
     },
   }
 }

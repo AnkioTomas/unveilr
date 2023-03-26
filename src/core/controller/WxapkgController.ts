@@ -90,6 +90,10 @@ export class WxapkgDecompiler extends BaseLogger {
       this.type === WxapkgType.GAME
     )
   }
+  // 是否是小程序插件
+  get isAppPlugin() {
+    return this.type === WxapkgType.APP_PLUGIN_V1
+  }
   // 保存的目录
   get saveDirectory(): PathController {
     return this.extractor.saveDirectory
@@ -336,7 +340,10 @@ export class WxapkgController extends BaseLogger {
         mainDecompiler.saveDirectory.rmrfSync()
       }
       for (const decompiler of this.decompilers) {
-        if (decompiler !== mainDecompiler) decompiler.saveDirectory = mainDecompiler.saveDirectory
+        // 小程序插件暂时不能放到主包内
+        if (decompiler !== mainDecompiler && !decompiler.isAppPlugin) {
+          decompiler.saveDirectory = mainDecompiler.saveDirectory
+        }
       }
     }
   }
