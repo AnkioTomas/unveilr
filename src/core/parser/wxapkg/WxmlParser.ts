@@ -1,119 +1,91 @@
-import { BaseParser, ParserError } from '../BaseParser'
-import { ProduciblePath } from '@core/controller/PathController'
-// import { traverseWxml } from '@core/workers/traverseWxml'
+import { BaseParser } from '../BaseParser'
 import { Saver } from '@utils/classes/Saver'
-import { parserWxml } from '@utils/wxmlParserJs'
-import { traverseAST } from '@utils/ast'
+import { parseWxml } from '@utils/wxmlParserJs'
+import { S2Observable, TraverseResult, TVSubject, WxmlParserV3Subject, ZArray } from '@core/parser/wxapkg/types'
+import { Visitor } from '@babel/traverse'
+import { parseJSONFromJSCode } from '@utils/ast'
+import { filter } from 'observable-fns'
 
+const zArrayFunctionNameRE = /gz\$gwx_[A-Za-z_0-9]+/
+const scopeNameRE = /\$gwx$|\$gwx_[A-Za-z_0-9]+/
+function getFirst<T>(p: T | T[]) {
+  return (Array.isArray(p) ? p : [p])[0]
+}
+function getZArrayKey(functionName: string): string {
+  const match = functionName.match(/_\d+$/)
+  return match ? match[0] : ''
+}
+function makeVisitor(result: TraverseResult): Visitor {
+  const data: ZArray = { mul: Object.create(null) }
+  const visitor = {
+    FunctionExpression(path) {
+      const parent = path.getFunctionParent()
+      if (!parent) return
+      if (!parent.isFunctionDeclaration()) return
+      const fn = parent.get('id')
+      if (!fn) return
+      const functionName = fn.getSource()
+      if (!zArrayFunctionNameRE.test(functionName)) return
+      const zMap = {} // var a=11
+      const zArr = [] // Z([3,'xx'])...
+      const list = path.get('body.body')
+      const blocks = Array.isArray(list) ? list : [list]
+      blocks.forEach((p) => {
+        if (p.isIfStatement() || p.isFunctionDeclaration()) return
+        if (p.isVariableDeclaration()) {
+          const declarations = p.get('declarations')[0]
+          if (!declarations) return
+          const { id, init } = declarations.node
+          if (id.type === 'Identifier' && init.type === 'NumericLiteral') {
+            zMap[id.name] = init.value
+          }
+        } else if (p.isExpressionStatement()) {
+          const expr = p.get('expression')
+          if (!expr.isCallExpression()) return
+          const zArg = expr.get('arguments')[0]
+          if (zArg.isArrayExpression() || zArg.isMemberExpression()) {
+            zArr.push(parseJSONFromJSCode(zArg.getSource(), { ...zMap, z: zArr }))
+          }
+        }
+      })
+      const key = getZArrayKey(functionName)
+      if (!key) return
+      data.mul[key] = zArr
+    },
+    VariableDeclarator(path) {
+      const id = path.get('id')
+      const init = path.get('init')
+      const defName = id.getSource()
+      if (defName === 'nnm' && init.isObjectExpression()) {
+        result.json = init.getSource()
+      }
+    },
+  }
+  result.z = data
+  return visitor
+}
 export class WxmlParser extends BaseParser {
   private sources: string
   constructor(saver: Saver) {
     super(saver)
   }
-  static compiler: string
-  static async getCompiler(path: ProduciblePath): Promise<string> {
-    if (this.compiler) return this.compiler
-    let source = ''
-    try {
-      await traverseAST(path, {
-        CallExpression(path) {
-          const args = path.get('arguments')
-          if (args.length !== 3 || args[1].getSource() !== '"__g"') return
-          const obj = args[2]
-          if (!obj.isObjectExpression()) return
-
-          const o = obj.get('properties.3.value')
-          source = (Array.isArray(o) ? o : [o])[0].getSource()
-          throw 'exit'
-        },
+  async parse(observable: S2Observable<TVSubject>): Promise<void> {
+    // 订阅wxml解析器
+    observable.pipe<S2Observable<WxmlParserV3Subject>>(filter((v) => v.WxmlParserV3)).subscribe((value) => {
+      const data = value.WxmlParserV3
+      if (!data) return
+      const { code, json, z } = data
+      const dir = this.dir
+      parseWxml(code, dir, json, z).then((result) => {
+        Object.entries(result).forEach(([path, buffer]) => {
+          this.saver.add({ path, buffer })
+        })
       })
-    } catch (e) {
-      if (e !== 'exit') {
-        ParserError.throw(e)
-      }
-    }
-    this.compiler = source
-    return source
-  }
-  async parse(): Promise<void> {
-    //     const code = `function gz$gwx_XC_3_1(){
-    // if( __WXML_GLOBAL__.ops_cached.$gwx_XC_3_1)return __WXML_GLOBAL__.ops_cached.$gwx_XC_3_1
-    // __WXML_GLOBAL__.ops_cached.$gwx_XC_3_1=[];
-    // (function(z){var a=11;function Z(ops){z.push(ops)}
-    // Z([3,'container'])
-    // Z([3,'user-info'])
-    // Z([3,'item'])
-    // Z([3,'姓名'])
-    // Z([3,'请输入姓名'])
-    // Z([[6],[[7],[3,'userInfo']],[3,'name']])
-    // Z(z[2])
-    // Z([3,'证件号码'])
-    // Z([3,'请输入证件号码'])
-    // Z([[6],[[7],[3,'userInfo']],[3,'cardNumberEnc']])
-    // Z([[6],[[7],[3,'agencyData']],[3,'length']])
-    // Z(z[2])
-    // Z([3,'代办人姓名'])
-    // Z(z[4])
-    // Z([[6],[[7],[3,'agencyData']],[1,0]])
-    // Z(z[10])
-    // Z(z[2])
-    // Z([3,'联系电话'])
-    // Z(z[8])
-    // Z([[6],[[7],[3,'agencyData']],[1,1]])
-    // Z([3,'searchIsAgency'])
-    // Z([3,'primary-btn'])
-    // Z([a,[3,'display:'],[[2,'?:'],[[6],[[7],[3,'agencyData']],[3,'length']],[1,'none'],[1,'block']]])
-    // Z([3,'查询本人被代办信息'])
-    // Z([3,'calcelAgency'])
-    // Z(z[21])
-    // Z([a,z[22][1],[[2,'?:'],[[2,'!'],[[6],[[7],[3,'agencyData']],[3,'length']]],[1,'none'],[1,'block']]])
-    // Z([3,'清除本人被代办信息'])
-    // Z([3,'tips'])
-    // Z([3,' 说明：如果您的健康码存在被代办情况，您可以通过此功能查询并解除代办关系。 '])
-    // Z(z[1])
-    // Z(z[2])
-    // Z(z[3])
-    // Z([3,'getUserInput'])
-    // Z([3,'name'])
-    // Z([3,'10'])
-    // Z(z[4])
-    // Z([[6],[[7],[3,'agencyInfo']],[3,'name']])
-    // Z(z[2])
-    // Z(z[7])
-    // Z(z[33])
-    // Z([3,'cardNumber'])
-    // Z([3,'18'])
-    // Z(z[8])
-    // Z([3,'idcard'])
-    // Z([[6],[[7],[3,'agencyInfo']],[3,'cardNumber']])
-    // Z([[6],[[7],[3,'agencyData1']],[3,'length']])
-    // Z(z[2])
-    // Z(z[12])
-    // Z(z[4])
-    // Z([[6],[[7],[3,'agencyData1']],[1,0]])
-    // Z(z[46])
-    // Z(z[2])
-    // Z(z[17])
-    // Z(z[8])
-    // Z([[6],[[7],[3,'agencyData1']],[1,1]])
-    // Z([3,'otherAgency'])
-    // Z(z[21])
-    // Z([a,z[22][1],[[2,'?:'],[[6],[[7],[3,'agencyData1']],[3,'length']],[1,'none'],[1,'block']]])
-    // Z([3,'查询他人被代办信息'])
-    // Z([3,'otherCancel'])
-    // Z(z[21])
-    // Z([a,z[22][1],[[2,'?:'],[[2,'!'],[[6],[[7],[3,'agencyData1']],[3,'length']]],[1,'none'],[1,'block']]])
-    // Z([a,[3,'清除'],[[6],[[7],[3,'agencyInfo']],[3,'name']],[3,'被代办信息']])
-    // Z(z[28])
-    // Z([3,' 说明：如您家人或朋友存在被代办情况，您可查询并为其解除代办关系。为他人解除代办关系需由被代办人本人或其监护人知情同意后操作。 '])
-    // })(__WXML_GLOBAL__.ops_cached.$gwx_XC_3_1);return __WXML_GLOBAL__.ops_cached.$gwx_XC_3_1
-    // }`
-    //     await traverseWxml({ code })
-    //     return void 0
+    })
   }
 
   async parseV1() {
-    const result = await parserWxml(this.sources, this.saver.saveDirectory.path)
+    const result = await parseWxml(this.sources, this.dir)
     Object.entries(result).forEach(([path, buffer]) => {
       this.saver.add({
         path,
@@ -121,16 +93,53 @@ export class WxmlParser extends BaseParser {
       })
     })
   }
+  get dir() {
+    return this.saver.saveDirectory.path
+  }
+
+  static visitorV3(subject: WxmlParserV3Subject): Visitor {
+    return {
+      BlockStatement(path) {
+        const parent = path.parentPath
+        if (!parent) return
+        if (!parent.isFunctionExpression()) return
+        const params = parent.get('params')
+        if (params.length !== 2) return
+        if (params[0].getSource() !== 'path' || params[1].getSource() !== 'global') return
+        const fn = path.find((p) => p.isAssignmentExpression())
+        if (!fn) return
+        const scopeName = getFirst(fn.get('left')).getSource()
+        if (!scopeNameRE.test(scopeName)) return
+        const result: TraverseResult = Object.create(null)
+        path.traverse(makeVisitor(result))
+        const contents = path.get('body').filter((p) => !p.isIfStatement())
+        let next = 0
+        const sourceIndex = contents.findIndex((p) => {
+          if (p.isVariableDeclaration()) {
+            const id = getFirst(p.get('declarations.0.id'))
+            if (id && id.isIdentifier()) {
+              const defineName = id.getSource()
+              if (defineName === 'nv_require') {
+                next = 1
+                return true
+              }
+              return defineName === 'x'
+            }
+          }
+          return false
+        })
+        const source = contents
+          .slice(sourceIndex + next)
+          .map((p) => p.getSource())
+          .join('\n')
+        result.scope = scopeName
+        result.code = source
+        subject.next({ WxmlParserV3: result })
+      },
+    }
+  }
 
   setSource(sources: string) {
     this.sources = sources
   }
 }
-
-// if (require.main === module) {
-//   const path = 'files/_468736192_311/common.app.js'
-//   WxmlParser.getCompiler(path).then((source) => {
-//     console.log(source)
-//   })
-//   // new WxmlParser('files/_468736192_311/app-wxss.js').parse()
-// }

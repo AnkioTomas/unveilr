@@ -7,19 +7,25 @@ import { Visitor } from '@babel/core'
 import { WxssParser } from '@core/parser/wxapkg/WxssParser'
 import { ScriptParser } from '@core/parser/wxapkg/ScriptParser'
 import { TraverseController } from '@core/controller/TraverseController'
-
-const subject = new Subject<TVSubjectType>()
-const visitors: Partial<TraverseVisitorMap> = {}
-const visitorsFn: Record<TraverseVisitorKeys, (subject1: typeof subject) => Visitor> = {
-  AppConfigService: AppConfigParser.visitor,
-  WxssParser: WxssParser.visitorSetCssToHead,
-  WxssParserCommon: WxssParser.visitorCommonStyle,
-  WxssParserCommon2: WxssParser.visitorCArray,
-  ScriptParser: ScriptParser.visitor,
-}
+import { WxmlParser } from '@core/parser/wxapkg/WxmlParser'
+import { initializeConfig } from '@core/controller/ConfigController'
+import { getConfigurator } from '@utils/getConfigurator'
 
 export function createExposed() {
+  const subject = new Subject<TVSubjectType>()
+  const visitors: Partial<TraverseVisitorMap> = {}
+  const visitorsFn: Record<TraverseVisitorKeys, (subject1: typeof subject) => Visitor> = {
+    AppConfigService: AppConfigParser.visitor,
+    WxssParser: WxssParser.visitorSetCssToHead,
+    WxssParserCommon: WxssParser.visitorCommonStyle,
+    WxssParserCommon2: WxssParser.visitorCArray,
+    ScriptParser: ScriptParser.visitor,
+    WxmlParserV3: WxmlParser.visitorV3,
+  }
   return {
+    initWorker(dev?: boolean) {
+      initializeConfig(getConfigurator(dev))
+    },
     async startTraverse(code: string) {
       const tCtrl = new TraverseController({ code })
       tCtrl.addVisitors(...Object.values(visitors))

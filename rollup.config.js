@@ -34,7 +34,7 @@ export default {
       },
     }),
     commonjs(),
-    nodeResolve(),
+    nodeResolve({ preferBuiltins: true }),
     json(),
     terser(),
     license({

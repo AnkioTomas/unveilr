@@ -1,19 +1,12 @@
 import { PathController, ProduciblePath } from '@core/controller/PathController'
-
-const config = {
-  isEnabled: false,
-}
-
-export function setUnlinkConfig(_config: boolean) {
-  Object.assign(config, { isEnabled: Boolean(_config) })
-}
+import { getConfig } from '@core/controller/ConfigController'
 
 export function unlinkSync(path: ProduciblePath) {
   return _unlink(path, true)
 }
 
 function _unlink(path: ProduciblePath, sync?: boolean) {
-  if (!config.isEnabled) return
+  if (!getConfig('WXClean')) return
   const ctrl = PathController.make(path)
 
   if (!ctrl.isFile) return

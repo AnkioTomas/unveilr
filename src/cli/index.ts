@@ -1,9 +1,8 @@
-import { Option, Command } from 'commander'
+import { Command, Option } from 'commander'
 import wxCommand from '@/cli/commands/wxapkg'
 import { LoggerLevel } from '@utils/logger'
 import { outputConfig } from '@/cli/outputConfig'
 import 'colors'
-import { version, name } from '../../package.json'
 
 export interface CliConfigurator {
   global: {
@@ -13,6 +12,7 @@ export interface CliConfigurator {
     appid?: string
     format?: boolean
     clean: boolean
+    parse: boolean
     output?: string
     packages: string[]
   }
@@ -44,14 +44,11 @@ Example:
     .configureOutput(outputConfig)
     .parse(argv)
   if (!argv.length) return cmd.help({ error: true })
-  const config: CliConfigurator = {
+  return {
     global: cmd.opts(),
     wx: {
       ...wxCommand.opts(),
       packages: wxCommand.args,
     },
   }
-  return config
 }
-
-export const cliConfigurator = registerCommand(version, name)

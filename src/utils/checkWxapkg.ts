@@ -38,8 +38,11 @@ export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<Wxa
   // GAME/GAME_SUBPACKAGE
   if (fileList.includes(WxapkgKeyFile.GAME))
     return fileList.includes(WxapkgKeyFile.APP_CONFIG) ? WxapkgType.GAME : WxapkgType.GAME_SUBPACKAGE
-  // PLUGIN
-  if (fileList.includes(WxapkgKeyFile.PLUGIN) && fileList.includes(WxapkgKeyFile.PLUGIN_JSON)) return WxapkgType.PLUGIN
+  // APP_PLUGIN_V1/GAME_PLUGIN
+  if (fileList.includes(WxapkgKeyFile.PLUGIN_JSON)) {
+    if (fileList.includes(WxapkgKeyFile.APPSERVICE)) return WxapkgType.APP_PLUGIN_V1
+    if (fileList.includes(WxapkgKeyFile.PLUGIN)) return WxapkgType.GAME_PLUGIN
+  }
   // not found
   return null
 }

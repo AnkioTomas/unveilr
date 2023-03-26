@@ -121,7 +121,11 @@ export class WxapkgExtractor extends BaseExtractor {
       .deepListDir()
       .find((path) => {
         const baseName = PathController.make(path).basename
-        return baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME
+        return (
+          baseName === WxapkgKeyFile.APP_SERVICE ||
+          baseName === WxapkgKeyFile.APPSERVICE ||
+          baseName === WxapkgKeyFile.GAME
+        )
       })
     if (!result) ExtractorError.throw(`Source code path not found, may not be a supported package`)
     return PathController.dir(result)

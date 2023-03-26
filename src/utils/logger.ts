@@ -1,29 +1,14 @@
 import { bold, grey, yellow } from 'colors/safe'
 import { createLogger, format, Logger, transports } from 'winston'
+import { getConfig } from '@core/controller/ConfigController'
+
 const { combine, timestamp, printf, colorize } = format
-const levels = {
-  error: 0,
-  warn: 1,
-  info: 2,
-  debug: 3,
-}
+const levels = { error: 0, warn: 1, info: 2, debug: 3 }
+
 export type LoggerLevel = keyof typeof levels
-export interface LoggerConfig {
-  level: LoggerLevel
-  name: string
-}
-
-const config: LoggerConfig = {
-  level: 'debug',
-  name: 'Main',
-}
-export function setLoggerConfig(_config: Partial<LoggerConfig>) {
-  Object.assign(config, _config)
-}
-
 export function getLogger(name?: string, level?: string): Logger {
   return createLogger({
-    level: level || config.level,
+    level: level || getConfig('logLevel'),
     levels,
     format: combine(
       timestamp({ format: 'HH:mm:ss' }),
@@ -39,7 +24,7 @@ export function getLogger(name?: string, level?: string): Logger {
       }),
       colorize({ all: true }),
     ),
-    defaultMeta: { scope: name || config.name },
+    defaultMeta: { scope: name || 'Core' },
     transports: [new transports.Console({ stderrLevels: ['error'] })],
   })
 }
@@ -47,6 +32,6 @@ export class BaseLogger {
   readonly logger: Logger
   constructor(name?: string) {
     name = name || this.constructor.name
-    this.logger = getLogger(name.length < 4 ? 'Core' : name)
+    this.logger = getLogger(name.length < 4 ? void 0 : name)
   }
 }

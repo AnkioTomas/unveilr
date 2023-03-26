@@ -1,22 +1,18 @@
-import { registerGlobalException } from '@utils/exceptions'
-import { setLoggerConfig } from '@utils/logger'
-import { setUnlinkConfig } from '@utils/unlink'
-import { clearConsole } from '@utils/clearConsole'
-import { initializeColors } from '@utils/colors'
-import { WxapkgController } from '@core/controller/WxapkgController'
-import { PathController } from '@core/controller/PathController'
-import { cliConfigurator } from '@/cli'
-import { setReformatConfig } from '@utils/reformat'
 import { PackageSuffix } from '@/enum'
+import { initializeColors } from '@utils/colors'
+import { clearConsole } from '@utils/clearConsole'
+import { registerGlobalException } from '@utils/exceptions'
+import { PathController } from '@core/controller/PathController'
+import { WxapkgController } from '@core/controller/WxapkgController'
+import { initializeConfig, getConfig } from '@core/controller/ConfigController'
+import { getConfigurator } from '@utils/getConfigurator'
 
 export async function main() {
+  initializeColors()
+  initializeConfig(getConfigurator())
   clearConsole()
   registerGlobalException()
-  initializeColors()
-  setLoggerConfig({ level: cliConfigurator.global.logLevel })
-  setUnlinkConfig(cliConfigurator.wx.clean)
-  setReformatConfig(cliConfigurator.wx.format)
-  const packages = cliConfigurator.wx.packages
+  const packages = getConfig('WXPackages')
   function filterWxapkg(ctrl: PathController) {
     return ctrl.isFile && ctrl.suffixWithout === PackageSuffix.WXAPKG
   }
@@ -32,8 +28,8 @@ export async function main() {
   }
   return new WxapkgController({
     wxapkgList,
-    wxAppId: cliConfigurator.wx.appid,
-    mainSaveDir: cliConfigurator.wx.output,
+    wxAppId: getConfig('WXAppId'),
+    mainSaveDir: getConfig('WXOutput'),
   }).exploit()
 }
 main().then()

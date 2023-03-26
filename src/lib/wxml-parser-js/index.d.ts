@@ -1,12 +1,9 @@
+import { ZArray } from '@core/parser/wxapkg/types'
+
 export interface ParserResult {
   [filename: string]: string
 }
-export interface parserV2Options {
-  compiler?: string
-  dir: string
-  zArrMap: { [id: string]: Array<unknown> }
-}
 
-export function parserWxml(code: string, dir: string): Promise<ParserResult>
+export function parseWxml(code: string, dir: string): Promise<ParserResult>
+export function parseWxml(code: string, dir: string, json: string, z: ZArray): Promise<ParserResult>
 
-export function parserWxmlV2(options: parserV2Options): Promise<ParserResult>
