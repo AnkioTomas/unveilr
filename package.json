@@ -1,7 +1,7 @@
 {
   "name": "unveilr",
   "author": "r3x5ur",
-  "version": "2.0.0-alpha.0",
+  "version": "2.0.0-alpha.1",
   "displayName": "小程序反编译",
   "keywords": [
     "wxapkg",
@@ -15,7 +15,7 @@
   ],
   "description": "将小程序包反编译成源码，小程序安全利器",
   "main": "dist/index.js",
-  "license": "MIT",
+  "license": "GPLv3",
   "repository": {
     "type": "git",
     "url": "https://github.com/r3x5ur/unveilr"
@@ -79,6 +79,8 @@
     "images/",
     "package.json",
     "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
     "LICENSE"
   ]
 }
