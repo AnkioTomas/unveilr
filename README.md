@@ -1,6 +1,6 @@
 ![logo](./images/logo.svg)<br>
 [![badge](https://img.shields.io/badge/r3x5ur-unveilr-red)][repo]
-[![badge](https://img.shields.io/github/license/r3x5ur/unveilr)][repo]
+[![license](https://img.shields.io/github/license/r3x5ur/unveilr?v=2)][repo]
 [![languages](https://img.shields.io/github/languages/top/r3x5ur/unveilr)][repo]
 [![visitor](https://visitor-badge.glitch.me/badge?page_id=https://github.com/r3x5ur/unveilr)][repo]
 [![GitHub all releases](https://img.shields.io/github/downloads/r3x5ur/unveilr/total)][release]
