@@ -2,10 +2,10 @@
 [![badge](https://img.shields.io/badge/r3x5ur-unveilr-red)][repo]
 [![badge](https://img.shields.io/github/license/r3x5ur/unveilr)][repo]
 [![languages](https://img.shields.io/github/languages/top/r3x5ur/unveilr)][repo]
-[![visitor](https://visitor-badge.glitch.me/badge?page_id=https://github.com/r3x5ur/wxapkg-unpacker)][repo]
+[![visitor](https://visitor-badge.glitch.me/badge?page_id=https://github.com/r3x5ur/unveilr)][repo]
 [![GitHub all releases](https://img.shields.io/github/downloads/r3x5ur/unveilr/total)][release]
-[![https://img.shields.io/npm/v/wxapkg-unpacker.svg](https://img.shields.io/npm/v/wxapkg-unpacker.svg)][npm]
-[![unveilr](https://img.shields.io/npm/dt/wxapkg-unpacker.svg)][npm]
+[![https://img.shields.io/npm/v/unveilr.svg](https://img.shields.io/npm/v/unveilr.svg)][npm]
+[![unveilr](https://img.shields.io/npm/dt/unveilr.svg)][npm]
 ## ！！！声明！！！
 **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此脚本用于非授权的测试，脚本开发者不负任何连带法律责任。**
 
@@ -75,5 +75,5 @@ $ unveilr wx /path/to/wxapkg/dir/ --no-parse
 - [mac_wxapkg_decrypt](https://github.com/TinyNiko/mac_wxapkg_decrypt)
 
 [repo]:https://github.com/r3x5ur/unveilr
-[npm]:https://www.npmjs.com/package/wxapkg-unpacker
+[npm]:https://www.npmjs.com/package/unveilr
 [release]:https://github.com/r3x5ur/unveilr/releases
