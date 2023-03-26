@@ -15,7 +15,7 @@
   ],
   "description": "将小程序包反编译成源码，小程序安全利器",
   "main": "dist/index.js",
-  "license": "GPLv3",
+  "license": "GPL-3.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/r3x5ur/unveilr"
