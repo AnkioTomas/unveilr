@@ -21,10 +21,18 @@ function log(message) {
 async function pkg() {
   log('Clean up old binaries...')
   rmSync(release, { force: true, recursive: true })
-  const targets = ['node14-win', 'node14-macos', 'node14-linux']
-  const pkgCmd = `-C GZip -t ${targets.toString()} -o ${release}/${name}@${version} ${distIndex}`
-    .split(' ')
-    .filter(Boolean)
+  const targets = [
+    'node14-win-x64',
+    'node14-win-arm64',
+    'node14-macos-x64',
+    'node14-macos-arm64',
+    'node14-linux-x64',
+    'node14-linux-arm64',
+  ]
+  const pkgCmd =
+    `-C GZip -t ${targets.toString()} --no-bytecode --public-packages "*" --public -o ${release}/${name}@${version} ${distIndex}`
+      .split(' ')
+      .filter(Boolean)
   log('Generating binaries...')
   await exec(pkgCmd)
 }
