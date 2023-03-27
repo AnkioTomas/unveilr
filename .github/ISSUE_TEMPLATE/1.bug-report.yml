@@ -8,8 +8,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        **感谢提交**
-        **请填写以下字段，便于更好的排查和解决问题，共同维护靠大家**
+        **🤝感谢提交**
+        **📝请填写以下字段，便于更好的排查和解决问题，共同维护靠大家**
   - type: input
     attributes:
       label: 版本信息
