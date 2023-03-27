@@ -1,7 +1,7 @@
-name: Bug Report
 title: "[Bug]: "
 labels: ["bug"]
 name: 🐛 Bug report
+assignees: @r3x5ur
 description: 创建报告以帮助我们改进
 
 body:
