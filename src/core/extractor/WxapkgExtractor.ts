@@ -124,7 +124,8 @@ export class WxapkgExtractor extends BaseExtractor {
         return (
           baseName === WxapkgKeyFile.APP_SERVICE ||
           baseName === WxapkgKeyFile.APPSERVICE ||
-          baseName === WxapkgKeyFile.GAME
+          baseName === WxapkgKeyFile.GAME ||
+          baseName === WxapkgKeyFile.PLUGIN_JSON
         )
       })
     if (!result) ExtractorError.throw(`Source code path not found, may not be a supported package`)
