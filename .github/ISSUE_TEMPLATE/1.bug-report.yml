@@ -13,7 +13,7 @@ body:
   - type: input
     attributes:
       label: 版本信息
-      description: unveilr -v 的输出
+      description: 填写 `unveilr -v` 的输出
     validations:
       required: true
   - type: input
