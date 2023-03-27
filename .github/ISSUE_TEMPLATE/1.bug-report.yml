@@ -26,9 +26,9 @@ body:
       label: 操作系统
       description: 运行时的操作系统
       options:
-        - Windows
-        - Linux
-        - MacOs
+        - windows
+        - linux
+        - macOS
     validations:
       required: true
   - type: input
