@@ -1,5 +1,10 @@
+name: Bug Report
+description: File a bug report
+title: "[Bug]: "
+labels: ["bug", "triage"]
 name: 🐛 Bug report
-description: Create a report to help us improve
+description: 创建报告以帮助我们改进
+
 body:
   - type: markdown
     attributes:
@@ -8,7 +13,7 @@ body:
         **请填写以下字段，便于更好的排查和解决问题，共同维护靠大家**
   - type: input
     attributes:
-      label: `unveilr`版本
+      label: 版本信息
       description: `unveilr -v` 的输出
   - type: input
     attributes:
