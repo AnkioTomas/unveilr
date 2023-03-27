@@ -1,5 +1,10 @@
 # CHANGELOG/更改日志
 
+### [:bookmark:v2.0.0-alpha.2 :loud_sound:2023-03-27](https://github.com/r3x5ur/wxapkg-unpacker/tree/v2.0.0-alpha.1)
+- 🐛解决Worker读取配置失败的问题 [#28](https://github.com/r3x5ur/unveilr/issues/28)
+- 🐛解决部分已知问题
+---
+
 ### [:bookmark:v2.0.0-alpha.1 :loud_sound:2023-03-26](https://github.com/r3x5ur/wxapkg-unpacker/tree/v2.0.0-alpha.1)
 - 🔥支持 `APP_V3,APP_SUBPACKAGE_V2`
 - 🔥支持 `APP_PLUGIN_V1`
