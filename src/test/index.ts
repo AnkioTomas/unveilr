@@ -1,6 +1,6 @@
 import { PathController } from '@core/controller/PathController'
 import { matchScripts } from '@utils/matchScripts'
-import { parseWxml } from '@/lib/wxml-parser/src/index'
+import { parseWxml } from '@utils/wxmlParserJs'
 
 const ctrl = PathController.make('files/watermark-test/watermark.html')
 const data = matchScripts(ctrl.readSync('utf8'))

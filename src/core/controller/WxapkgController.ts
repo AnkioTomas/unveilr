@@ -14,6 +14,7 @@ import { WorkerController } from '@core/controller/WorkerController'
 import { unlink } from '@utils/unlink'
 import { BaseError } from '@utils/exceptions'
 import { getConfig, getInnerConfig } from '@core/controller/ConfigController'
+import { getWccVersion } from '@utils/getWccVersion'
 
 export class WxapkgError extends BaseError {}
 export type ParsersKey = TraverseVisitorKeys | 'WxmlParserV1'
@@ -185,6 +186,10 @@ export class WxapkgDecompiler extends BaseLogger {
         appConfigSource,
         setAppConfig = true,
       } = options || {}
+      const wccVersion = getWccVersion(viewSource)
+      if (wccVersion) {
+        this.logger.info(`The package ${this.pathCtrl.logpath} wcc version is: [${wccVersion.blue.bold}]`)
+      }
       if (setAppConfig) {
         const appConfigSource$1 = appConfigSource || (await bdc.join(WxapkgKeyFile.APP_CONFIG).read('utf8'))
         const ACParser = this.parsers.AppConfigService as AppConfigParser

@@ -37,6 +37,10 @@ body:
       description: 路径自己脱敏如：`unveilr /path/to/dir`
     validations:
       required: true
+  - type: input
+    attributes:
+      label: wcc版本
+      description: "当控制台有输出`wcc version is: [v0.xxx]`时，请填入[]中的内容"
   - type: textarea
     attributes:
       label: 重现步骤(最好能上传反编译失败的样本)
