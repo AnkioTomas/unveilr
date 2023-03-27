@@ -51,4 +51,4 @@ body:
   - type: textarea
     attributes:
       label: 其他信息
-      description: Tell us anything else you think we should know.
+      description: 其他你觉得可能有用的信息
