@@ -76,7 +76,7 @@
   "files": [
     "bin/",
     "dist/",
-    "images/",
+    "images/logo.svg",
     "package.json",
     "README.md",
     "CHANGELOG.md",
