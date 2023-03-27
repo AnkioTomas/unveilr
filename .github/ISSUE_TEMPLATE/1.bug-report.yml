@@ -1,7 +1,6 @@
 name: Bug Report
-description: File a bug report
 title: "[Bug]: "
-labels: ["bug", "triage"]
+labels: ["bug"]
 name: 🐛 Bug report
 description: 创建报告以帮助我们改进
 
@@ -15,24 +14,34 @@ body:
     attributes:
       label: 版本信息
       description: unveilr -v 的输出
+    validations:
+      required: true
   - type: input
     attributes:
       label: 运行平台
       description: |
         UNIX: output of `uname -a`
         Windows: output of `"$([Environment]::OSVersion.VersionString) $(('x86', 'x64')[[Environment]::Is64BitOperatingSystem])"` in PowerShell console
+    validations:
+      required: true
   - type: input
     attributes:
       label: 运行时命令
       description: 路径自己脱敏如：`unveilr /path/to/dir`
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: 重现步骤(最好能上传反编译失败的样本)
       description: 输入有关您的错误的详细信息
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: 预期结果
       description: 请提供文本输出而不是屏幕截图
+    validations:
+      required: true
   - type: textarea
     attributes:
       label: 实际结果
