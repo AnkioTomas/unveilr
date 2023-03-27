@@ -13,8 +13,7 @@ import { Saver } from '@utils/classes/Saver'
 import { WorkerController } from '@core/controller/WorkerController'
 import { unlink } from '@utils/unlink'
 import { BaseError } from '@utils/exceptions'
-import { isDevelopment } from '@utils/isDev'
-import { getConfig } from '@core/controller/ConfigController'
+import { getConfig, getInnerConfig } from '@core/controller/ConfigController'
 
 export class WxapkgError extends BaseError {}
 export type ParsersKey = TraverseVisitorKeys | 'WxmlParserV1'
@@ -382,7 +381,7 @@ export class WxapkgController extends BaseLogger {
       tasks.forEach((item) => {
         const { decompiler, visitors, source } = item
         wCtrl.addTask((exposed) => {
-          exposed.initWorker(isDevelopment())
+          exposed.initWorker(getInnerConfig())
           forEachVisitors(decompiler, visitors, exposed)
           return exposed.startTraverse(source)
         })

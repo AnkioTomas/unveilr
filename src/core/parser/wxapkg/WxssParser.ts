@@ -20,7 +20,7 @@ import { getLogger } from '@utils/logger'
 import { parseJSONFromJSCode } from '@utils/ast'
 
 function makeCStyleName(index: number): string {
-  return `./__unveilr_wxss__/unveilr.${md5(index.toString()).slice(-6)}.wxss`
+  return `./@unveilr/wxss/unveilr.${md5(index.toString()).slice(-6)}.wxss`
 }
 export function styleConversion(k: string, source: string): string {
   const logger = getLogger('StyleConversion')

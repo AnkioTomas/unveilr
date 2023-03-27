@@ -5,6 +5,11 @@ export class ConfigController {
   private constructor(config: CliConfigurator) {
     this.config = config
   }
+
+  get innerConfig(): Readonly<CliConfigurator> {
+    return Object.freeze(this.config)
+  }
+
   get logLevel() {
     return this.config.global.logLevel
   }
@@ -49,4 +54,9 @@ export function getConfig<T extends keyof ConfigController>(key: T): ConfigContr
 
 export function initializeConfig(config: CliConfigurator) {
   ConfigController.init(config)
+}
+
+export function getInnerConfig() {
+  const inst = ConfigController.getInstance()
+  return inst.innerConfig
 }

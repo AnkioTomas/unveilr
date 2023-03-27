@@ -9,7 +9,6 @@ import { ScriptParser } from '@core/parser/wxapkg/ScriptParser'
 import { TraverseController } from '@core/controller/TraverseController'
 import { WxmlParser } from '@core/parser/wxapkg/WxmlParser'
 import { initializeConfig } from '@core/controller/ConfigController'
-import { getConfigurator } from '@utils/getConfigurator'
 
 export function createExposed() {
   const subject = new Subject<TVSubjectType>()
@@ -23,8 +22,9 @@ export function createExposed() {
     WxmlParserV3: WxmlParser.visitorV3,
   }
   return {
-    initWorker(dev?: boolean) {
-      initializeConfig(getConfigurator(dev))
+    // worker 运行时需要复制一份配置
+    initWorker(config: Parameters<typeof initializeConfig>[0]) {
+      initializeConfig(config)
     },
     async startTraverse(code: string) {
       const tCtrl = new TraverseController({ code })
