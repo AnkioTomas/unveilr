@@ -14,7 +14,7 @@ body:
   - type: input
     attributes:
       label: 版本信息
-      description: `unveilr -v` 的输出
+      description: unveilr -v 的输出
   - type: input
     attributes:
       label: 运行平台
