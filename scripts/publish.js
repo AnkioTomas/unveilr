@@ -1,7 +1,8 @@
-const { readFileSync, writeFileSync } = require('fs')
-const { resolve } = require('path')
-const { execSync } = require('child_process')
 require('colors')
+const { readFileSync, writeFileSync, rmSync, existsSync } = require('fs')
+const { resolve } = require('path')
+const { execSync, exec } = require('child_process')
+const { version } = require('../package.json')
 
 function log(message) {
   console.log(`[LOG] ${message}`.blue)
@@ -19,29 +20,64 @@ function isAlreadyRelease(log, version) {
   return d.exec(log) !== null
 }
 
-function main() {
+async function main() {
+  const releaseLock = resolve(__dirname, '../.release.lock')
+
   // new version
-  execSync('npm version prerelease --preid=alpha --no-git-tag-version')
-  const { version } = require('../package.json')
-  const logPath = resolve(__dirname, '../CHANGELOG.md')
-  const changLog = readFileSync(logPath, 'utf8')
-  if (isAlreadyRelease(changLog, version)) return log(`v${version.bold} already released!`.red)
-  const newVersion = `# 更改日志
+  const newVersion = () => {
+    execSync('npm version prerelease --preid=alpha --no-git-tag-version')
+    const { version } = require('../package.json')
+    const logPath = resolve(__dirname, '../CHANGELOG.md')
+    const changLog = readFileSync(logPath, 'utf8')
+    if (isAlreadyRelease(changLog, version)) return log(`v${version.bold} already released!`.red)
+    const newVersion = `# 更改日志
 
 ### [:bookmark:v${version} :loud_sound:${getDate()}](https://github.com/r3x5ur/unveilr/tree/v${version})
 - 🐛解决部分已知问题
 ---
 `
-  const newLog = newVersion + changLog.replace('# 更改日志\n', '')
-  writeFileSync(logPath, newLog)
-  const add = execSync('git add .').toString()
-  const commit = execSync(`git commit -m ":bookmark:v${version}"`).toString()
-  const tag = execSync(`git tag v${version} -m "v${version}"`).toString()
-  const push = execSync(`git push`).toString()
-  const pushTag = execSync(`git push --tag`).toString()
-  log(add + commit + tag + push + pushTag)
-  log(`v${version.bold} released!`.green)
-  execSync(`npm publish`)
+    const newLog = newVersion + changLog.replace('# 更改日志\n', '')
+    writeFileSync(logPath, newLog)
+    execSync(`git add . && git commit -m ":bookmark:v${version}" && git tag v${version} -m "v${version}"`)
+  }
+  const submit = () => {
+    return new Promise((resolve, reject) => {
+      const release = exec(`git push && git push --tag`)
+      release.stdout.on('data', log)
+      release.stderr.on('data', log)
+      release.on('close', (code) => {
+        if (code !== 0) return reject(code)
+        log(`v${version.bold} released!`.green)
+        resolve()
+      })
+    })
+  }
+  const release = async () => {
+    const maxRetry = 3
+    let retry = 0
+    while (retry <= maxRetry) {
+      try {
+        await submit()
+        break
+      } catch (e) {
+        retry++
+        retry !== maxRetry - 1 && log('retry...'.yellow)
+      }
+      if (retry > maxRetry) {
+        writeFileSync(releaseLock, Buffer.from(''))
+        await Promise.reject('release failed!'.red)
+      } else {
+        rmSync(releaseLock, { force: true })
+        // execSync(`npm publish`)
+      }
+    }
+  }
+  if (existsSync(releaseLock)) {
+    log('release lock file exists!'.red)
+  } else {
+    newVersion()
+  }
+  await release()
 }
 
-main()
+main().catch(log)
