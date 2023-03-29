@@ -12,7 +12,7 @@
 ### ✨新版本特性 (项目重构中 预计 3月底发布 2.0正式版)
 - 🔥支持自动解密(`windows`从路径上提取`wxAppId`)
 - 🔥自动合并子包
-- 🔥支持解析最新版`wxapkg` (`APP_V3`/`APP_SUBPACKAGE_V2`)
+- 🔥支持解析最新版`wxapkg` (`APP_V3`/`APP_V4`/`APP_SUBPACKAGE_V2`)
 - 🔥支持解析最新版小程序插件 (`APP_PLUGIN_V1`)
 - 🔥采用`@babel/core`直接解析语法树，精准提取源码(`1.x`是正则提取)
 - 🔥使用`Threadjs`做的线程池，`cpu`直接干到顶(🤡解析语法树特别吃`cpu`)
