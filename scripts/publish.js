@@ -29,7 +29,6 @@ async function main() {
     const logPath = resolve(__dirname, '../CHANGELOG.md')
     const packagePath = resolve(__dirname, '../package.json')
     const { version } = JSON.parse(readFileSync(packagePath, 'utf8'))
-
     const changLog = readFileSync(logPath, 'utf8')
     if (!isAlreadyRelease(changLog, version)) {
       const newVersion = `# 更改日志
