@@ -6,7 +6,7 @@ export function unlinkSync(path: ProduciblePath) {
 }
 
 function _unlink(path: ProduciblePath, sync?: boolean) {
-  if (!getConfig('WXClean')) return
+  if (!getConfig('WXParse') || !getConfig('WXClean')) return
   const ctrl = PathController.make(path)
 
   if (!ctrl.isFile) return
