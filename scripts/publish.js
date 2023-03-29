@@ -34,11 +34,14 @@ function main() {
 `
   const newLog = newVersion + changLog.replace('# 更改日志\n', '')
   writeFileSync(logPath, newLog)
-  execSync('git add ..')
-  execSync(`git commit -m ":bookmark:v${version}"`)
-  execSync(`git tag v${version} -m ":bookmark:v${version}"`)
-  execSync(`git push --tag`)
-  execSync(`npm publish`)
+  const add = execSync('git add .').toString()
+  const commit = execSync(`git commit -m ":bookmark:v${version}"`).toString()
+  const tag = execSync(`git tag v${version} -m "v${version}"`).toString()
+  const push = execSync(`git push`).toString()
+  const pushTag = execSync(`git push --tag`).toString()
+  log(add + commit + tag + push + pushTag)
   log(`v${version.bold} released!`.green)
+  execSync(`npm publish`)
 }
+
 main()

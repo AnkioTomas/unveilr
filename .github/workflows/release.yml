@@ -24,13 +24,18 @@ jobs:
       - name: Build
         run: yarn pkg
 
+      - name: "Build Changelog"
+        id: build_changelog
+        uses: mikepenz/release-changelog-builder-action@v3.7.0
+
       - name: Create Release and Upload Release Asset
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
-          tag_name: ${{ github.ref }}
-          name: Release ${{ github.ref }}
-          body: TODO New Release.
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          body: |
+            ${{steps.build_changelog.outputs.changelog}}
           draft: true
           prerelease: true
           files: release/*.tar.gz
