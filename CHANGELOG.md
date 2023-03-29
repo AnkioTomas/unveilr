@@ -1,7 +1,16 @@
 # 更改日志
 
 ### [:bookmark:v2.0.0-alpha.3 :loud_sound:2023-03-29](https://github.com/r3x5ur/unveilr/tree/v2.0.0-alpha.3)
-- 🐛解决部分已知问题
+* 添加更友好的 bug-report by @0xNoobS3c in https://github.com/r3x5ur/unveilr/pull/30
+* [PR] 添加 wcc_version 检测 by @r3x5ur in https://github.com/r3x5ur/unveilr/pull/33
+* Bump @typescript-eslint/parser from 5.56.0 to 5.57.0 by @dependabot in https://github.com/r3x5ur/unveilr/pull/35
+* Bump typescript from 4.9.5 to 5.0.2 by @dependabot in https://github.com/r3x5ur/unveilr/pull/39
+* Bump prettier from 2.8.6 to 2.8.7 by @dependabot in https://github.com/r3x5ur/unveilr/pull/38
+* Bump @typescript-eslint/eslint-plugin from 5.56.0 to 5.57.0 by @dependabot in https://github.com/r3x5ur/unveilr/pull/37
+* Bump rollup from 3.20.0 to 3.20.2 by @dependabot in https://github.com/r3x5ur/unveilr/pull/36
+* [PR] 添加CI工具 by @r3x5ur in https://github.com/r3x5ur/unveilr/pull/41
+* :bug:(clean) "Clean rely parse (Resolves #40)" by @r3x5ur in https://github.com/r3x5ur/unveilr/pull/42
+* :fire:(core) "Add APP_V4 support(Resolves #29)" by @r3x5ur in https://github.com/r3x5ur/unveilr/pull/43
 ---
 
 ### [:bookmark:v2.0.0-alpha.2 :loud_sound:2023-03-27](https://github.com/r3x5ur/unveilr/tree/v2.0.0-alpha.2)
