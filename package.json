@@ -1,7 +1,7 @@
 {
   "name": "unveilr",
   "author": "r3x5ur",
-  "version": "2.0.0-alpha.2",
+  "version": "2.0.0-alpha.4",
   "displayName": "小程序反编译",
   "keywords": [
     "wxapkg",
@@ -30,7 +30,8 @@
     "run": "ts-node -r tsconfig-paths/register --transpile-only src/index.ts",
     "ts-node": "ts-node -r tsconfig-paths/register --transpile-only",
     "build": "npx rollup -c --bundleConfigAsCjs",
-    "pkg": "node scripts/pkg.js"
+    "pkg": "node scripts/pkg.js",
+    "release": "node scripts/publish.js"
   },
   "dependencies": {
     "@babel/core": "^7.21.3",
