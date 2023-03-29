@@ -36,8 +36,8 @@ function main() {
   writeFileSync(logPath, newLog)
   execSync('git add ..')
   execSync(`git commit -m ":bookmark:v${version}"`)
-  execSync(`git tag v${version}`)
-  execSync(`git push --tag -m ":bookmark:v${version}"`)
+  execSync(`git tag v${version} -m ":bookmark:v${version}"`)
+  execSync(`git push --tag`)
   execSync(`npm publish`)
   log(`v${version.bold} released!`.green)
 }
