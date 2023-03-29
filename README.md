@@ -3,10 +3,13 @@
 [![license](https://img.shields.io/github/license/r3x5ur/unveilr?v=2)][repo]
 [![languages](https://img.shields.io/github/languages/top/r3x5ur/unveilr)][repo]
 [![visitor](https://visitor-badge.glitch.me/badge?page_id=https://github.com/r3x5ur/unveilr)][repo]
+[![visitor](https://img.shields.io/github/commit-activity/m/r3x5ur/unveilr)][repo]
 [![https://img.shields.io/npm/v/unveilr.svg](https://img.shields.io/npm/v/unveilr.svg)][npm]
 [![unveilr](https://img.shields.io/npm/dt/unveilr.svg)][npm]
+[![unveilr](https://img.shields.io/node/v/unveilr)][npm]
 [![release](https://github.com/r3x5ur/unveilr/actions/workflows/release.yml/badge.svg?event=push)][release]
 [![release](https://img.shields.io/github/downloads/r3x5ur/unveilr/total)][release]
+[![vul](https://img.shields.io/snyk/vulnerabilities/github/r3x5ur/unveilr)][repo]
 ## ！！！声明！！！
 **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此脚本用于非授权的测试，脚本开发者不负任何连带法律责任。**
 
