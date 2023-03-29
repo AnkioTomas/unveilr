@@ -27,6 +27,7 @@ export enum WxapkgType {
   APP_V1 = 'APP_V1',
   APP_V2 = 'APP_V2',
   APP_V3 = 'APP_V3',
+  APP_V4 = 'APP_V4',
   /** 对标 {@link APP_V1},{@link APP_V2}*/
   APP_SUBPACKAGE_V1 = 'APP_SUBPACKAGE_V1',
   /** 对标 {@link APP_V3}*/

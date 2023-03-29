@@ -29,7 +29,8 @@ export function createExposed() {
     async startTraverse(code: string) {
       const tCtrl = new TraverseController({ code })
       tCtrl.addVisitors(...Object.values(visitors))
-      return tCtrl.traverse()
+      await tCtrl.traverse()
+      subject.complete()
     },
     setVisitor(...keys: Array<keyof TraverseVisitorMap>) {
       keys.forEach((key) => (visitors[key] = visitorsFn[key](subject)))

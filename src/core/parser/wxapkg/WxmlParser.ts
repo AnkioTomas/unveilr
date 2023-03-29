@@ -70,18 +70,26 @@ export class WxmlParser extends BaseParser {
     super(saver)
   }
   async parse(observable: S2Observable<TVSubject>): Promise<void> {
+    let resolve
+    const promise = new Promise<void>((_resolve) => (resolve = _resolve))
     // 订阅wxml解析器
-    observable.pipe<S2Observable<WxmlParserV3Subject>>(filter((v) => v.WxmlParserV3)).subscribe((value) => {
-      const data = value.WxmlParserV3
-      if (!data) return
-      const { code, json, z } = data
-      const dir = this.dir
-      parseWxml(code, dir, json, z).then((result) => {
-        Object.entries(result).forEach(([path, buffer]) => {
-          this.saver.add({ path, buffer })
+    observable.pipe<S2Observable<WxmlParserV3Subject>>(filter((v) => v.WxmlParserV3)).subscribe({
+      next: (value) => {
+        const data = value.WxmlParserV3
+        if (!data) return
+        const { code, json, z } = data
+        const dir = this.dir
+        parseWxml(code, dir, json, z).then((result) => {
+          Object.entries(result).forEach(([path, buffer]) => {
+            this.saver.add({ path, buffer })
+          })
         })
-      })
+      },
+      complete() {
+        resolve && resolve()
+      },
     })
+    return promise
   }
 
   async parseV1() {
