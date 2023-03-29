@@ -7,10 +7,17 @@ import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 import { md5 } from '@utils/crypto'
 
-interface pageInfo {
+interface PageInfo {
   [key: string]: {
     window: { usingComponents: { [key: string]: unknown }; [key: string]: unknown }
   }
+}
+interface TabBarItem {
+  iconPath?: string
+  iconData?: string
+  selectedIconPath?: string
+  selectedIconData?: string
+  pagePath?: string
 }
 export class AppConfigParser extends BaseParser {
   private serviceSource: string
@@ -72,15 +79,18 @@ export class AppConfigParser extends BaseParser {
       }
       // tabBar
       const tabBar = config.pop('tabBar')
-      const ignoreSuffixes = 'html,wxss,json'
+      const ignoreSuffixes = 'wxml,wxs,wxss,html,json'
       if (tabBar && Array.isArray(tabBar.list)) {
-        const hashMap: { [key: string]: string }[] = Object.create(null)
-        dirCtrl.deepListDir().forEach((p) => {
-          const pCtrl = PathController.unix(p)
-          if (ignoreSuffixes.includes(pCtrl.suffixWithout)) return
-          hashMap[md5(pCtrl.readSync())] = pCtrl.crop(dirCtrl).unixpath
-        })
-        tabBar.list.forEach((item) => {
+        const hashMap: Record<string, string> = Object.create(null)
+        dirCtrl
+          .reload()
+          .deepListDir()
+          .forEach((p) => {
+            const pCtrl = PathController.unix(p)
+            if (ignoreSuffixes.includes(pCtrl.suffixWithout)) return
+            hashMap[md5(pCtrl.readSync())] = pCtrl.crop(dirCtrl).unixpath
+          })
+        tabBar.list.forEach((item: TabBarItem) => {
           item.pagePath = PathController.make(item.pagePath).whitout().unixpath
           if (item.iconData) {
             const path = hashMap[md5(item.iconData, true)]
@@ -99,7 +109,7 @@ export class AppConfigParser extends BaseParser {
         })
       }
       // usingComponents
-      const page: pageInfo = config.pop('page')
+      const page: PageInfo = config.pop('page')
       config.pop('renderer')
       Object.keys(page).forEach((key) => {
         const usingComponents = page[key].window.usingComponents
@@ -121,14 +131,22 @@ export class AppConfigParser extends BaseParser {
       save(WxapkgKeyFile.APP_JSON, result)
       // usingComponents -> json
       if (!this.serviceSource) ParserError.throw(`Service source not found!`)
-      observable.pipe<S2Observable<AppConfigServiceSubject>>(filter((v) => v.AppConfigService)).subscribe((value) => {
-        Object.entries(value.AppConfigService).forEach((args) => save(...args))
+      let resolve
+      const promise = new Promise<void>((_resolve) => (resolve = _resolve))
+      observable.pipe<S2Observable<AppConfigServiceSubject>>(filter((v) => v.AppConfigService)).subscribe({
+        next: (value) => {
+          Object.entries(value.AppConfigService).forEach((args) => save(...args))
+        },
+        complete() {
+          Object.keys(page).forEach((key) => {
+            let pCtrl = PathController.make(key)
+            if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
+            save(pCtrl, page[key]['window'])
+          })
+          resolve && resolve()
+        },
       })
-      Object.keys(page).forEach((key) => {
-        let pCtrl = PathController.make(key)
-        if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
-        save(pCtrl, page[key]['window'])
-      })
+      return promise
     } catch (e) {
       ParserError.throw('Parse failed! ' + e.message)
     }

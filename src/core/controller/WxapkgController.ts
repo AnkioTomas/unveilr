@@ -7,7 +7,7 @@ import { WxmlParser } from '@core/parser/wxapkg/WxmlParser'
 import { ScriptParser } from '@core/parser/wxapkg/ScriptParser'
 import { AppConfigParser } from '@core/parser/wxapkg/AppConfigParser'
 import { matchScripts } from '@utils/matchScripts'
-import { ParserLike, TraverseVisitorKeys } from '@core/parser/wxapkg/types'
+import { ParserLike, TraverseVisitorKeys, TVSubjectType } from '@core/parser/wxapkg/types'
 import { createExposed, traverseModule } from '@core/workers/traverse'
 import { Saver } from '@utils/classes/Saver'
 import { WorkerController } from '@core/controller/WorkerController'
@@ -15,6 +15,7 @@ import { unlink } from '@utils/unlink'
 import { BaseError } from '@utils/exceptions'
 import { getConfig, getInnerConfig } from '@core/controller/ConfigController'
 import { getWccVersion } from '@utils/getWccVersion'
+import { Observable } from 'observable-fns'
 
 export class WxapkgError extends BaseError {}
 export type ParsersKey = TraverseVisitorKeys | 'WxmlParserV1'
@@ -44,7 +45,7 @@ export class WxapkgDecompiler extends BaseLogger {
   // 解包器
   private readonly extractor: WxapkgExtractor
   // 解析器
-  readonly parsers: Record<ParsersKey, ParserLike>
+  readonly parsers: Record<ParsersKey, ParserLike<Observable<TVSubjectType>, Promise<void>>>
   // 解析后使用的保存器
   private readonly saver: Saver
   // 遍历列表
@@ -67,6 +68,7 @@ export class WxapkgDecompiler extends BaseLogger {
     this.checkTypeAvailable()
     return (
       this.type === WxapkgType.APP_V3 ||
+      this.type === WxapkgType.APP_V4 ||
       this.type === WxapkgType.APP_SUBPACKAGE_V2 ||
       this.type === WxapkgType.APP_PLUGIN_V1
     )
@@ -87,12 +89,17 @@ export class WxapkgDecompiler extends BaseLogger {
       this.type === WxapkgType.APP_V1 ||
       this.type === WxapkgType.APP_V2 ||
       this.type === WxapkgType.APP_V3 ||
+      this.type === WxapkgType.APP_V4 ||
       this.type === WxapkgType.GAME
     )
   }
   // 是否是小程序插件
   get isAppPlugin() {
     return this.type === WxapkgType.APP_PLUGIN_V1
+  }
+  // 是否是游戏插件
+  get isGamePlugin() {
+    return this.type === WxapkgType.GAME_PLUGIN
   }
   // 保存的目录
   get saveDirectory(): PathController {
@@ -149,6 +156,7 @@ export class WxapkgDecompiler extends BaseLogger {
       case WxapkgType.APP_V1:
       case WxapkgType.APP_V2:
       case WxapkgType.APP_V3:
+      case WxapkgType.APP_V4:
       case WxapkgType.APP_SUBPACKAGE_V1:
       case WxapkgType.APP_SUBPACKAGE_V2:
       case WxapkgType.APP_PLUGIN_V1:
@@ -178,7 +186,7 @@ export class WxapkgDecompiler extends BaseLogger {
   async initTraverseList() {
     this.checkIsSaveExtracted()
     // 源码路径
-    const bdc = this.extractor.getSourceDir()
+    const bdc = this.extractor.getSourceDir(this.isAppPlugin || this.isGamePlugin)
     const setApp = async (options?: SetAppOptions) => {
       const {
         serviceSource = await bdc.join(WxapkgKeyFile.APP_SERVICE).read('utf8'),
@@ -233,6 +241,7 @@ export class WxapkgDecompiler extends BaseLogger {
 
     switch (this.type) {
       case WxapkgType.APP_V1:
+      case WxapkgType.APP_V4:
         await setApp({
           viewSource: matchScripts(await bdc.join(WxapkgKeyFile.PAGE_FRAME_HTML).read('utf8')),
         })
@@ -308,6 +317,8 @@ export class WxapkgDecompiler extends BaseLogger {
 export class WxapkgController extends BaseLogger {
   private readonly decompilers: WxapkgDecompiler[]
   private readonly mainSaveDir: PathController
+  // 解析结果的Promise
+  private readonly parsersPromise: Promise<void>[]
   constructor(wxapkgList: ProduciblePath[])
   constructor(...wxapkgList: ProduciblePath[])
   constructor(options: WxapkgControllerOptions)
@@ -324,6 +335,7 @@ export class WxapkgController extends BaseLogger {
       wxAppId && decompiler.setExtractorWxAppId(wxAppId)
       return decompiler
     })
+    this.parsersPromise = []
   }
 
   async calcDecompilersSaveDir() {
@@ -353,7 +365,7 @@ export class WxapkgController extends BaseLogger {
   }
 
   async invokeTraverseWorker(): Promise<void> {
-    function forEachVisitors(decompiler: WxapkgDecompiler, visitors: ParsersKey[], exposed: TraverseExposed) {
+    const forEachVisitors = (decompiler: WxapkgDecompiler, visitors: ParsersKey[], exposed: TraverseExposed) => {
       const seen = new Set()
       visitors.forEach((key) => {
         if (key === 'WxmlParserV1') {
@@ -366,12 +378,14 @@ export class WxapkgController extends BaseLogger {
         }
         const parserLike = decompiler.parsers[key]
         exposed.setVisitor(key)
-        !seen.has(parserLike) && parserLike.parse(exposed.observable())
+        !seen.has(parserLike) && this.parsersPromise.push(parserLike.parse(exposed.observable()))
         seen.add(parserLike)
       })
     }
     const results = await Promise.all(this.decompilers.map((d) => d.makeParserTraverse()))
-    const tasks = results.flat().filter(Boolean)
+    const temp: TraverseData[] = []
+    results.forEach((items) => temp.push(...items))
+    const tasks = temp.filter(Boolean)
     if (!tasks.length) {
       this.logger.warn('No task to traverse')
       return
@@ -396,6 +410,7 @@ export class WxapkgController extends BaseLogger {
   }
 
   async saveFiles() {
+    await Promise.all(this.parsersPromise)
     await Promise.all(this.decompilers.map((d) => d.save()))
   }
 

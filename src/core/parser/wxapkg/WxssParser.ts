@@ -87,18 +87,30 @@ export class WxssParser extends BaseParser {
     const addSaver = (data: Dict) => {
       Object.entries(data).forEach(([path, buffer]) => this.saver.add({ path, buffer }))
     }
+    let resolve
+    const promise = new Promise<void>((_resolve) => (resolve = _resolve))
     // 订阅公共样式
-    observable
-      .pipe<S2Observable<WxssParserCommonSubject>>(filter((v) => v.WxssParserCommon))
-      .subscribe((data) => addSaver(data.WxssParserCommon))
+    observable.pipe<S2Observable<WxssParserCommonSubject>>(filter((v) => v.WxssParserCommon)).subscribe({
+      next: (data) => addSaver(data.WxssParserCommon),
+      complete() {
+        resolve && resolve()
+      },
+    })
     // 订阅公共样式2 _C
-    observable
-      .pipe<S2Observable<WxssParserCommon2Subject>>(filter((v) => v.WxssParserCommon2))
-      .subscribe((data) => addSaver(data.WxssParserCommon2))
+    observable.pipe<S2Observable<WxssParserCommon2Subject>>(filter((v) => v.WxssParserCommon2)).subscribe({
+      next: (data) => addSaver(data.WxssParserCommon2),
+      complete() {
+        resolve && resolve()
+      },
+    })
     // 订阅非公共样式
-    observable
-      .pipe<S2Observable<WxssParserSubject>>(filter((v) => v.WxssParser))
-      .subscribe((data) => addSaver(data.WxssParser))
+    observable.pipe<S2Observable<WxssParserSubject>>(filter((v) => v.WxssParser)).subscribe({
+      next: (data) => addSaver(data.WxssParser),
+      complete() {
+        resolve && resolve()
+      },
+    })
+    return promise
   }
   //  读取 `setCssToHead` 函数
   static visitorSetCssToHead(subject: WxssParserSubject): Visitor {

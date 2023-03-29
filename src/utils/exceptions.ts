@@ -2,7 +2,7 @@ import { BaseLogger } from '@utils/logger'
 
 class GlobalExceptionCaught extends BaseLogger {
   constructor() {
-    super()
+    super('Exception')
     const ignores = 'exit,cancel,pass'.split(',')
     const handler = (e: Error | string) => (ignores.includes(String(e)) ? '' : this.logger.error(e))
     process.on('uncaughtException', handler)

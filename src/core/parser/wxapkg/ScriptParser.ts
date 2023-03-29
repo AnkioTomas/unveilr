@@ -4,15 +4,31 @@ import { reformat } from '@utils/reformat'
 import { S2Observable, ScriptParserSubject, TVSubject } from '@core/parser/wxapkg/types'
 import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
+import { PathController } from '@core/controller/PathController'
 
 export class ScriptParser extends BaseParser {
   constructor(saver: Saver) {
     super(saver)
   }
   async parse(observable: S2Observable<TVSubject>): Promise<void> {
-    observable.pipe<S2Observable<ScriptParserSubject>>(filter((v) => v.ScriptParser)).subscribe((value) => {
-      Object.entries(value.ScriptParser).forEach(([path, buffer]) => this.saver.add({ path, buffer }))
+    let resolve
+    const promise = new Promise<void>((_resolve) => (resolve = _resolve))
+    observable.pipe<S2Observable<ScriptParserSubject>>(filter((v) => v.ScriptParser)).subscribe({
+      next: (value) => {
+        Object.entries(value.ScriptParser).forEach(([path, buffer]) => {
+          if (path.startsWith('__plugin__')) {
+            if (!PathController.make(path).suffixWithout) {
+              path = '__plugin__/index.js'
+            }
+          }
+          this.saver.add({ path, buffer })
+        })
+      },
+      complete() {
+        resolve && resolve()
+      },
     })
+    return promise
   }
 
   static visitor(subject: ScriptParserSubject): Visitor {
@@ -22,7 +38,7 @@ export class ScriptParser extends BaseParser {
         if (callee.type === 'Identifier' && callee.name === 'define') {
           const args = path.get('arguments')
           const [filenamePathNode, sourcePathNode] = args
-          if (filenamePathNode.node.type !== 'StringLiteral') return
+          if (!filenamePathNode.isStringLiteral()) return
           if (sourcePathNode.node.type !== 'FunctionExpression') return
           const filename = filenamePathNode.node.value
           const body = sourcePathNode.get('body.body')

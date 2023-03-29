@@ -5,12 +5,12 @@ import { BuildParams, traverseAST } from '@utils/ast'
 
 export class TraverseController<DataType extends object = object> {
   visitors: Visitor
-  private fileBuilder: unknown
+  private fileBuilder: BabelFileResult | ProduciblePath | BuildParams
   private readonly dataSet: DataType
   constructor(path: ProduciblePath, opt?: TraverseOptions)
   constructor(builder: BuildParams, opt?: TraverseOptions)
   constructor(file: BabelFileResult, opt?: TraverseOptions)
-  constructor(fileBuilder: unknown, visitor?: Visitor) {
+  constructor(fileBuilder: BabelFileResult | ProduciblePath | BuildParams, visitor?: Visitor) {
     this.setFileBuilder(fileBuilder)
     this.addVisitors(visitor)
     this.dataSet = Object.create(null)
@@ -22,7 +22,7 @@ export class TraverseController<DataType extends object = object> {
   }
 
   async traverse(opt?: Pick<TraverseOptions, 'scope' | 'noScope'>): Promise<void> {
-    return traverseAST(this.fileBuilder, { ...this.visitors, ...opt })
+    return traverseAST(this.fileBuilder as BuildParams, { ...this.visitors, ...opt })
   }
 
   private _mergeVisitors(...source: Visitor[]): Visitor {
@@ -44,35 +44,7 @@ export class TraverseController<DataType extends object = object> {
     return dataMap
   }
 
-  setItem(k: keyof DataType, v: DataType[keyof DataType]): this {
-    this.dataSet[k] = v
-    return this
-  }
-  changeItem(
-    k: keyof DataType,
-    handler: (v: DataType[keyof DataType]) => DataType[keyof DataType],
-    _default: DataType[keyof DataType],
-  ): this {
-    this.setItem(k, handler(this.getItem(k, _default)))
-    return this
-  }
-
-  getItem(k: keyof DataType, _default: DataType[keyof DataType]): DataType[keyof DataType] {
-    return this.dataSet[k] || _default
-  }
-  popItem(k: keyof DataType, _default: DataType[keyof DataType]): DataType[keyof DataType] {
-    const data = this.dataSet[k]
-    delete this.dataSet[k]
-    return data || _default
-  }
-  get data() {
-    return this.dataSet
-  }
-
-  setFileBuilder(file: BabelFileResult): this
-  setFileBuilder(path: ProduciblePath): this
-  setFileBuilder(builder: BuildParams): this
-  setFileBuilder(v: unknown): this {
+  setFileBuilder(v: BabelFileResult | ProduciblePath | BuildParams): this {
     this.fileBuilder = v
     return this
   }

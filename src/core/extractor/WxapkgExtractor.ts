@@ -114,7 +114,7 @@ export class WxapkgExtractor extends BaseExtractor {
   get saveDirectory() {
     return this.saver.saveDirectory
   }
-  getSourceDir(): PathController {
+  getSourceDir(isPlugin: boolean): PathController {
     const result = this.saver.saveDirectory
       .join(this.sourcePath || '.')
       .reload()
@@ -125,7 +125,7 @@ export class WxapkgExtractor extends BaseExtractor {
           baseName === WxapkgKeyFile.APP_SERVICE ||
           baseName === WxapkgKeyFile.APPSERVICE ||
           baseName === WxapkgKeyFile.GAME ||
-          baseName === WxapkgKeyFile.PLUGIN_JSON
+          (isPlugin && baseName === WxapkgKeyFile.PLUGIN_JSON)
         )
       })
     if (!result) ExtractorError.throw(`Source code path not found, may not be a supported package`)
