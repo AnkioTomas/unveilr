@@ -6,6 +6,7 @@
 [![GitHub all releases](https://img.shields.io/github/downloads/r3x5ur/unveilr/total)][release]
 [![https://img.shields.io/npm/v/unveilr.svg](https://img.shields.io/npm/v/unveilr.svg)][npm]
 [![unveilr](https://img.shields.io/npm/dt/unveilr.svg)][npm]
+[![release](https://github.com/r3x5ur/unveilr/actions/workflows/release.yml/badge.svg?event=push)][release]
 ## ！！！声明！！！
 **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此脚本用于非授权的测试，脚本开发者不负任何连带法律责任。**
 
