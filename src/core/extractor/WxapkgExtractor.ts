@@ -4,6 +4,7 @@ import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@utils/checkWx
 import { PackageSuffix, WxapkgKeyFile, WxapkgType } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 import { Saver } from '@utils/classes/Saver'
+import { reformat } from '@utils/reformat'
 
 export interface WxapkgFileHeader {
   infoLength: number
@@ -97,7 +98,8 @@ export class WxapkgExtractor extends BaseExtractor {
     files.forEach((file) => {
       const { name, start, end } = file
       const path = name.startsWith('/') ? name.slice(1) : name
-      const buffer = buf.subarray(start, end)
+      let buffer: string | Buffer = buf.subarray(start, end)
+      if (path.endsWith('json')) buffer = reformat(buffer.toString('utf8'), { parser: 'json' })
       this.saver.add({ path, buffer })
       // 获取源码目录
       const baseName = PathController.make(path).basename
