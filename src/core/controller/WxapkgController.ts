@@ -284,7 +284,7 @@ export class WxapkgDecompiler extends BaseLogger {
     await this.cleanup()
   }
   async cleanup() {
-    if (!getConfig('WXClean')) return
+    if (!getConfig('WXParse') || !getConfig('WXClean')) return
     const dirCtrl = this.saveDirectory
     this.logger.debug(`Start cleaning ${dirCtrl.logpath}`)
     const unlinks = [
