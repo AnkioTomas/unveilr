@@ -3,17 +3,15 @@ import { BabelFileResult } from '@babel/core'
 import { ProduciblePath } from '@core/controller/PathController'
 import { BuildParams, traverseAST } from '@utils/ast'
 
-export class TraverseController<DataType extends object = object> {
+export class TraverseController {
   visitors: Visitor
   private fileBuilder: BabelFileResult | ProduciblePath | BuildParams
-  private readonly dataSet: DataType
   constructor(path: ProduciblePath, opt?: TraverseOptions)
   constructor(builder: BuildParams, opt?: TraverseOptions)
   constructor(file: BabelFileResult, opt?: TraverseOptions)
   constructor(fileBuilder: BabelFileResult | ProduciblePath | BuildParams, visitor?: Visitor) {
     this.setFileBuilder(fileBuilder)
     this.addVisitors(visitor)
-    this.dataSet = Object.create(null)
   }
 
   addVisitors(...visitors: Visitor[]): this {

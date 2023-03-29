@@ -26,18 +26,21 @@ async function main() {
   // new version
   const newVersion = () => {
     execSync('npm version prerelease --preid=alpha --no-git-tag-version')
-    const { version } = require('../package.json')
     const logPath = resolve(__dirname, '../CHANGELOG.md')
+    const packagePath = resolve(__dirname, '../package.json')
+    const { version } = JSON.parse(readFileSync(packagePath, 'utf8'))
+
     const changLog = readFileSync(logPath, 'utf8')
-    if (isAlreadyRelease(changLog, version)) return log(`v${version.bold} already released!`.red)
-    const newVersion = `# 更改日志
+    if (!isAlreadyRelease(changLog, version)) {
+      const newVersion = `# 更改日志
 
 ### [:bookmark:v${version} :loud_sound:${getDate()}](https://github.com/r3x5ur/unveilr/tree/v${version})
 - 🐛解决部分已知问题
 ---
 `
-    const newLog = newVersion + changLog.replace('# 更改日志\n', '')
-    writeFileSync(logPath, newLog)
+      const newLog = newVersion + changLog.replace('# 更改日志\n', '')
+      writeFileSync(logPath, newLog)
+    }
     execSync(`git add . && git commit -m ":bookmark:v${version}" && git tag v${version} -m "v${version}"`)
   }
   const submit = () => {
@@ -68,7 +71,7 @@ async function main() {
         await Promise.reject('release failed!'.red)
       } else {
         rmSync(releaseLock, { force: true })
-        // execSync(`npm publish`)
+        execSync(`npm publish`)
       }
     }
   }
