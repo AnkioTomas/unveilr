@@ -110,6 +110,10 @@ export class WxapkgDecompiler extends BaseLogger {
     this.extractor.setSaver(dir)
     this.saver.saveDirectory = dir
   }
+  // 源码目录
+  get sourceDir(): PathController {
+    return this.extractor.getSourceDir(this.isAppPlugin || this.isGamePlugin)
+  }
   get path(): PathController {
     return this.pathCtrl
   }
@@ -186,7 +190,7 @@ export class WxapkgDecompiler extends BaseLogger {
   async initTraverseList() {
     this.checkIsSaveExtracted()
     // 源码路径
-    const bdc = this.extractor.getSourceDir(this.isAppPlugin || this.isGamePlugin)
+    const bdc = this.sourceDir
     const setApp = async (options?: SetAppOptions) => {
       const {
         serviceSource = await bdc.join(WxapkgKeyFile.APP_SERVICE).read('utf8'),
@@ -294,7 +298,7 @@ export class WxapkgDecompiler extends BaseLogger {
   }
   async cleanup() {
     if (!getConfig('WXParse') || !getConfig('WXClean')) return
-    const dirCtrl = this.saveDirectory
+    const dirCtrl = this.sourceDir
     this.logger.debug(`Start cleaning ${dirCtrl.logpath}`)
     const unlinks = [
       '.appservice.js',
@@ -384,7 +388,10 @@ export class WxapkgController extends BaseLogger {
     }
     const results = await Promise.all(this.decompilers.map((d) => d.makeParserTraverse()))
     const temp: TraverseData[] = []
-    results.forEach((items) => temp.push(...items))
+    results.forEach((items) => {
+      if (!items) return
+      temp.push(...items)
+    })
     const tasks = temp.filter(Boolean)
     if (!tasks.length) {
       this.logger.warn('No task to traverse')
