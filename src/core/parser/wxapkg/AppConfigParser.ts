@@ -49,10 +49,7 @@ export class AppConfigParser extends BaseParser {
         const filename = PathController.make(path).unixpath
         if (seenPage.has(filename)) return
         seenPage.add(filename)
-        this.saver.add({
-          path,
-          buffer,
-        })
+        this.saver.add(path, buffer)
       }
       pages.splice(pages.indexOf(epp), 1)
       pages.unshift(epp)
@@ -155,10 +152,7 @@ export class AppConfigParser extends BaseParser {
     const config = JSON.parse(this.sources)
     const subPackages = config['subPackages']
     subPackages && this.logger.info(`AppConfigParser detected ${subPackages.length.toString().blue.bold} subpackages`)
-    this.saver.add({
-      path: WxapkgKeyFile.GAME_JSON,
-      buffer: this.sources,
-    })
+    this.saver.add(WxapkgKeyFile.GAME_JSON, this.sources)
   }
 
   setServiceSource(source: string) {

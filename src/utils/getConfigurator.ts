@@ -13,7 +13,7 @@ export function getConfigurator(dev?: boolean): CliConfigurator {
       format: true,
       clean: true,
       parse: true,
-      packages: ['files'],
+      packages: ['files/311-APP_V3.wxapkg'],
     },
   }
 }

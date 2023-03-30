@@ -79,20 +79,15 @@ export class WxapkgDecryptor extends BaseDecryptor {
       const xorKey = wxAppId.length < 2 ? 0x66 : wxAppId.charCodeAt(wxAppId.length - 2)
       const oriContents = Buffer.from(contents.map((b) => b ^ xorKey))
       this.decryptedBuffer = Buffer.concat([oriHeader.subarray(0, 0x3ff), oriContents])
-      checkWxapkg(this.decryptedBuffer, 'Please check if wxAppId is correct')
+      if (!checkWxapkg(this.decryptedBuffer)) DecryptorError.throw('Please check if wxAppId is correct')
       this.logger.debug('Decryption successful!')
     } catch (e) {
       throw new DecryptorError('Decryption failed! ' + e.message)
     }
   }
 
-  async save(target?: ProduciblePath): Promise<number> {
-    return this.saver
-      .add({
-        path: target || this.target,
-        buffer: this.result,
-      })
-      .save(true)
+  async save(target?: ProduciblePath) {
+    this.saver.add(target || this.target, this.result)
   }
 
   static async decryptResult(options: WxapkgDecryptorOptions): Promise<Buffer>

@@ -5,14 +5,11 @@ export function checkMacEncryption(buf: Buffer): boolean {
   const encryptedForMac = 'WAPkgEncryptedTagForMac'
   return buf.subarray(-encryptedForMac.length).toString() !== encryptedForMac
 }
-export function checkWxapkg<T extends Error>(path: ProduciblePath, throws?: string | T): boolean
-export function checkWxapkg<T extends Error>(buff: Buffer, throws?: string | T): boolean
-
-export function checkWxapkg(v: unknown, throws?: unknown): boolean {
+export function checkWxapkg(path: ProduciblePath): boolean
+export function checkWxapkg(buff: Buffer): boolean
+export function checkWxapkg(v: ProduciblePath | Buffer): boolean {
   const buf = (isProduciblePath(v) ? PathController.make(v).readSync() : v) as Buffer
-  const invalid = buf.readUInt8(0) === 0xbe && buf.readUInt8(13) === 0xed
-  if (throws && !invalid) throw typeof throws === 'string' ? Error(throws) : throws
-  return invalid
+  return buf.readUInt8(0) === 0xbe && buf.readUInt8(13) === 0xed
 }
 
 export async function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>

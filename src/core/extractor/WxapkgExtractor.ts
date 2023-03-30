@@ -4,7 +4,6 @@ import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@utils/checkWx
 import { PackageSuffix, WxapkgKeyFile, WxapkgType } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 import { Saver } from '@utils/classes/Saver'
-import { reformat } from '@utils/reformat'
 
 export interface WxapkgFileHeader {
   infoLength: number
@@ -52,7 +51,7 @@ export class WxapkgExtractor extends BaseExtractor {
     this.wxAppId = appid
   }
   getFileHeader(buf: Buffer): WxapkgFileHeader {
-    checkWxapkg(buf, new ExtractorError(`File ${this.pathCtrl.logpath} is an invalid package!`))
+    if (!checkWxapkg(buf)) ExtractorError.throw(`File ${this.pathCtrl.logpath} is an invalid package!`)
     const unknownInfo = buf.readUInt32BE(1)
     unknownInfo && this.logger.warn('UnknownInfo: ', unknownInfo)
     return {
@@ -98,9 +97,7 @@ export class WxapkgExtractor extends BaseExtractor {
     files.forEach((file) => {
       const { name, start, end } = file
       const path = name.startsWith('/') ? name.slice(1) : name
-      let buffer: string | Buffer = buf.subarray(start, end)
-      if (path.endsWith('json')) buffer = reformat(buffer.toString('utf8'), { parser: 'json' })
-      this.saver.add({ path, buffer })
+      this.saver.add(path, buf.subarray(start, end))
       // 获取源码目录
       const baseName = PathController.make(path).basename
       if (baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME) {
@@ -110,8 +107,8 @@ export class WxapkgExtractor extends BaseExtractor {
     const list = files.map((file) => PathController.make(file.name).basename)
     this.wxapkgType = await checkWxapkgType(list)
   }
-  async save() {
-    await this.saver.save(true)
+  save() {
+    this.saver.merge()
   }
   get saveDirectory() {
     return this.saver.saveDirectory

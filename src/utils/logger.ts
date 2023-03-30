@@ -6,7 +6,7 @@ const { combine, timestamp, printf, colorize } = format
 const levels = { error: 0, warn: 1, info: 2, debug: 3 }
 
 export type LoggerLevel = keyof typeof levels
-export function getLogger(name?: string, level?: string): Logger {
+export function getLogger(name?: string, level?: LoggerLevel): Logger {
   return createLogger({
     level: level || getConfig('logLevel'),
     levels,
@@ -30,8 +30,8 @@ export function getLogger(name?: string, level?: string): Logger {
 }
 export class BaseLogger {
   readonly logger: Logger
-  constructor(name?: string) {
+  constructor(name?: string, level?: LoggerLevel) {
     name = name || this.constructor.name
-    this.logger = getLogger(name.length < 4 ? void 0 : name)
+    this.logger = getLogger(name.length < 4 ? void 0 : name, level)
   }
 }
