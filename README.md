@@ -11,7 +11,7 @@
 [![release](https://img.shields.io/github/downloads/r3x5ur/unveilr/total)][release]
 [![vul](https://img.shields.io/snyk/vulnerabilities/github/r3x5ur/unveilr)][repo]
 ## ！！！声明！！！
-**本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此脚本用于非授权的测试，脚本开发者不负任何连带法律责任。**
+**本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非授权的测试，开发者不负任何连带法律责任。**
 
 ### ✨新版本特性 (项目重构中 预计 3月底发布 2.0正式版)
 - 🔥支持自动解密(`windows`从路径上提取`wxAppId`)
