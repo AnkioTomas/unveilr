@@ -37,7 +37,7 @@ export function decryptBuffer(buffer: Buffer, password: string, salt: string, iv
   })
   return WordArrayToBuffer(cipher)
 }
-export function md5(b64Str: string, fromBase64: boolean): string
+export function md5(b64Str: string, fromBase64: true): string
 export function md5(buffer: Buffer): string
 export function md5(message: string): string
 export function md5(_message: string | Buffer | CryptoJS.lib.WordArray, fromBase64?: boolean): string {

@@ -5,8 +5,6 @@ import { S2Observable, TraverseResult, TVSubject, WxmlParserV3Subject, ZArray } 
 import { Visitor } from '@babel/traverse'
 import { parseJSONFromJSCode } from '@utils/ast'
 import { filter } from 'observable-fns'
-import { PathController, ProduciblePath } from '@core/controller/PathController'
-import { reformat } from '@utils/reformat'
 
 const zArrayFunctionNameRE = /gz\$gwx\d*_[A-Za-z_0-9]+/
 const scopeNameRE = /\$gwx\d*$|\$gwx\d*_[A-Za-z_0-9]+/
@@ -82,7 +80,7 @@ export class WxmlParser extends BaseParser {
         const { code, json, z } = data
         const dir = this.dir
         parseWxml(code, dir, json, z).then((result) => {
-          Object.entries(result).forEach((args) => this.add2Saver(...args))
+          Object.entries(result).forEach((args) => this.saver.add(...args))
         })
       },
       complete() {
@@ -94,19 +92,9 @@ export class WxmlParser extends BaseParser {
 
   async parseV1() {
     const result = await parseWxml(this.sources, this.dir)
-    Object.entries(result).forEach((args) => this.add2Saver(...args))
+    Object.entries(result).forEach((args) => this.saver.add(...args))
   }
 
-  private add2Saver(path: ProduciblePath, buffer: string) {
-    switch (PathController.make(path).suffixWithout) {
-      case 'wxs':
-        buffer = reformat(buffer, { parser: 'babel' })
-        break
-      case 'json':
-        buffer = reformat(buffer, { parser: 'json' })
-    }
-    this.saver.add({ path, buffer })
-  }
   get dir() {
     return this.saver.saveDirectory.path
   }

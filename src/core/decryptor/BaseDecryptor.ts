@@ -20,7 +20,7 @@ export class BaseDecryptor extends BaseLogger {
 
   decrypt(): void {
     if (!this.decipherable) {
-      throw DecryptorError.make(`File ${this.pathCtrl.logpath} cannot be decrypted!`)
+      DecryptorError.throw(`File ${this.pathCtrl.logpath} cannot be decrypted!`)
     }
   }
 }

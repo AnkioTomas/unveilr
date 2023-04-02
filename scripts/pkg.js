@@ -1,4 +1,3 @@
-require('colors')
 const { rmSync, readdirSync } = require('fs')
 const { join } = require('path')
 const { execSync } = require('child_process')
@@ -10,7 +9,7 @@ const distIndex = 'dist/index.js'
 const release = 'release'
 
 function log(message) {
-  console.log(`[PKG] ${message}`.blue)
+  console.log(`[PKG] ${message}`)
 }
 
 /**
@@ -42,7 +41,7 @@ async function _tgz() {
   for (const p of files) {
     const source = join(release, p)
     const dest = source + '.tar.gz'
-    log(`Generating ${dest.gray.blue}`)
+    log(`Generating dest ${dest}`)
     await tgz.compressFile(source, dest)
     rmSync(source)
   }

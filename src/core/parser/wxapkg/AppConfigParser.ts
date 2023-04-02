@@ -6,6 +6,8 @@ import { AppConfigServiceSubject, S2Observable, TVSubject } from '@core/parser/w
 import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 import { md5 } from '@utils/crypto'
+import { findBuffer } from '@core/controller/SaveController'
+import { info } from '@utils/colors'
 
 interface PageInfo {
   [key: string]: {
@@ -49,10 +51,7 @@ export class AppConfigParser extends BaseParser {
         const filename = PathController.make(path).unixpath
         if (seenPage.has(filename)) return
         seenPage.add(filename)
-        this.saver.add({
-          path,
-          buffer,
-        })
+        this.saver.add(path, buffer)
       }
       pages.splice(pages.indexOf(epp), 1)
       pages.unshift(epp)
@@ -68,7 +67,7 @@ export class AppConfigParser extends BaseParser {
             return page.replace(root, '')
           })
         })
-        this.logger.info(`AppConfigParser detected ${subPackages.length.toString().blue.bold} subpackages`)
+        this.logger.info(`AppConfigParser detected ${info(subPackages.length.toString())} subpackages`)
       }
       // 处理 ext.json
       const extAppid = config.pop('extAppid')
@@ -82,14 +81,12 @@ export class AppConfigParser extends BaseParser {
       const ignoreSuffixes = 'wxml,wxs,wxss,html,json'
       if (tabBar && Array.isArray(tabBar.list)) {
         const hashMap: Record<string, string> = Object.create(null)
-        dirCtrl
-          .reload()
-          .deepListDir()
-          .forEach((p) => {
-            const pCtrl = PathController.unix(p)
-            if (ignoreSuffixes.includes(pCtrl.suffixWithout)) return
-            hashMap[md5(pCtrl.readSync())] = pCtrl.crop(dirCtrl).unixpath
-          })
+        findBuffer(dirCtrl).forEach(({ key, buffer }) => {
+          const pCtrl = PathController.unix(key)
+          if (ignoreSuffixes.includes(pCtrl.suffixWithout)) return
+          if (!Buffer.isBuffer(buffer)) return
+          hashMap[md5(buffer)] = pCtrl.crop(dirCtrl.absunixpath).unixpath
+        })
         tabBar.list.forEach((item: TabBarItem) => {
           item.pagePath = PathController.make(item.pagePath).whitout().unixpath
           if (item.iconData) {
@@ -154,11 +151,8 @@ export class AppConfigParser extends BaseParser {
   parseGame() {
     const config = JSON.parse(this.sources)
     const subPackages = config['subPackages']
-    subPackages && this.logger.info(`AppConfigParser detected ${subPackages.length.toString().blue.bold} subpackages`)
-    this.saver.add({
-      path: WxapkgKeyFile.GAME_JSON,
-      buffer: this.sources,
-    })
+    subPackages && this.logger.info(`AppConfigParser detected ${info(subPackages.length.toString())} subpackages`)
+    this.saver.add(WxapkgKeyFile.GAME_JSON, this.sources)
   }
 
   setServiceSource(source: string) {

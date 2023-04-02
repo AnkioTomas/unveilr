@@ -4,7 +4,7 @@ import { checkMacEncryption, checkWxapkg, checkWxapkgType } from '@utils/checkWx
 import { PackageSuffix, WxapkgKeyFile, WxapkgType } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 import { Saver } from '@utils/classes/Saver'
-import { reformat } from '@utils/reformat'
+import { info, link } from '@utils/colors'
 
 export interface WxapkgFileHeader {
   infoLength: number
@@ -22,11 +22,14 @@ export interface WxapkgExtractorOptions {
   wxAppId?: string
   saveDir?: ProduciblePath
 }
+
 export class WxapkgExtractor extends BaseExtractor {
   private wxAppId: string
   private saver: Saver
   private wxapkgType: WxapkgType
   private sourcePath: string
+  private isExtracted: boolean
+
   constructor(path: ProduciblePath)
   constructor(options: WxapkgExtractorOptions)
   constructor(v: WxapkgExtractorOptions | ProduciblePath) {
@@ -38,8 +41,58 @@ export class WxapkgExtractor extends BaseExtractor {
       this.setSaver(saveDir)
       this.wxAppId = wxAppId
     }
+    this.isExtracted = false
     this.suffix = PackageSuffix.WXAPKG
   }
+
+  // 是否提取完成
+  get extracted() {
+    if (!this.isExtracted) ExtractorError.throw(`Need to extract first`)
+    return true
+  }
+
+  // 包类型
+  get type() {
+    if (!this.wxapkgType) ExtractorError.throw(`WxapkgType not available, No extract or unsupported packages`)
+    return this.wxapkgType
+  }
+
+  // 是否主包
+  get isMainPackage() {
+    return (
+      this.type === WxapkgType.APP_V1 ||
+      this.type === WxapkgType.APP_V2 ||
+      this.type === WxapkgType.APP_V3 ||
+      this.type === WxapkgType.APP_V4 ||
+      this.type === WxapkgType.GAME
+    )
+  }
+
+  // 是否是分包
+  get isSubpackage() {
+    return (
+      this.type === WxapkgType.APP_SUBPACKAGE_V1 ||
+      this.type === WxapkgType.APP_SUBPACKAGE_V2 ||
+      this.type === WxapkgType.GAME_SUBPACKAGE
+    )
+  }
+
+  // 是否是小程序插件
+  get isAppPlugin() {
+    return this.type === WxapkgType.APP_PLUGIN_V1
+  }
+
+  // 是否是游戏插件
+  get isGamePlugin() {
+    return this.type === WxapkgType.GAME_PLUGIN
+  }
+
+  // 是否是插件
+  get isPlugin() {
+    return this.isAppPlugin || this.isGamePlugin
+  }
+
+  // 设置保存的路径
   setSaver(saveDir: ProduciblePath | undefined) {
     saveDir = saveDir || this.pathCtrl.whitout()
     if (!this.saver) {
@@ -48,11 +101,27 @@ export class WxapkgExtractor extends BaseExtractor {
     }
     this.saver.saveDirectory = saveDir
   }
+
+  // 设置WxAppId
   setWxAppId(appid: string) {
     this.wxAppId = appid
   }
+
+  save() {
+    this.saver.merge()
+  }
+
+  get saveDirectory() {
+    return this.saver.saveDirectory
+  }
+
+  get sourceDir(): PathController {
+    return this.saveDirectory.join(this.sourcePath)
+  }
+
+  // 获取文件头信息
   getFileHeader(buf: Buffer): WxapkgFileHeader {
-    checkWxapkg(buf, new ExtractorError(`File ${this.pathCtrl.logpath} is an invalid package!`))
+    if (!checkWxapkg(buf)) ExtractorError.throw(`File ${this.pathCtrl.logpath} is an invalid package!`)
     const unknownInfo = buf.readUInt32BE(1)
     unknownInfo && this.logger.warn('UnknownInfo: ', unknownInfo)
     return {
@@ -60,6 +129,8 @@ export class WxapkgExtractor extends BaseExtractor {
       dataLength: buf.readUInt32BE(9),
     }
   }
+
+  // 获取包内的文件信息
   getFileByRaw(buf: Buffer): WxapkgFileInfo[] {
     const fileCount = buf.readUInt32BE(0)
     this.logger.debug(`Read file count ${fileCount}`)
@@ -82,12 +153,13 @@ export class WxapkgExtractor extends BaseExtractor {
         }
       })
   }
-  async _extract(buf: Buffer): Promise<void> {
+
+  extractInner(buf: Buffer): void {
     const isEncrypted = buf.subarray(0, 6).toString('hex') === '56314d4d5758'
     if (isEncrypted) {
-      this.logger.debug(`File ${this.pathCtrl.logpath} encrypted, Starting decrypt `)
-      const buffer = await WxapkgDecryptor.decryptResult(this.pathCtrl, this.wxAppId)
-      return this._extract(buffer)
+      this.logger.debug(`File ${this.pathCtrl.logpath} encrypted, Starting decrypt`)
+      const buffer = WxapkgDecryptor.decryptResult(this.pathCtrl, this.wxAppId)
+      return this.extractInner(buffer)
     }
     this.logger.debug(`Starting extract ${this.pathCtrl.logpath}`)
     const { dataLength, infoLength } = this.getFileHeader(buf.subarray(0, 14))
@@ -95,57 +167,44 @@ export class WxapkgExtractor extends BaseExtractor {
     this.logger.debug(`Header data length ${dataLength}`)
     const files = this.getFileByRaw(buf.subarray(14, infoLength + 14))
     this.logger.debug(`Starting save extracted files`)
-    files.forEach((file) => {
+    const pathList = files.map((file) => {
       const { name, start, end } = file
       const path = name.startsWith('/') ? name.slice(1) : name
-      let buffer: string | Buffer = buf.subarray(start, end)
-      if (path.endsWith('json')) buffer = reformat(buffer.toString('utf8'), { parser: 'json' })
-      this.saver.add({ path, buffer })
-      // 获取源码目录
-      const baseName = PathController.make(path).basename
-      if (baseName === WxapkgKeyFile.APP_SERVICE || baseName === WxapkgKeyFile.GAME) {
-        this.sourcePath = PathController.dir(path).path
-      }
+      this.saver.add(path, buf.subarray(start, end))
+      const basename = PathController.make(path).basename
+      return { path, basename }
     })
-    const list = files.map((file) => PathController.make(file.name).basename)
-    this.wxapkgType = await checkWxapkgType(list)
-  }
-  async save() {
-    await this.saver.save(true)
-  }
-  get saveDirectory() {
-    return this.saver.saveDirectory
-  }
-  getSourceDir(isPlugin: boolean): PathController {
-    const result = this.saver.saveDirectory
-      .join(this.sourcePath || '.')
-      .reload()
-      .deepListDir()
-      .find((path) => {
-        const baseName = PathController.make(path).basename
-        return (
-          baseName === WxapkgKeyFile.APP_SERVICE ||
-          baseName === WxapkgKeyFile.APPSERVICE ||
-          baseName === WxapkgKeyFile.GAME ||
-          (isPlugin && baseName === WxapkgKeyFile.PLUGIN_JSON)
-        )
-      })
-    if (!result) ExtractorError.throw(`Source code path not found, may not be a supported package`)
-    return PathController.dir(result)
+    const type = checkWxapkgType(pathList.map(({ basename }) => basename))
+    if (!type) this.logger.warn(`Parsed packages are not supported`)
+    this.logger.info(`The package ${this.pathCtrl.logpath} type is: [${info(type)}]`)
+    if (type === WxapkgType.FRAMEWORK) this.logger.warn(`Running the framework does not require unpacking`)
+    this.wxapkgType = type
+    const isPlugin = this.isPlugin
+    const sp = pathList.find((item) => {
+      const { basename } = item
+      return (
+        basename === WxapkgKeyFile.APP_SERVICE ||
+        basename === WxapkgKeyFile.APPSERVICE ||
+        basename === WxapkgKeyFile.GAME ||
+        (isPlugin && basename === WxapkgKeyFile.PLUGIN_JSON)
+      )
+    })
+    if (!sp) ExtractorError.throw(`File ${this.pathCtrl.logpath} source directory not found`)
+    this.sourcePath = PathController.make(sp.path || '.').dirname
+    this.isExtracted = true
   }
 
-  async extract(save?: boolean): Promise<WxapkgType> {
+  extract(save?: boolean) {
     super.extract()
-    const buf = await this.pathCtrl.read()
+    const buf = this.pathCtrl.readSync()
     if (!checkMacEncryption(buf)) {
-      const target = 'https://github.com/TinyNiko/mac_wxapkg_decrypt'
+      const target = link(info('https://github.com/TinyNiko/mac_wxapkg_decrypt'))
       ExtractorError.throw(
-        `Package ${this.pathCtrl.logpath} is an encrypted package for Mac, please use ${target} to decrypt it before using it`,
+        `Package ${this.pathCtrl.logpath} is an encrypted package for Mac
+    please use ${target} to decrypt it before using it`,
       )
     }
-    await this._extract(buf)
-    if (!this.wxapkgType) this.logger.warn(`Parsed packages are not supported`)
-    save && (await this.save())
-    return this.wxapkgType
+    this.extractInner(buf)
+    save && this.save()
   }
 }

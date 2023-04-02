@@ -11,11 +11,12 @@ import { ParserLike, TraverseVisitorKeys, TVSubjectType } from '@core/parser/wxa
 import { createExposed, traverseModule } from '@core/workers/traverse'
 import { Saver } from '@utils/classes/Saver'
 import { WorkerController } from '@core/controller/WorkerController'
-import { unlink } from '@utils/unlink'
 import { BaseError } from '@utils/exceptions'
 import { getConfig, getInnerConfig } from '@core/controller/ConfigController'
 import { getWccVersion } from '@utils/getWccVersion'
 import { Observable } from 'observable-fns'
+import { flashDisk, getSaveController, saveAble2String } from '@core/controller/SaveController'
+import { info } from '@utils/colors'
 
 export class WxapkgError extends BaseError {}
 export type ParsersKey = TraverseVisitorKeys | 'WxmlParserV1'
@@ -40,8 +41,6 @@ interface SetAppOptions {
 export class WxapkgDecompiler extends BaseLogger {
   // 包路径
   private readonly pathCtrl: PathController
-  // 包类型
-  private type: WxapkgType
   // 解包器
   private readonly extractor: WxapkgExtractor
   // 解析器
@@ -50,72 +49,53 @@ export class WxapkgDecompiler extends BaseLogger {
   private readonly saver: Saver
   // 遍历列表
   private readonly traverseList: TraverseData[]
-  // 是否已经提取
-  private isSaveExtracted = false
-
   // 是否使用 V1 版本解析器
   get isParserV1() {
-    this.checkTypeAvailable()
+    const type = this.extractor.type
     // prettier-ignore
     return (
-      this.type === WxapkgType.APP_V1 ||
-      this.type === WxapkgType.APP_V2 ||
-      this.type === WxapkgType.APP_SUBPACKAGE_V1
+      type === WxapkgType.APP_V1 ||
+      type === WxapkgType.APP_V2 ||
+      type === WxapkgType.APP_SUBPACKAGE_V1
     )
   }
   // 是否使用 V3 版本解析器
   get isParserV3() {
-    this.checkTypeAvailable()
+    const type = this.extractor.type
     return (
-      this.type === WxapkgType.APP_V3 ||
-      this.type === WxapkgType.APP_V4 ||
-      this.type === WxapkgType.APP_SUBPACKAGE_V2 ||
-      this.type === WxapkgType.APP_PLUGIN_V1
+      type === WxapkgType.APP_V3 ||
+      type === WxapkgType.APP_V4 ||
+      type === WxapkgType.APP_SUBPACKAGE_V2 ||
+      type === WxapkgType.APP_PLUGIN_V1
     )
   }
-  // 是否是分包
-  get isSubpackage() {
-    this.checkTypeAvailable()
-    return (
-      this.type === WxapkgType.APP_SUBPACKAGE_V1 ||
-      this.type === WxapkgType.APP_SUBPACKAGE_V2 ||
-      this.type === WxapkgType.GAME_SUBPACKAGE
-    )
-  }
-  // 是否主包
+  // 是否是主包
   get isMainPackage() {
-    this.checkTypeAvailable()
-    return (
-      this.type === WxapkgType.APP_V1 ||
-      this.type === WxapkgType.APP_V2 ||
-      this.type === WxapkgType.APP_V3 ||
-      this.type === WxapkgType.APP_V4 ||
-      this.type === WxapkgType.GAME
-    )
+    return this.extractor.isMainPackage
   }
-  // 是否是小程序插件
+  // 是否是子包
+  get isSubpackage() {
+    return this.extractor.isSubpackage
+  }
   get isAppPlugin() {
-    return this.type === WxapkgType.APP_PLUGIN_V1
+    return this.extractor.isAppPlugin
   }
-  // 是否是游戏插件
-  get isGamePlugin() {
-    return this.type === WxapkgType.GAME_PLUGIN
-  }
-  // 保存的目录
-  get saveDirectory(): PathController {
-    return this.extractor.saveDirectory
-  }
-  set saveDirectory(dir: ProduciblePath) {
-    dir = dir || this.path.whitout()
-    this.extractor.setSaver(dir)
-    this.saver.saveDirectory = dir
+  // 当前包路径
+  get path(): PathController {
+    return this.pathCtrl
   }
   // 源码目录
   get sourceDir(): PathController {
-    return this.extractor.getSourceDir(this.isAppPlugin || this.isGamePlugin)
+    return this.extractor.sourceDir
   }
-  get path(): PathController {
-    return this.pathCtrl
+  // 保存的目录
+  get saveDir(): PathController {
+    return this.saver.saveDirectory
+  }
+  set saveDir(dir: ProduciblePath) {
+    dir = dir || this.path.whitout()
+    this.extractor.setSaver(dir)
+    this.saver.saveDirectory = dir
   }
 
   constructor(path: ProduciblePath) {
@@ -123,40 +103,30 @@ export class WxapkgDecompiler extends BaseLogger {
     this.pathCtrl = PathController.make(path)
     // 默认保存路径为 path.whitout()
     this.extractor = new WxapkgExtractor({ path: this.path })
-    this.saver = new Saver(this.saveDirectory)
+    this.saver = new Saver(this.extractor.saveDirectory)
     this.parsers = Object.create(null)
     this.traverseList = []
   }
   setExtractorWxAppId(appid: string) {
     this.extractor.setWxAppId(appid)
   }
-  async extract() {
-    const type = await this.extractor.extract()
-    this.type = type
-    if (!type) return
-    this.logger.info(`The current package type is: [${type.blue.bold}]`)
-    if (type === WxapkgType.FRAMEWORK) return this.logger.warn(`Running the framework does not require unpacking`)
+  extract() {
+    this.extractor.extract()
+  }
+  extractorSave(): void {
+    this.extractor.save()
   }
   async makeParserTraverse(): Promise<TraverseData[]> {
-    await this.extractor.save()
-    this.isSaveExtracted = true
-    if (!getConfig('WXParse')) return
     this.initParsers()
     await this.initTraverseList()
     const list = this.traverseList.filter((item) => item.source)
     if (!list.length) this.logger.warn(`File ${this.path.logpath} no data to parse`)
     return list.map((item) => Object.assign({ decompiler: this }, item))
   }
-  checkTypeAvailable() {
-    if (!this.type) WxapkgError.throw(`Type not available, please unpack first`)
-  }
-  checkIsSaveExtracted() {
-    if (!this.isSaveExtracted) WxapkgError.throw(`This operation must first save the extraction results`)
-  }
   initParsers() {
-    this.checkIsSaveExtracted()
+    if (!this.extractor.extracted) return
     this.parsers.ScriptParser = new ScriptParser(this.saver)
-    switch (this.type) {
+    switch (this.extractor.type) {
       case WxapkgType.APP_V1:
       case WxapkgType.APP_V2:
       case WxapkgType.APP_V3:
@@ -188,22 +158,26 @@ export class WxapkgDecompiler extends BaseLogger {
     }
   }
   async initTraverseList() {
-    this.checkIsSaveExtracted()
+    if (!this.extractor.extracted) return
     // 源码路径
-    const bdc = this.sourceDir
+    const sourceDir = this.sourceDir
+    const getSource = (keyFile: WxapkgKeyFile) => {
+      const ctrl = sourceDir.join(keyFile)
+      return saveAble2String(getSaveController().get(ctrl.abspath))
+    }
     const setApp = async (options?: SetAppOptions) => {
       const {
-        serviceSource = await bdc.join(WxapkgKeyFile.APP_SERVICE).read('utf8'),
-        viewSource = await bdc.join(WxapkgKeyFile.APP_WXSS).read('utf8'),
+        serviceSource = getSource(WxapkgKeyFile.APP_SERVICE),
+        viewSource = getSource(WxapkgKeyFile.APP_WXSS),
         appConfigSource,
         setAppConfig = true,
       } = options || {}
       const wccVersion = getWccVersion(viewSource)
       if (wccVersion) {
-        this.logger.info(`The package ${this.pathCtrl.logpath} wcc version is: [${wccVersion.blue.bold}]`)
+        this.logger.info(`The package ${this.pathCtrl.logpath} wcc version is: [${info(wccVersion)}]`)
       }
       if (setAppConfig) {
-        const appConfigSource$1 = appConfigSource || (await bdc.join(WxapkgKeyFile.APP_CONFIG).read('utf8'))
+        const appConfigSource$1 = appConfigSource || getSource(WxapkgKeyFile.APP_CONFIG)
         const ACParser = this.parsers.AppConfigService as AppConfigParser
         ACParser.setSources(appConfigSource$1)
         ACParser.setServiceSource(serviceSource)
@@ -217,7 +191,7 @@ export class WxapkgDecompiler extends BaseLogger {
           visitors: ['ScriptParser'],
         })
       }
-      const styleResource = [viewSource, WxssParser.getHTMLStyleSource(bdc)].join(';\n')
+      const styleResource = [viewSource, WxssParser.getHTMLStyleSource(sourceDir)].join(';\n')
       this.traverseList.push({
         source: styleResource,
         visitors: ['WxssParser', 'WxssParserCommon', 'WxssParserCommon2'],
@@ -236,19 +210,17 @@ export class WxapkgDecompiler extends BaseLogger {
         })
       }
     }
-    const setOtherScript = async (name: string) => {
+    const setOtherScript = async (name: WxapkgKeyFile) => {
       this.traverseList.push({
-        source: await bdc.join(name).read('utf8'),
+        source: getSource(name),
         visitors: ['ScriptParser'],
       })
     }
 
-    switch (this.type) {
+    switch (this.extractor.type) {
       case WxapkgType.APP_V1:
       case WxapkgType.APP_V4:
-        await setApp({
-          viewSource: matchScripts(await bdc.join(WxapkgKeyFile.PAGE_FRAME_HTML).read('utf8')),
-        })
+        await setApp({ viewSource: matchScripts(getSource(WxapkgKeyFile.PAGE_FRAME_HTML)) })
         break
       case WxapkgType.APP_V2:
       case WxapkgType.APP_V3:
@@ -257,22 +229,22 @@ export class WxapkgDecompiler extends BaseLogger {
       case WxapkgType.APP_SUBPACKAGE_V1:
       case WxapkgType.APP_SUBPACKAGE_V2:
         await setApp({
-          viewSource: await bdc.join(WxapkgKeyFile.PAGE_FRAME).read('utf8'),
+          viewSource: getSource(WxapkgKeyFile.PAGE_FRAME),
           setAppConfig: false,
         })
         break
       case WxapkgType.APP_PLUGIN_V1:
         await setApp({
-          viewSource: await bdc.join(WxapkgKeyFile.PAGEFRAME).read('utf8'),
-          serviceSource: await bdc.join(WxapkgKeyFile.APPSERVICE).read('utf8'),
+          viewSource: getSource(WxapkgKeyFile.PAGEFRAME),
+          serviceSource: getSource(WxapkgKeyFile.APPSERVICE),
           setAppConfig: false,
         })
         break
       case WxapkgType.GAME:
         {
-          const appConfigSource = await bdc.join(WxapkgKeyFile.APP_CONFIG).read('utf8')
-          const gameSource = await bdc.join(WxapkgKeyFile.GAME).read('utf8')
-          const subContext = await bdc.join(WxapkgKeyFile.SUBCONTEXT).read('utf8')
+          const appConfigSource = getSource(WxapkgKeyFile.APP_CONFIG)
+          const gameSource = getSource(WxapkgKeyFile.GAME)
+          const subContext = getSource(WxapkgKeyFile.SUBCONTEXT)
           const source = [gameSource, subContext].filter(Boolean).join(';\n')
           const ACParser = this.parsers.AppConfigService as AppConfigParser
           ACParser.setSources(appConfigSource)
@@ -292,12 +264,11 @@ export class WxapkgDecompiler extends BaseLogger {
         break
     }
   }
-  async save() {
-    await this.saver.save(true)
-    await this.cleanup()
+  save() {
+    this.saver.merge()
+    getConfig('WXClearDecompile') && this.cleanup()
   }
-  async cleanup() {
-    if (!getConfig('WXParse') || !getConfig('WXClean')) return
+  cleanup() {
     const dirCtrl = this.sourceDir
     this.logger.debug(`Start cleaning ${dirCtrl.logpath}`)
     const unlinks = [
@@ -313,8 +284,10 @@ export class WxapkgDecompiler extends BaseLogger {
       'pageframe.js',
       'webview.app.js',
       'subContext.js',
+      'plugin.js',
     ]
-    await Promise.all(unlinks.map((p) => unlink(dirCtrl.join(p), true)))
+    const inst = getSaveController()
+    unlinks.forEach((p) => inst.delete(dirCtrl.join(p).abspath))
   }
 }
 
@@ -333,6 +306,7 @@ export class WxapkgController extends BaseLogger {
     else Object.assign(options, v)
     const { wxapkgList, mainSaveDir, wxAppId } = options
     if (mainSaveDir) this.mainSaveDir = PathController.make(mainSaveDir)
+    if (!wxapkgList.length) WxapkgError.throw(`No wxapkg available`)
     // 初始化反编译器
     this.decompilers = wxapkgList.map((p) => {
       const decompiler = new WxapkgDecompiler(p)
@@ -342,30 +316,47 @@ export class WxapkgController extends BaseLogger {
     this.parsersPromise = []
   }
 
-  async calcDecompilersSaveDir() {
+  extractorSave() {
+    // 保存之前清理一下之前的结果
+    this.clearOldResult()
+    // 保存提取之后的结果
+    this.decompilers.forEach((d) => d.extractorSave())
+  }
+  extract(isNoParse: boolean) {
+    // 提取文件
+    this.decompilers.forEach((d) => d.extract())
+    // 不解析直接保存结果
+    if (isNoParse) return this.extractorSave()
+    // 检测主包
     let mainDecompiler: WxapkgDecompiler
-    const find = async (decompiler: WxapkgDecompiler) => {
-      await decompiler.extract()
-      if (!getConfig('WXParse')) return
-      if (decompiler.isMainPackage) {
+    this.decompilers.forEach((d) => {
+      if (d.isMainPackage) {
         if (mainDecompiler) WxapkgError.throw(`There can only be one main package`)
-        mainDecompiler = decompiler
+        mainDecompiler = d
       }
-    }
-    await Promise.all(this.decompilers.map((d) => find(d)))
+    })
+    // 不存在主包直接保存结果
+    if (!mainDecompiler) return this.extractorSave()
     // 存在主包把其他子包的保存路径指向主包
-    if (mainDecompiler) {
-      if (this.mainSaveDir) {
-        mainDecompiler.saveDirectory = this.mainSaveDir
-        mainDecompiler.saveDirectory.rmrfSync()
-      }
-      for (const decompiler of this.decompilers) {
-        // 小程序插件暂时不能放到主包内
-        if (decompiler !== mainDecompiler && !decompiler.isAppPlugin) {
-          decompiler.saveDirectory = mainDecompiler.saveDirectory
-        }
-      }
+    if (this.mainSaveDir) {
+      mainDecompiler.saveDir = this.mainSaveDir
+      mainDecompiler.saveDir.rmrfSync()
     }
+    this.decompilers.forEach((d) => {
+      if (d === mainDecompiler) return
+      // 小程序插件暂时不能放到主包内
+      if (d.isAppPlugin) return
+      d.saveDir = mainDecompiler.saveDir
+    })
+    this.extractorSave()
+  }
+
+  clearOldResult() {
+    if (!getConfig('WXClearSave')) return
+    Array.from(new Set(this.decompilers.map((d) => d.saveDir))).forEach((ctrl) => {
+      ctrl.rmrfSync()
+      this.logger.debug(`Cleaned old result ${ctrl.logpath}`)
+    })
   }
 
   async invokeTraverseWorker(): Promise<void> {
@@ -418,12 +409,14 @@ export class WxapkgController extends BaseLogger {
 
   async saveFiles() {
     await Promise.all(this.parsersPromise)
-    await Promise.all(this.decompilers.map((d) => d.save()))
+    this.decompilers.forEach((d) => d.save())
+    await flashDisk()
   }
 
   async exploit() {
-    await this.calcDecompilersSaveDir()
-    await this.invokeTraverseWorker()
+    const isParse = getConfig('WXParse')
+    this.extract(!isParse)
+    isParse && (await this.invokeTraverseWorker())
     await this.saveFiles()
   }
 }

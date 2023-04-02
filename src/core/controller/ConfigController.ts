@@ -16,8 +16,14 @@ export class ConfigController {
   get WXReformat() {
     return this.config.wx.format
   }
-  get WXClean() {
-    return this.config.wx.clean
+  get WXClearDecompile() {
+    return this.WXParse && this.config.wx.clearDecompile
+  }
+  get WXClearSave() {
+    return this.config.wx.clearSave
+  }
+  get WXDepth() {
+    return this.config.wx.depth
   }
   get WXParse() {
     return this.config.wx.parse

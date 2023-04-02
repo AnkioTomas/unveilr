@@ -13,11 +13,11 @@ import { Visitor } from '@babel/core'
 import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 import { transformStyle } from '@utils/transformStyle'
-import { unlink } from '@utils/unlink'
 import { WxapkgKeyFile } from '@/enum'
 import { md5 } from '@utils/crypto'
 import { getLogger } from '@utils/logger'
 import { parseJSONFromJSCode } from '@utils/ast'
+import { findBuffer, getSaveController, saveAble2String } from '@core/controller/SaveController'
 
 function makeCStyleName(index: number): string {
   return `./@unveilr/wxss/unveilr.${md5(index.toString()).slice(-6)}.wxss`
@@ -69,23 +69,25 @@ export class WxssParser extends BaseParser {
   static getHTMLStyleSource(findDir: ProduciblePath): string {
     const htmlSources: string[] = []
     const findDirCtrl = PathController.make(findDir)
-    findDirCtrl
-      .deepListDir()
-      .map((p) => {
-        const ctrl = PathController.make(p)
-        if (ctrl.suffixWithout.toLowerCase() !== 'html') return
-        if (ctrl.basename === WxapkgKeyFile.PAGE_FRAME_HTML) return
-        const s = ctrl.readSync('utf8')
-        s && htmlSources.push(matchScripts(s))
-        unlink(ctrl)
-      })
-      .filter(Boolean)
-    return htmlSources.join(';\n')
+    const saveCtrl = getSaveController()
+    const suffixes = ['.appservice.js', '.common.js', '.webview.js']
+    findBuffer(findDirCtrl).forEach(({ key, buffer }) => {
+      const ctrl = PathController.make(key)
+      if (ctrl.suffixWithout.toLowerCase() !== 'html') return
+      if (ctrl.basename === WxapkgKeyFile.PAGE_FRAME_HTML) return
+      const s = saveAble2String(buffer)
+      s && htmlSources.push(matchScripts(s))
+      if (ctrl.suffixWithout.toLowerCase() === 'html') {
+        suffixes.forEach((suffix) => saveCtrl.delete(ctrl.whitout(suffix).abspath))
+      }
+      saveCtrl.delete(ctrl.abspath)
+    })
+    return htmlSources.filter(Boolean).join(';\n')
   }
 
   async parse(observable: S2Observable<TVSubject>): Promise<void> {
     const addSaver = (data: Dict) => {
-      Object.entries(data).forEach(([path, buffer]) => this.saver.add({ path, buffer }))
+      Object.entries(data).forEach((args) => this.saver.add(...args))
     }
     let resolve
     const promise = new Promise<void>((_resolve) => (resolve = _resolve))

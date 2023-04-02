@@ -5,27 +5,14 @@ export function checkMacEncryption(buf: Buffer): boolean {
   const encryptedForMac = 'WAPkgEncryptedTagForMac'
   return buf.subarray(-encryptedForMac.length).toString() !== encryptedForMac
 }
-export function checkWxapkg<T extends Error>(path: ProduciblePath, throws?: string | T): boolean
-export function checkWxapkg<T extends Error>(buff: Buffer, throws?: string | T): boolean
-
-export function checkWxapkg(v: unknown, throws?: unknown): boolean {
+export function checkWxapkg(path: ProduciblePath): boolean
+export function checkWxapkg(buff: Buffer): boolean
+export function checkWxapkg(v: ProduciblePath | Buffer): boolean {
   const buf = (isProduciblePath(v) ? PathController.make(v).readSync() : v) as Buffer
-  const invalid = buf.readUInt8(0) === 0xbe && buf.readUInt8(13) === 0xed
-  if (throws && !invalid) throw typeof throws === 'string' ? Error(throws) : throws
-  return invalid
+  return buf.readUInt8(0) === 0xbe && buf.readUInt8(13) === 0xed
 }
 
-export async function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>
-export async function checkWxapkgType(list: string[]): Promise<WxapkgType>
-export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<WxapkgType | null> {
-  let fileList: string[]
-  if (isProduciblePath(v)) {
-    const pCtrl = PathController.make(v)
-    if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
-    fileList = await pCtrl.readdir()
-  } else {
-    fileList = v as string[]
-  }
+function _getWxapkgType(fileList: string[]): WxapkgType {
   if (fileList.every((filename) => filename.startsWith('WA'))) return WxapkgType.FRAMEWORK
   // APP_V1/APP_V4
   if (fileList.includes(WxapkgKeyFile.PAGE_FRAME_HTML)) {
@@ -48,4 +35,15 @@ export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<Wxa
   }
   // not found
   return null
+}
+export function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>
+export function checkWxapkgType(list: string[]): WxapkgType
+export function checkWxapkgType(v: ProduciblePath | string[]): Promise<WxapkgType> | WxapkgType {
+  if (isProduciblePath(v)) {
+    const pCtrl = PathController.make(v)
+    if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
+    return pCtrl.readdir().then((fileList) => _getWxapkgType(fileList))
+  } else {
+    return _getWxapkgType(v)
+  }
 }
