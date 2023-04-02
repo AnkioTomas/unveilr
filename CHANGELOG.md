@@ -1,5 +1,13 @@
 # 更改日志
 
+### [:bookmark:v2.0.0-beta.1 :loud_sound:2023-04-02](https://github.com/r3x5ur/unveilr/tree/v2.0.0-beta.1)
+* [PR] fix bug (#45,#46) by @r3x5ur in https://github.com/r3x5ur/unveilr/pull/47
+* 🐛fix bug  [#54](https://github.com/r3x5ur/unveilr/issues/54) 
+* ✨add feat [#51](https://github.com/r3x5ur/unveilr/issues/51) 
+* 🐛fix bug  [#32](https://github.com/r3x5ur/unveilr/issues/32) 
+* ⬆️Replace `colors`with `chalk`
+* ♻️Refactor `Saver`Components
+
 ### [:bookmark:v2.0.0-alpha.3 :loud_sound:2023-03-29](https://github.com/r3x5ur/unveilr/tree/v2.0.0-alpha.3)
 * 添加更友好的 bug-report by @0xNoobS3c in https://github.com/r3x5ur/unveilr/pull/30
 * [PR] 添加 wcc_version 检测 by @r3x5ur in https://github.com/r3x5ur/unveilr/pull/33
