@@ -27,6 +27,6 @@ export class BaseError extends Error {
   }
 
   static throw(msg: string) {
-    throw new this(msg)
+    throw this.make(msg)
   }
 }

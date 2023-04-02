@@ -2,6 +2,7 @@ import * as babel from '@babel/core'
 import { traverse, Visitor, BabelFileResult } from '@babel/core'
 import { TraverseOptions } from '@babel/traverse'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
+import { error } from '@utils/colors'
 
 export async function buildAST(path: ProduciblePath): Promise<BabelFileResult>
 export async function buildAST(code: string, filename: string): Promise<BabelFileResult>
@@ -40,10 +41,10 @@ export function parseJSONFromJSCode(code: string, context?: object) {
   const file = new babel['File']({ filename: '.' }, { ast: babel.parseSync(code), code })
   traverse(file.ast, {
     CallExpression(path) {
-      throw Error(`This code snippet is not safe: ${path.getSource().bgRed.bold}`)
+      throw Error(`This code snippet is not safe: ${error(path.getSource())}`)
     },
     AssignmentExpression(path) {
-      throw Error(`This code snippet is not safe: ${path.getSource().bgRed.bold}`)
+      throw Error(`This code snippet is not safe: ${error(path.getSource())}`)
     },
   })
   const fn = Function('context', `with(context){return JSON.stringify(${code})}`)

@@ -1,4 +1,4 @@
-import { bold, grey, yellow } from 'colors/safe'
+import { bold, grey, yellow } from '@utils/colors'
 import { createLogger, format, Logger, transports } from 'winston'
 import { getConfig } from '@core/controller/ConfigController'
 
@@ -14,7 +14,7 @@ export function getLogger(name?: string, level?: LoggerLevel): Logger {
       timestamp({ format: 'HH:mm:ss' }),
       printf((info) => {
         const LEVEL = `[${bold(info.level.toUpperCase())}]`
-        const TIME = bold(grey(info.timestamp))
+        const TIME = grey(info.timestamp)
         const SCOPE = yellow(`<${info.scope}>`)
         const MESSAGE = ((m) => {
           if (m instanceof Error) return m.stack

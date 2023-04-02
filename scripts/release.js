@@ -1,11 +1,10 @@
-require('colors')
 const { readFileSync, writeFileSync, rmSync, existsSync } = require('fs')
 const { resolve } = require('path')
 const { execSync, exec } = require('child_process')
 const { version } = require('../package.json')
 
 function log(message) {
-  console.log(`[LOG] ${message}`.blue)
+  console.log(`[RELEASE] ${message}`)
 }
 
 function getDate() {
@@ -47,7 +46,7 @@ async function main() {
       release.stderr.on('data', log)
       release.on('close', (code) => {
         if (code !== 0) return reject(code)
-        log(`v${version.bold} released!`.green)
+        log(`v${version} released!`)
         resolve()
       })
     })
@@ -61,11 +60,11 @@ async function main() {
         break
       } catch (e) {
         retry++
-        retry !== maxRetry - 1 && log('retry...'.yellow)
+        retry !== maxRetry - 1 && log('retry...')
       }
       if (retry > maxRetry) {
         writeFileSync(releaseLock, Buffer.from(''))
-        await Promise.reject('release failed!'.red)
+        await Promise.reject('release failed!')
       } else {
         rmSync(releaseLock, { force: true })
         execSync(`npm publish`)
@@ -73,7 +72,7 @@ async function main() {
     }
   }
   if (existsSync(releaseLock)) {
-    log('release lock file exists!'.red)
+    log('release lock file exists!')
   } else {
     newVersion()
   }

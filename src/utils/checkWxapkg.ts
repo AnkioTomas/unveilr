@@ -12,17 +12,7 @@ export function checkWxapkg(v: ProduciblePath | Buffer): boolean {
   return buf.readUInt8(0) === 0xbe && buf.readUInt8(13) === 0xed
 }
 
-export async function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>
-export async function checkWxapkgType(list: string[]): Promise<WxapkgType>
-export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<WxapkgType | null> {
-  let fileList: string[]
-  if (isProduciblePath(v)) {
-    const pCtrl = PathController.make(v)
-    if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
-    fileList = await pCtrl.readdir()
-  } else {
-    fileList = v as string[]
-  }
+function _getWxapkgType(fileList: string[]): WxapkgType {
   if (fileList.every((filename) => filename.startsWith('WA'))) return WxapkgType.FRAMEWORK
   // APP_V1/APP_V4
   if (fileList.includes(WxapkgKeyFile.PAGE_FRAME_HTML)) {
@@ -45,4 +35,15 @@ export async function checkWxapkgType(v: ProduciblePath | string[]): Promise<Wxa
   }
   // not found
   return null
+}
+export function checkWxapkgType(path: ProduciblePath): Promise<WxapkgType>
+export function checkWxapkgType(list: string[]): WxapkgType
+export function checkWxapkgType(v: ProduciblePath | string[]): Promise<WxapkgType> | WxapkgType {
+  if (isProduciblePath(v)) {
+    const pCtrl = PathController.make(v)
+    if (!pCtrl.isDirectory) throw Error(`Path ${v} is not a directory`)
+    return pCtrl.readdir().then((fileList) => _getWxapkgType(fileList))
+  } else {
+    return _getWxapkgType(v)
+  }
 }

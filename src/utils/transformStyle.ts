@@ -1,5 +1,4 @@
 import { parse, generate, walk, CssNode, Raw, TypeSelector, List, ListItem, Declaration, Value } from 'css-tree'
-import { reformat } from '@utils/reformat'
 export type TransformStyleResult = {
   buffer: string
   path?: string
@@ -101,7 +100,7 @@ export function transformStyle(style: string, path?: string): TransformStyleResu
     }
   })
   return {
-    buffer: reformat(generate(ast), { parser: 'css' }),
+    buffer: generate(ast),
     path,
   }
 }

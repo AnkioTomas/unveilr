@@ -3,6 +3,7 @@ import { checkWxapkg } from '@utils/checkWxapkg'
 import { PackageSuffix } from '@/enum'
 import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
 import { decryptBuffer } from '@utils/crypto'
+import { info } from '@utils/colors'
 
 export interface WxapkgDecryptorOptions {
   path: ProduciblePath
@@ -54,7 +55,7 @@ export class WxapkgDecryptor extends BaseDecryptor {
     const _result = this.pathCtrl.abspath.match(/wx[a-z\d]{16}/g)
     if (!_result) throw new DecryptorError('wxAppId must be required!')
     this.wxAppId = _result[0]
-    this.logger.info(`From ${this.pathCtrl.logpath} detected wxAppId: ${this.wxAppId.blue.bold}`)
+    this.logger.info(`From ${this.pathCtrl.logpath} detected wxAppId: ${info(this.wxAppId)}`)
   }
 
   checkWxAppId() {
@@ -63,9 +64,9 @@ export class WxapkgDecryptor extends BaseDecryptor {
     }
   }
 
-  async decrypt(buffer?: Buffer): Promise<void> {
+  decrypt(buffer?: Buffer): void {
     super.decrypt()
-    buffer = buffer || (await this.pathCtrl.read())
+    buffer = buffer || this.pathCtrl.readSync()
     this._decrypt(buffer)
   }
 
@@ -90,11 +91,11 @@ export class WxapkgDecryptor extends BaseDecryptor {
     this.saver.add(target || this.target, this.result)
   }
 
-  static async decryptResult(options: WxapkgDecryptorOptions): Promise<Buffer>
-  static async decryptResult(path: ProduciblePath, wxAppId?: string, target?: ProduciblePath): Promise<Buffer>
-  static async decryptResult(o: WxapkgDecryptorOptions | ProduciblePath, wxAppId?: string): Promise<Buffer> {
+  static decryptResult(options: WxapkgDecryptorOptions): Buffer
+  static decryptResult(path: ProduciblePath, wxAppId?: string, target?: ProduciblePath): Buffer
+  static decryptResult(o: WxapkgDecryptorOptions | ProduciblePath, wxAppId?: string): Buffer {
     const inst = isProduciblePath(o) ? new WxapkgDecryptor(o, wxAppId) : new WxapkgDecryptor(o)
-    await inst.decrypt()
+    inst.decrypt()
     return inst.result
   }
 }

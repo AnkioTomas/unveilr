@@ -1,21 +1,13 @@
 import { Command, Option } from 'commander'
-import wxCommand from '@/cli/commands/wxapkg'
+import wxCommand, { WxConfigurator } from '@/cli/commands/wxapkg'
 import { LoggerLevel } from '@utils/logger'
 import { outputConfig } from '@/cli/outputConfig'
-import 'colors'
 
 export interface CliConfigurator {
   global: {
     logLevel: LoggerLevel
   }
-  wx: {
-    appid?: string
-    format?: boolean
-    clean: boolean
-    parse: boolean
-    output?: string
-    packages: string[]
-  }
+  wx: WxConfigurator
 }
 
 export function registerCommand(version: string, name: string, _argv?: string[]): CliConfigurator {

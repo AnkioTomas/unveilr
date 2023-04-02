@@ -1,6 +1,5 @@
 import { BaseParser } from '../BaseParser'
 import { Visitor } from '@babel/core'
-import { reformat } from '@utils/reformat'
 import { S2Observable, ScriptParserSubject, TVSubject } from '@core/parser/wxapkg/types'
 import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
@@ -16,12 +15,13 @@ export class ScriptParser extends BaseParser {
     observable.pipe<S2Observable<ScriptParserSubject>>(filter((v) => v.ScriptParser)).subscribe({
       next: (value) => {
         Object.entries(value.ScriptParser).forEach(([path, buffer]) => {
+          // 小游戏插件以目录作为名字的define
           if (path.startsWith('__plugin__')) {
             if (!PathController.make(path).suffixWithout) {
               path = '__plugin__/index.js'
             }
           }
-          this.saver.add({ path, buffer })
+          this.saver.add(path, buffer)
         })
       },
       complete() {
@@ -45,7 +45,7 @@ export class ScriptParser extends BaseParser {
           const source = (Array.isArray(body) ? body : [body]).map((p) => p.getSource()).join('')
           subject.next({
             ScriptParser: {
-              [filename]: reformat(source, { parser: 'babel' }),
+              [filename]: source,
             },
           })
         }

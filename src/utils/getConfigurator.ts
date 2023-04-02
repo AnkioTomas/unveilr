@@ -10,10 +10,14 @@ export function getConfigurator(dev?: boolean): CliConfigurator {
       logLevel: 'info',
     },
     wx: {
+      // appid: '',
       format: true,
-      clean: true,
+      clearDecompile: true,
+      clearSave: true,
       parse: true,
-      packages: ['files/311-APP_V3.wxapkg'],
+      depth: 1,
+      // output: '',
+      packages: ['files'],
     },
   }
 }

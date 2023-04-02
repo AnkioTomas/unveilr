@@ -1,7 +1,7 @@
 import { PathController, ProduciblePath } from '@core/controller/PathController'
 import { BaseLogger } from '@utils/logger'
 import { BaseError } from '@utils/exceptions'
-import { SaveAble, SaveController } from '@core/controller/SaveController'
+import { getSaveController, SaveAble, SaveController } from '@core/controller/SaveController'
 import { isWorkerRuntime } from '@utils/isWorkerRuntime'
 
 export class SavingError extends BaseError {}
@@ -18,7 +18,7 @@ export class Saver extends BaseLogger {
     super()
     this.saveList = []
     this.saveDirectory = baseDir
-    this.saveCtrl = SaveController.getInstance()
+    this.saveCtrl = getSaveController()
   }
   set saveDirectory(dir: ProduciblePath) {
     this.baseDir = PathController.make(dir)

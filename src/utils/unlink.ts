@@ -1,12 +1,10 @@
 import { PathController, ProduciblePath } from '@core/controller/PathController'
-import { getConfig } from '@core/controller/ConfigController'
 
 export function unlinkSync(path: ProduciblePath) {
   return _unlink(path, true)
 }
 
 function _unlink(path: ProduciblePath, sync?: boolean) {
-  if (!getConfig('WXParse') || !getConfig('WXClean')) return
   const ctrl = PathController.make(path)
 
   if (!ctrl.isFile) return

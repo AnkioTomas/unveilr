@@ -13,9 +13,9 @@ import {
 } from 'fs'
 import { readdir, readFile, writeFile, unlink, rm } from 'fs/promises'
 import { sep, dirname, extname, join, resolve, basename, relative, isAbsolute } from 'path'
-import { grey, bold } from 'colors/safe'
 import { ObjectEncodingOptions, OpenMode } from 'node:fs'
 import { Abortable } from 'node:events'
+import { grey } from '@utils/colors'
 
 export type ProduciblePath = string | PathController
 export type Optional<T> = T | null
@@ -92,7 +92,7 @@ export class PathController {
       this.abspath.length - this.basename.length <= dirML
         ? this.abspath
         : this.abspath.slice(0, dirML) + '...' + this.basename
-    return bold(grey(s))
+    return grey(s)
   }
 
   get dirname(): string {
@@ -191,19 +191,56 @@ export class PathController {
     unlinkSync(this.abspath)
     this.reload()
   }
-  deepListDir(absolute?: boolean): Optional<string[]> {
+  deepListDir(depth: number): string[]
+  deepListDir(absolute?: boolean, depth?: number): string[]
+  deepListDir(arg1?: boolean | number, arg2?: number): string[] {
     if (!this.isDirectory) return []
     const list: string[] = []
-
-    function listFile(dir) {
+    let absolute: boolean
+    let depth: number
+    const deepPath = absolute ? this.absunixpath : this.unixpath
+    switch (arguments.length) {
+      case 0:
+        absolute = false
+        depth = Number.MAX_SAFE_INTEGER
+        break
+      case 1:
+        if (typeof arg1 === 'boolean') {
+          absolute = arg1
+          depth = Number.MAX_SAFE_INTEGER
+        } else if (typeof arg1 === 'number') {
+          absolute = false
+          depth = arg1 || Number.MAX_SAFE_INTEGER
+        } else {
+          throw new Error('arg1 must be boolean or number')
+        }
+        break
+      case 2:
+        absolute = arg1 as boolean
+        depth = arg2 || Number.MAX_SAFE_INTEGER
+    }
+    const listFile = (dir: string): void => {
       readdirSync(dir).forEach((item) => {
         const fullPath = join(dir, item)
-        statSync(fullPath).isDirectory() ? listFile(fullPath) : list.push(fullPath)
+        if (statSync(fullPath).isDirectory()) {
+          if (depth !== Number.MAX_SAFE_INTEGER) {
+            // 一层不需要往下判断了
+            if (depth === 1) return
+            let prevDeep
+            if (dir === deepPath) prevDeep = 1
+            else {
+              const croppedPath = PathController.make(dir).crop(deepPath).unixpath
+              prevDeep = croppedPath.split('/').length + 1
+            }
+            if (prevDeep >= depth) return
+          }
+          listFile(fullPath)
+        } else {
+          list.push(fullPath)
+        }
       })
-      return list
     }
-
-    listFile(absolute ? this.abspath : this.path)
+    listFile(deepPath)
     return list
   }
 
