@@ -17,6 +17,7 @@
 
 ### :loud_sound:公告 
 - :rocket:[v2.0.0-beta.1](https://github.com/r3x5ur/unveilr/releases/tag/)已经发布，快来试试吧~
+- 一些常见问题移到[讨论区](https://github.com/r3x5ur/unveilr/discussions)去了
 
 ### ✨新版本特性
 
