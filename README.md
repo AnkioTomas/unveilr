@@ -12,7 +12,7 @@
 [![vul](https://img.shields.io/snyk/vulnerabilities/github/r3x5ur/unveilr)][repo]
 
 # 🔥🔥🔥活动🔥🔥🔥
-> [赞赏送 `newBing` 和 `chatgpt` 账号了](http://r3x5ur.me/sponsor)
+> [免费送 `newBing` 和 `chatgpt` 账号了](http://r3x5ur.me/sponsor)
 
 ## ！！！声明！！！
 **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非授权的测试，开发者不负任何连带法律责任。**
