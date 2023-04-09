@@ -117,6 +117,7 @@ export class WxapkgDecompiler extends BaseLogger {
     this.extractor.save()
   }
   async makeParserTraverse(): Promise<TraverseData[]> {
+    if (this.extractor.isFramework) return []
     this.initParsers()
     await this.initTraverseList()
     const list = this.traverseList.filter((item) => item.source)
@@ -265,6 +266,7 @@ export class WxapkgDecompiler extends BaseLogger {
     }
   }
   save() {
+    if (this.extractor.isFramework) return
     this.saver.merge()
     getConfig('WXClearDecompile') && this.cleanup()
   }

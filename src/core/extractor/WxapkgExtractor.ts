@@ -92,6 +92,11 @@ export class WxapkgExtractor extends BaseExtractor {
     return this.isAppPlugin || this.isGamePlugin
   }
 
+  // 是否是运行框架
+  get isFramework() {
+    return this.type === WxapkgType.FRAMEWORK
+  }
+
   // 设置保存的路径
   setSaver(saveDir: ProduciblePath | undefined) {
     saveDir = saveDir || this.pathCtrl.whitout()
@@ -177,8 +182,12 @@ export class WxapkgExtractor extends BaseExtractor {
     const type = checkWxapkgType(pathList.map(({ basename }) => basename))
     if (!type) this.logger.warn(`Parsed packages are not supported`)
     this.logger.info(`The package ${this.pathCtrl.logpath} type is: [${info(type)}]`)
-    if (type === WxapkgType.FRAMEWORK) this.logger.warn(`Running the framework does not require unpacking`)
     this.wxapkgType = type
+    if (type === WxapkgType.FRAMEWORK) {
+      this.logger.warn(`Running the framework does not require unpacking`)
+      this.isExtracted = true
+      return
+    }
     const isPlugin = this.isPlugin
     const sp = pathList.find((item) => {
       const { basename } = item

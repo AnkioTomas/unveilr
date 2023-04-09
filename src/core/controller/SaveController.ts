@@ -33,7 +33,7 @@ export class SaveController extends BaseLogger {
 
   static setIsReFormat(isReFormat: boolean) {
     SaveController.isReFormat = isReFormat
-    isReFormat && getSaveController().logger.info(`Turning on code formatting can slow down some operations`)
+    isReFormat && getSaveController().logger.warn(`Turning on code formatting can slow down some operations`)
   }
 
   private readonly fileBucket: Bucket
