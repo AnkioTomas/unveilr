@@ -17,7 +17,7 @@
 ## ！！！声明！！！
 **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非授权的测试，开发者不负任何连带法律责任。**
 
-### :loud_sound:公告 
+### :loud_sound:公告
 - :rocket:[v2.0.0-beta.1](https://github.com/r3x5ur/unveilr/releases/tag/)已经发布，快来试试吧~
 - 一些常见问题移到[讨论区](https://github.com/r3x5ur/unveilr/discussions)去了
 
@@ -104,6 +104,10 @@ $ unveilr wx /path/to/wxapkg/dir/ --no-parse
 - [wxappUnpacker](https://github.com/qwerty472123/wxappUnpacker)
 - [pc_wxapkg_decrypt](https://github.com/BlackTrace/pc_wxapkg_decrypt)
 - [mac_wxapkg_decrypt](https://github.com/TinyNiko/mac_wxapkg_decrypt)
+
+
+### :monocle_face:快来聊聊
+![logo](./images/group-chat.jpg)
 
 [repo]:https://github.com/r3x5ur/unveilr
 
