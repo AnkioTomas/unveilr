@@ -980,9 +980,9 @@ commondir@^1.0.1:
   integrity sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==
 
 compressing@^1.8.0:
-  version "1.8.0"
-  resolved "https://registry.yarnpkg.com/compressing/-/compressing-1.8.0.tgz#dcad24ea82c52af5de9329c082440d2d8cced2f7"
-  integrity sha512-PyO8OGoPa2D7Vby7i+H8EiYSH0+bxcACZLUx5xZgCWg22tet7G3FLSws3Tc30WM0GA9vbsE0k+Tm5BzIM/4UuQ==
+  version "1.9.0"
+  resolved "https://registry.yarnpkg.com/compressing/-/compressing-1.9.0.tgz#52400f0b3a7c6a56222461175a7e4d0ef2700fd3"
+  integrity sha512-WBNRH/mIV7aEFuYQFk4zCQZPEXDtyuCCeIcq5wYbmk5VewmUWV1YXAGyG6+hwrRGfG3HTy3c4BV79yfgloPJWQ==
   dependencies:
     "@eggjs/yauzl" "^2.11.0"
     flushwritable "^1.0.0"
