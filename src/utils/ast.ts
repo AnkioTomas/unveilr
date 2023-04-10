@@ -7,14 +7,14 @@ import { error } from '@utils/colors'
 export async function buildAST(path: ProduciblePath): Promise<BabelFileResult>
 export async function buildAST(code: string, filename: string): Promise<BabelFileResult>
 
-export async function buildAST(v: unknown, filename?: string): Promise<BabelFileResult> {
-  let code: string = v as string
+export async function buildAST(v: ProduciblePath | string, filename?: string): Promise<BabelFileResult> {
+  let code = v as string
   if (!filename) {
     const pCtrl = PathController.make(v as ProduciblePath)
     filename = pCtrl.abspath
     code = await pCtrl.read('utf8')
   }
-  const ast = await babel.parseAsync(code, { sourceFileName: filename })
+  const ast = await babel.parseAsync(code, { sourceFileName: filename, sourceType: 'script' })
   return new babel['File']({ filename }, { ast, code })
 }
 
@@ -23,7 +23,10 @@ export type BuildParams = { code: string; filename?: string }
 export async function traverseAST(path: ProduciblePath, opt?: TraverseOptions): Promise<void>
 export async function traverseAST(builder: BuildParams, opt?: TraverseOptions): Promise<void>
 export async function traverseAST(file: BabelFileResult, opt?: TraverseOptions): Promise<void>
-export async function traverseAST(v: unknown, opt: TraverseOptions): Promise<void> {
+export async function traverseAST(
+  v: ProduciblePath | BuildParams | BabelFileResult,
+  opt?: TraverseOptions,
+): Promise<void> {
   if (isProduciblePath(v)) {
     const file = await buildAST(v)
     return traverse(file.ast, opt)
@@ -38,7 +41,7 @@ export { Visitor }
 
 export function parseJSONFromJSCode(code: string, context?: object) {
   // 防止恶意代码
-  const file = new babel['File']({ filename: '.' }, { ast: babel.parseSync(code), code })
+  const file = new babel['File']({ filename: '.' }, { ast: babel.parseSync(code, { sourceType: 'script' }), code })
   traverse(file.ast, {
     CallExpression(path) {
       throw Error(`This code snippet is not safe: ${error(path.getSource())}`)
