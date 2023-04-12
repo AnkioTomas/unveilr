@@ -1,8 +1,8 @@
 import { hasOwnProperty } from '@utils/hasOwnProperty'
 
-export function deepCopy(obj: unknown): unknown {
-  let copy: unknown
+type UnknownObject = Record<string, unknown>
 
+export function deepCopy(obj: unknown): unknown {
   // 处理非对象和特殊对象的情况
   if (obj === null || typeof obj !== 'object') {
     return obj
@@ -10,14 +10,14 @@ export function deepCopy(obj: unknown): unknown {
 
   // 处理日期对象
   if (obj instanceof Date) {
-    copy = new Date()
-    copy.setTime(obj.getTime())
-    return copy
+    const _copy = new Date()
+    _copy.setTime(obj.getTime())
+    return _copy
   }
 
   // 处理数组对象
   if (obj instanceof Array) {
-    copy = []
+    const copy: unknown[] = []
     for (let i = 0, len = obj.length; i < len; i++) {
       copy[i] = deepCopy(obj[i])
     }
@@ -26,10 +26,11 @@ export function deepCopy(obj: unknown): unknown {
 
   // 处理普通对象
   if (obj instanceof Object) {
-    copy = {}
-    for (const key in obj) {
-      if (hasOwnProperty<typeof obj>(obj, key)) {
-        copy[key] = deepCopy(obj[key])
+    const copy: UnknownObject = {}
+    const _object = obj as UnknownObject
+    for (const key in _object) {
+      if (hasOwnProperty(_object, key)) {
+        copy[key] = deepCopy(_object[key])
       }
     }
     return copy
