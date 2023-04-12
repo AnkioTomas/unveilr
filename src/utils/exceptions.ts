@@ -4,7 +4,10 @@ class GlobalExceptionCaught extends BaseLogger {
   constructor() {
     super('Exception')
     const ignores = 'exit,cancel,pass'.split(',')
-    const handler = (e: Error | string) => (ignores.includes(String(e)) ? '' : this.logger.error(e))
+    const handler = (e: Error | string) => {
+      !ignores.includes(String(e)) && this.logger.error(e)
+      process.exit(1)
+    }
     process.on('uncaughtException', handler)
     process.on('unhandledRejection', handler)
     this.logger.debug('Global exception interception is enabled')

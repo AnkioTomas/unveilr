@@ -42,5 +42,5 @@ Example:
       ...wxCommand.opts(),
       packages: wxCommand.args,
     },
-  }
+  } as CliConfigurator
 }
