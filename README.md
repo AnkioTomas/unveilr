@@ -78,11 +78,11 @@ $ unveilr /path/to/wxapkg/dir/
 # 解包多个包
 $ unveilr /path/to/1.wxapkg /path/to/2.wxapkg ...
 # 指定子命令并指定微信AppId
-$ unveilr wx /path/to/wxapkg/dir/ -i wx11aa22bb33cc44dd
+$ unveilr wx -i wx11aa22bb33cc44dd /path/to/wxapkg/dir/ 
 # 格式化解析出来的代码
-$ unveilr wx /path/to/wxapkg/dir/ -f
+$ unveilr wx -f /path/to/wxapkg/dir/
 # 只提取源文件不解析进行反编译
-$ unveilr wx /path/to/wxapkg/dir/ --no-parse
+$ unveilr wx --no-parse /path/to/wxapkg/dir/ 
 ```
 
 #### 旧版本可以使用 [1.0.2版本](https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2)
