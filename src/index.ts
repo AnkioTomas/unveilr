@@ -6,12 +6,14 @@ import { WxapkgController } from '@core/controller/WxapkgController'
 import { initializeConfig, getConfig } from '@core/controller/ConfigController'
 import { getConfigurator } from '@utils/getConfigurator'
 import { SaveController } from '@core/controller/SaveController'
+
 export async function main() {
   initializeConfig(getConfigurator())
   clearConsole()
   registerGlobalException()
   SaveController.setIsClean(getConfig('WXClearDecompile'))
   SaveController.setIsReFormat(getConfig('WXReformat'))
+  // SaveController.setIsSafeMode(true)
   const packages = getConfig('WXPackages')
   function filterWxapkg(ctrl: PathController) {
     return ctrl.isFile && ctrl.suffixWithout === PackageSuffix.WXAPKG

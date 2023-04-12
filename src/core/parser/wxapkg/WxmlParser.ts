@@ -1,10 +1,10 @@
 import { BaseParser } from '../BaseParser'
 import { Saver } from '@utils/classes/Saver'
-import { parseWxml } from '@utils/wxmlParserJs'
+import { parseWxml, parseZArrayFromCode } from '@utils/wxmlParserJs'
 import { S2Observable, TraverseResult, TVSubject, WxmlParserV3Subject, ZArray } from '@core/parser/wxapkg/types'
 import { Visitor } from '@babel/traverse'
-import { parseJSONFromJSCode } from '@utils/ast'
 import { filter } from 'observable-fns'
+import { deepCopy } from '@utils/deepCopy'
 
 const zArrayFunctionNameRE = /gz\$gwx\d*_[A-Za-z_0-9]+/
 const scopeNameRE = /\$gwx\d*$|\$gwx\d*_[A-Za-z_0-9]+/
@@ -17,7 +17,7 @@ function getZArrayKey(functionName: string): string {
 }
 function makeVisitor(result: TraverseResult): Visitor {
   const data: ZArray = { mul: Object.create(null) }
-  const visitor = {
+  const visitor: Visitor = {
     FunctionExpression(path) {
       const parent = path.getFunctionParent()
       if (!parent) return
@@ -26,31 +26,11 @@ function makeVisitor(result: TraverseResult): Visitor {
       if (!fn) return
       const functionName = fn.getSource()
       if (!zArrayFunctionNameRE.test(functionName)) return
-      const zMap = {} // var a=11
-      const zArr = [] // Z([3,'xx'])...
       const list = path.get('body.body')
       const blocks = Array.isArray(list) ? list : [list]
-      blocks.forEach((p) => {
-        if (p.isIfStatement() || p.isFunctionDeclaration()) return
-        if (p.isVariableDeclaration()) {
-          const declarations = p.get('declarations')[0]
-          if (!declarations) return
-          const { id, init } = declarations.node
-          if (id.type === 'Identifier' && init.type === 'NumericLiteral') {
-            zMap[id.name] = init.value
-          }
-        } else if (p.isExpressionStatement()) {
-          const expr = p.get('expression')
-          if (!expr.isCallExpression()) return
-          const zArg = expr.get('arguments')[0]
-          if (zArg.isArrayExpression() || zArg.isMemberExpression()) {
-            zArr.push(parseJSONFromJSCode(zArg.getSource(), { ...zMap, z: zArr }))
-          }
-        }
-      })
       const key = getZArrayKey(functionName)
       if (!key) return
-      data.mul[key] = zArr
+      data.mul[key] = deepCopy(parseZArrayFromCode(blocks.map((p) => p.getSource()).join('\n'))) as unknown[]
     },
     VariableDeclarator(path) {
       const id = path.get('id')

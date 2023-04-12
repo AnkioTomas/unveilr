@@ -189,14 +189,19 @@ export class WxapkgExtractor extends BaseExtractor {
       return
     }
     const isPlugin = this.isPlugin
-    const sp = pathList.find((item) => {
+    let sp = null
+    pathList.forEach((item) => {
       const { basename } = item
-      return (
+      const isAvailable =
         basename === WxapkgKeyFile.APP_SERVICE ||
         basename === WxapkgKeyFile.APPSERVICE ||
         basename === WxapkgKeyFile.GAME ||
         (isPlugin && basename === WxapkgKeyFile.PLUGIN_JSON)
-      )
+      if (!isAvailable) return
+      if (!sp) return (sp = item)
+      const currentLen = item.path.split('/').length
+      const oldLen = sp.path.split('/').length
+      sp = currentLen < oldLen ? item : sp
     })
     if (!sp) ExtractorError.throw(`File ${this.pathCtrl.logpath} source directory not found`)
     this.sourcePath = PathController.make(sp.path || '.').dirname
