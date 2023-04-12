@@ -89,7 +89,7 @@ export class SaveController extends BaseLogger {
   private async saveFile(path: string, buffer: SaveAble) {
     const ctrl = PathController.make(path)
     if (!buffer) {
-      this.logger.warn(`You are trying to save a falsy data to ${ctrl.logpath}`)
+      this.logger.debug(`You are trying to save a falsy data to ${ctrl.logpath}`)
       buffer = ''
     }
     ctrl.mkdir()
