@@ -341,8 +341,13 @@ export class WxapkgController extends BaseLogger {
     if (!mainDecompiler) return this.extractorSave()
     // 存在主包把其他子包的保存路径指向主包
     if (this.mainSaveDir) {
-      mainDecompiler.saveDir = this.mainSaveDir
-      mainDecompiler.saveDir.rmrfSync()
+      const output = this.mainSaveDir
+      mainDecompiler.saveDir = output
+      if (output.isDirectory && output.deepListDir(1).length) {
+        if (!getConfig('WxClearOutput'))
+          WxapkgError.throw(`This output path is not empty, please use ${info('--clear-output')} force cleanup`)
+        mainDecompiler.saveDir.rmrfSync()
+      }
     }
     this.decompilers.forEach((d) => {
       if (d === mainDecompiler) return

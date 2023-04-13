@@ -68,7 +68,8 @@ npx unveilr --help
 | `wx`     | `--no-clear-save`         | 不清除之前的编译结果                                     |
 | `wx`     | `--no-parse`              | 只提取`wxapkg`中的文件，不进行反编译                         |
 | `wx`     | `-d, --depth <depth>`     | 设置从目录中查找`wxapkg`的深度默认: `1` 设置为`0`时不限制深度        |
-| `wx`     | ` -o, --output <path>`    | 设置反编译输出路径                                      |
+| `wx`     | ` -o, --output <path>`    | 设置反编译输出目录                                      |
+| `wx`     | `--clear-output`          | 当输出目录不为空时程序将终止，提供该参数表示强制清空输出目录                 |
 
 ### 💡使用示例
 
@@ -78,11 +79,11 @@ $ unveilr /path/to/wxapkg/dir/
 # 解包多个包
 $ unveilr /path/to/1.wxapkg /path/to/2.wxapkg ...
 # 指定子命令并指定微信AppId
-$ unveilr wx -i wx11aa22bb33cc44dd /path/to/wxapkg/dir/ 
+$ unveilr wx -i wx11aa22bb33cc44dd /path/to/wxapkg/dir/
 # 格式化解析出来的代码
 $ unveilr wx -f /path/to/wxapkg/dir/
 # 只提取源文件不解析进行反编译
-$ unveilr wx --no-parse /path/to/wxapkg/dir/ 
+$ unveilr wx --no-parse /path/to/wxapkg/dir/
 ```
 
 #### 旧版本可以使用 [1.0.2版本](https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2)
