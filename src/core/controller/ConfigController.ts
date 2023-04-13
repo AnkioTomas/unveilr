@@ -37,6 +37,9 @@ export class ConfigController {
   get WXOutput() {
     return this.config.wx.output
   }
+  get WxClearOutput() {
+    return this.config.wx.clearOutput
+  }
 
   static instance: ConfigController
 

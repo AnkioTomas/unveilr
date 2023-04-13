@@ -21,6 +21,7 @@ wxCommand
   .addOption(noParseOption)
   .addOption(depthOptions)
   .option('-o, --output <path>', 'Set output path, default: main package whit out')
+  .option('--clear-output', 'Empty the specified output folder')
   .description('Decompile the WeChat applet')
   .addArgument(new Argument('<packages...>', 'Set package path, could be a file, directory or multiple files'))
   .showHelpAfterError()
@@ -35,5 +36,6 @@ export interface WxConfigurator {
   parse: boolean
   depth: number
   output?: string
+  clearOutput?: boolean
   packages: string[]
 }
