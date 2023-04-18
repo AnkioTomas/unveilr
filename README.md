@@ -108,7 +108,7 @@ $ unveilr wx --no-parse /path/to/wxapkg/dir/
 
 
 ### :monocle_face:快来聊聊
-![logo](./images/group-chat.jpg)
+![logo](https://gcore.jsdelivr.net/gh/r3x5ur/oss/unveilr/group-chat.jpg)
 
 [repo]:https://github.com/r3x5ur/unveilr
 
