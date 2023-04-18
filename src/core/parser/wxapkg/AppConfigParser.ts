@@ -112,7 +112,7 @@ export class AppConfigParser extends BaseParser {
         const usingComponents = page[key].window.usingComponents
         if (!usingComponents || !Object.keys(usingComponents).length) return
         Object.keys(usingComponents).forEach((k) => {
-          const p = (usingComponents[k] as string).replace('plugin://', '/__plugin__/')
+          const p = (usingComponents[k] as string).replace(/plugin(-private)?:\/\//, '/__plugin__/')
           const file = p.startsWith('/') ? p.slice(1) : PathController.make(key).join('..', p).unixpath
           page[file] = page[file] || Object.create(null)
           page[file].window = page[file].window || Object.create(null)
