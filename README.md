@@ -35,7 +35,6 @@
 #### 1. 下载可执行文件 【这是一个命令行工具，windows上双击是不行的】
 
 - 从[下载地址][release]下载对应操作系统的可执行文件
-- 运行 `unveilr@[version]-[platform]-[arch][.exe] --help`
 - 例如：`unveilr@2.0.0-win-x64.exe --help`
 - 具体参数看[参数详解](#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3)
 
