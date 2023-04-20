@@ -58,8 +58,8 @@
 
 | 子命令      | 参数                        | 解释                                             |
 |----------|---------------------------|------------------------------------------------|
-| `global` | `-l, --log-level <level>` | 设置日志等级 `debug`，`info`，`warn`，`error` 默认 `info` |
-| `global` | `-v, --version`           | 打印版本号并退出                                     |
+|          | `-l, --log-level <level>` | 设置日志等级 `debug`，`info`，`warn`，`error` 默认 `info` |
+|          | `-v, --version`           | 打印版本号并退出                                     |
 | `wx`     | `<packages...>`           | `wxapkg`的路径，可以是多个，也可以是一个目录                     |
 | `wx`     | `-i, --appid <appid>`     | 解密`windows`上的 `wxapkg`时需要提供**🔥已经支持自动从路径中提取**  |
 | `wx`     | `-f, --format`            | 是否需要格式化解析出来的代码                                 |
