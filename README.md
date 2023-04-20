@@ -71,18 +71,19 @@
 | `wx`     | `--clear-output`          | 当输出目录不为空时程序将终止，提供该参数表示强制清空输出目录                 |
 
 ### 💡使用示例
+- __如果路径有空格必需加引号__
 
 ```bash
 # 直接解包整个目录
-$ unveilr /path/to/wxapkg/dir/
+$ unveilr "/path/to/wxapkg/dir/"
 # 解多个包
-$ unveilr /path/to/1.wxapkg /path/to/2.wxapkg ...
+$ unveilr "/path/to/1.wxapkg" "/path/to/2.wxapkg" ...
 # 指定wx子命令并指定微信AppId
-$ unveilr wx -i wx11aa22bb33cc44dd /path/to/wxapkg/dir/
+$ unveilr wx -i wx11aa22bb33cc44dd "/path/to/wxapkg/dir/"
 # 格式化解析出来的代码
-$ unveilr wx -f /path/to/wxapkg/dir/
+$ unveilr wx -f "/path/to/wxapkg/dir/"
 # 只提取源文件不解析进行反编译
-$ unveilr wx --no-parse /path/to/wxapkg/dir/
+$ unveilr wx --no-parse "/path/to/wxapkg/dir/"
 ```
 
 #### 旧版本可以使用 [1.0.2版本](https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2)
