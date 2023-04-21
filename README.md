@@ -4,19 +4,17 @@
 [![languages](https://img.shields.io/github/languages/top/r3x5ur/unveilr)][repo]
 [![visitor](https://visitor-badge.glitch.me/badge?page_id=https://github.com/r3x5ur/unveilr)][repo]
 [![visitor](https://img.shields.io/github/commit-activity/m/r3x5ur/unveilr)][repo]
-[![https://img.shields.io/npm/v/unveilr.svg](https://img.shields.io/npm/v/unveilr.svg)][npm]
-[![unveilr](https://img.shields.io/npm/dt/unveilr.svg)][npm]
-[![unveilr](https://img.shields.io/node/v/unveilr)][npm]
-[![release](https://github.com/r3x5ur/unveilr/actions/workflows/release.yml/badge.svg?event=push)][release]
 [![release](https://img.shields.io/github/downloads/r3x5ur/unveilr/total)][release]
 [![vul](https://img.shields.io/snyk/vulnerabilities/github/r3x5ur/unveilr)][repo]
 
 ## ！！！声明！！！
-**本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非授权的测试，开发者不负任何连带法律责任。**
+**本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非法操作，开发者不负任何连带法律责任。**
+
+**如有侵权相关问题，请联系作者，邮箱：2352327206@qq.com**
 
 ### :loud_sound:公告
-- :rocket:[v2.0.0](https://github.com/r3x5ur/unveilr/releases/tag/)已经发布，快来试试吧~
-- 一些常见问题移到[讨论区](https://github.com/r3x5ur/unveilr/discussions)去了
+- 删除 `npm` 包
+- 提高使用门槛，不再提供使用方面的问题解答
 
 ### ✨新版本特性
 
@@ -29,28 +27,14 @@
 
 ### ✅安装方法
 
-#### 1. 下载可执行文件 【这是一个命令行工具，windows上双击是不行的】
+下载可执行文件
 
 - 从[下载地址][release]下载对应操作系统的可执行文件
-- 例如：`unveilr@2.0.0-win-x64.exe --help`
-- 具体参数看[参数详解](#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3)
-
-#### 2. npm 安装
-- `npm i unveilr -g`
-
-#### 3. yarn 安装
-- `yarn global add unveilr`
-
-#### npm 或 yarn 安装后使用方法
-- `unveilr --help` 或者 `uvr -h`
-- 具体参数看[参数详解](#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3)
-- 当 'unveilr' 不是内部或外部命令，也不是可运行的程序或批处理文件
-- 尝试在命令前面加一个 npx, 例如：`npx unveilr --help`
+- 具体参数看下面[参数详解](#%E5%8F%82%E6%95%B0%E8%AF%A6%E8%A7%A3)
 
 
 ### 📝参数详解
 
-- 子命令是为了后续集成别的平台小程序解包功能 **([其他小程序反编译方案收集](https://github.com/r3x5ur/unveilr/discussions/24))**
 - 子命令默认为 `wx`
 
 | 子命令      | 参数                        | 解释                                             |
@@ -68,30 +52,11 @@
 | `wx`     | `--clear-output`          | 当输出目录不为空时程序将终止，提供该参数表示强制清空输出目录                 |
 
 ### 💡使用示例
-- __如果路径有空格必需加引号__
-
-```bash
-# 直接解包整个目录
-$ unveilr "/path/to/wxapkg/dir/"
-# 解多个包
-$ unveilr "/path/to/1.wxapkg" "/path/to/2.wxapkg" ...
-# 指定wx子命令并指定微信AppId
-$ unveilr wx -i wx11aa22bb33cc44dd "/path/to/wxapkg/dir/"
-# 格式化解析出来的代码
-$ unveilr wx -f "/path/to/wxapkg/dir/"
-# 只提取源文件不解析进行反编译
-$ unveilr wx --no-parse "/path/to/wxapkg/dir/"
-```
-
-#### 旧版本可以使用 [1.0.2版本](https://github.com/r3x5ur/unveilr/releases/tag/v1.0.2)
+- 提高使用门槛，不再提供示例
 
 ### [:bulb:提交问题](https://github.com/r3x5ur/wxapkg-unpacker/issues)
 
-### [:triangular_flag_on_post:社区讨论](https://github.com/r3x5ur/unveilr/discussions)
-
 ### [:memo:更改日志](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CHANGELOG.md)
-
-### [:money_with_wings:赞助(开源不易，感谢支持)](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CONTRIBUTING.md)
 
 ### 💬其他说明
 
@@ -104,11 +69,6 @@ $ unveilr wx --no-parse "/path/to/wxapkg/dir/"
 - [mac_wxapkg_decrypt](https://github.com/TinyNiko/mac_wxapkg_decrypt)
 
 
-### :monocle_face:快来聊聊
-![logo](https://gcore.jsdelivr.net/gh/r3x5ur/oss/unveilr/group-chat.jpg)
-
 [repo]:https://github.com/r3x5ur/unveilr
-
-[npm]:https://www.npmjs.com/package/unveilr
 
 [release]:https://github.com/r3x5ur/unveilr/releases
