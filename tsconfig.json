@@ -1,0 +1,31 @@
+{
+  "compileOnSave": true,
+  "compilerOptions": {
+    "target": "ES2018",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "inlineSourceMap": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "stripInternal": true,
+    "pretty": true,
+    "declaration": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "baseUrl": "./src",
+    "paths": {
+      "@/*": ["./*"],
+      "@utils/*": ["utils/*"],
+      "@core/*": ["core/*"],
+      "@enum/*": ["enum/*"]
+    }
+  },
+  "exclude": ["node_modules", "/**/*.d.ts"],
+  "ts-node": {
+    "transpileOnly": true,
+    "require": ["tsconfig-paths/register"]
+  }
+}

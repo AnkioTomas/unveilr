@@ -1,0 +1,73 @@
+{
+  "name": "unveilr",
+  "author": "r3x5ur",
+  "version": "2.0.1",
+  "displayName": "小程序反编译",
+  "keywords": [
+    "wxapkg",
+    "unpack",
+    "微信小程序",
+    "微信小游戏",
+    "反编译",
+    "unveilr",
+    "抖音小程序",
+    "抖音小游戏"
+  ],
+  "description": "将小程序包反编译成源码，小程序安全利器",
+  "main": "dist/index.js",
+  "license": "GPL-3.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/r3x5ur/unveilr"
+  },
+  "bugs": "https://github.com/r3x5ur/unveilr/issues",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "scripts": {
+    "eslint": "eslint --fix src --ext .ts --max-warnings=0",
+    "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
+    "run": "ts-node -r tsconfig-paths/register --transpile-only src/index.ts",
+    "ts-node": "ts-node -r tsconfig-paths/register --transpile-only",
+    "build": "npx rollup -c --bundleConfigAsCjs",
+    "pkg": "node scripts/pkg.js",
+    "release": "node scripts/release.js"
+  },
+  "dependencies": {
+    "@babel/core": "^7.21.3",
+    "chalk": "4.1.2",
+    "commander": "^10.0.0",
+    "crypto-js": "^4.1.1",
+    "css-tree": "^2.3.1",
+    "observable-fns": "^0.6.1",
+    "prettier": "^2.8.5",
+    "shelljs": "^0.8.5",
+    "threads": "^1.7.0",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^24.0.1",
+    "@rollup/plugin-json": "^6.0.0",
+    "@rollup/plugin-node-resolve": "^15.0.1",
+    "@types/babel__core": "^7.20.0",
+    "@types/babel__traverse": "^7.18.3",
+    "@types/crypto-js": "^4.1.1",
+    "@types/css-tree": "^2.3.1",
+    "@types/node": "^18.14.4",
+    "@types/prettier": "^2.7.2",
+    "@types/shelljs": "^0.8.11",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.54.0",
+    "compressing": "^1.8.0",
+    "eslint": "8.22.0",
+    "pkg": "^5.8.1",
+    "rollup": "^3.19.1",
+    "rollup-plugin-clear": "^2.0.7",
+    "rollup-plugin-license": "^3.0.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.34.1",
+    "ts-node-dev": "^2.0.0",
+    "tsconfig-paths": "^4.1.2",
+    "typescript": "^5.0.2"
+  }
+}
