@@ -69,19 +69,5 @@
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.1.2",
     "typescript": "^5.0.2"
-  },
-  "bin": {
-    "unveilr": "bin/index.js",
-    "uvr": "bin/index.js"
-  },
-  "files": [
-    "bin/",
-    "dist/",
-    "images/logo.svg",
-    "package.json",
-    "README.md",
-    "CHANGELOG.md",
-    "CONTRIBUTING.md",
-    "LICENSE"
-  ]
+  }
 }

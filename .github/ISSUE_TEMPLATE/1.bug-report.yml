@@ -16,10 +16,6 @@ body:
       description: 填写 `unveilr -v` 的输出
     validations:
       required: true
-  - type: input
-    attributes:
-      label: NodeJs版本
-      description: 填写 `node -v` 的输出 _(使用二进制文件的可以不填)_
   - type: dropdown
     id: sys-version
     attributes:
@@ -37,13 +33,9 @@ body:
       description: 路径自己脱敏如：`unveilr /path/to/dir`
     validations:
       required: true
-  - type: input
-    attributes:
-      label: wcc版本
-      description: "当控制台有输出`wcc version is: [v0.xxx]`时，请填入[]中的内容"
   - type: textarea
     attributes:
-      label: 重现步骤(最好能上传反编译失败的样本)
+      label: 重现步骤
       description: 输入有关您的错误的详细信息
     validations:
       required: true
