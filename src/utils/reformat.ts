@@ -6,7 +6,17 @@ export const REFORMAT_MAP: Record<string, BuiltInParserName> = {
   json: 'json',
   wxs: 'babel',
   js: 'babel',
-  wxml: 'html',
+  /**
+   * fix like:
+   * ```html
+   * <view style="
+   *  width: 100%;
+   *  height: 100%;
+   * "><view/>
+   * ```
+   * resulting in an error
+   * */
+  // wxml: 'html',
 }
 export function reformat(path: ProduciblePath, source: string): string {
   try {
