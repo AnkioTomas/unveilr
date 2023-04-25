@@ -17,7 +17,7 @@ export function getConfigurator(dev?: boolean): CliConfigurator {
       parse: false,
       depth: 1,
       // output: '',
-      packages: ['files/wxac43fa84faa1b7fd-APP_V4.wxapkg'],
+      packages: ['files'],
     },
   }
 }
