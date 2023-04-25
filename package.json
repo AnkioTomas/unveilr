@@ -57,7 +57,7 @@
     "@types/prettier": "^2.7.2",
     "@types/shelljs": "^0.8.11",
     "@typescript-eslint/eslint-plugin": "^5.59.1",
-    "@typescript-eslint/parser": "^5.54.0",
+    "@typescript-eslint/parser": "^5.59.1",
     "compressing": "^1.8.0",
     "eslint": "8.22.0",
     "pkg": "^5.8.1",
