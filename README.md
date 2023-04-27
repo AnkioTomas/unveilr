@@ -58,7 +58,8 @@
 
 ### [:memo:更改日志](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CHANGELOG.md)
 
-### [💬技术交流 telegram](https://t.me/+40lT6rp_bU1iZmI9)
+### 💫小圈子
+- [✈️TG](https://t.me/+40lT6rp_bU1iZmI9)
 
 
 ### 💬其他说明
