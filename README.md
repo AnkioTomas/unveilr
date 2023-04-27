@@ -56,6 +56,9 @@
 
 ### [:memo:更改日志](https://github.com/r3x5ur/wxapkg-unpacker/blob/master/CHANGELOG.md)
 
+### [💬技术交流](https://t.me/+40lT6rp_bU1iZmI9)
+
+
 ### 💬其他说明
 
 - 本程序现在使用的开源协议是 [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)
