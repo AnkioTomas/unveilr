@@ -9,7 +9,7 @@ import { SaveController } from '@core/controller/SaveController'
 
 export async function main() {
   initializeConfig(getConfigurator())
-  clearConsole()
+  getConfig('logLevel') === 'debug' && clearConsole()
   registerGlobalException()
   SaveController.setIsClean(getConfig('WXClearDecompile'))
   SaveController.setIsReFormat(getConfig('WXReformat'))

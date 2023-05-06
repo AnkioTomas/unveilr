@@ -1,3 +1,0 @@
-[submodule "src/lib/wxml-parser"]
-	path = src/lib/wxml-parser
-	url = git@47.243.177.122:wxml-parser.git
