@@ -1,8 +1,7 @@
 node_modules
 dist
-bin
 scripts
 rollup.config.js
 
-src/core/parser/wxapkg/wxml-parser/parseWxml.ts
-src/core/parser/wxapkg/wxml-parser/parseZArray.ts
+parseWxml.ts
+parseZArray.ts
