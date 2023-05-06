@@ -1,10 +1,11 @@
 import { BaseParser } from '../BaseParser'
 import { Saver } from '@utils/classes/Saver'
-import { parseWxml, parseZArrayFromCode } from '@utils/wxmlParserJs'
+import { parseWxml, parseZArrayFromCode } from '@core/parser/wxapkg/wxml-parser'
 import { S2Observable, TraverseResult, TVSubject, WxmlParserV3Subject, ZArray } from '@core/parser/wxapkg/types'
 import { Visitor } from '@babel/traverse'
 import { filter } from 'observable-fns'
 import { deepCopy } from '@utils/deepCopy'
+import { SaveAble } from '@core/controller/SaveController'
 
 const zArrayFunctionNameRE = /gz\$gwx\d*_[A-Za-z_0-9]+/
 const scopeNameRE = /\$gwx\d*$|\$gwx\d*_[A-Za-z_0-9]+/
@@ -60,7 +61,7 @@ export class WxmlParser extends BaseParser {
         const { code, json, z } = data
         const dir = this.dir
         parseWxml(code, dir, json, z).then((result) => {
-          Object.entries(result).forEach((args) => this.saver.add(...args))
+          Object.entries(result).forEach(([path, buffer]) => this.saver.add(path, buffer))
         })
       },
       complete() {
@@ -72,7 +73,7 @@ export class WxmlParser extends BaseParser {
 
   async parseV1() {
     const result = await parseWxml(this.sources, this.dir)
-    Object.entries(result).forEach((args) => this.saver.add(...args))
+    Object.entries(result).forEach(([path, buffer]) => this.saver.add(path, buffer as SaveAble))
   }
 
   get dir() {

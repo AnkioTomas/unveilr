@@ -1,7 +1,7 @@
-lib
 node_modules
 dist
-bin
 scripts
 rollup.config.js
 
+parseWxml.ts
+parseZArray.ts

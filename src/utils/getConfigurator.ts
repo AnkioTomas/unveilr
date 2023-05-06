@@ -11,10 +11,10 @@ export function getConfigurator(dev?: boolean): CliConfigurator {
     },
     wx: {
       // appid: '',
-      format: true,
+      format: false,
       clearDecompile: true,
       clearSave: true,
-      parse: true,
+      parse: false,
       depth: 1,
       // output: '',
       packages: ['files'],

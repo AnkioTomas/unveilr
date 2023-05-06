@@ -125,14 +125,14 @@ export class PathController {
 
   async read(opt?: ReadBufferOption): Promise<Buffer>
   async read(opt?: ReadStringOption): Promise<string>
-  async read(opt?: unknown): Promise<Buffer | string> {
+  async read(opt?: never): Promise<Buffer | string> {
     if (!this.isFile) return null
     return await readFile(this.path, opt)
   }
 
   readSync(opt?: ReadBufferOption): Buffer
   readSync(opt?: ReadStringOption): string
-  readSync(opt?: unknown): Buffer | string {
+  readSync(opt?: never): Buffer | string {
     return readFileSync(this.path, opt)
   }
 

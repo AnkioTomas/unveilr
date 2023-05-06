@@ -1,5 +1,6 @@
 # 更改日志
-
+### [:bookmark:v2.0.1 :loud_sound:2023-04-21](https://github.com/r3x5ur/unveilr/tree/v2.0.1)
+* 解决一些小bug
 ### [:bookmark:v2.0.0 :loud_sound:2023-04-13](https://github.com/r3x5ur/unveilr/tree/v2.0.0)
 * Bump @babel/core from 7.21.0 to 7.21.3 by @dependabot in https://github.com/r3x5ur/unveilr/pull/22
 * Bump prettier from 2.8.4 to 2.8.5 by @dependabot in https://github.com/r3x5ur/unveilr/pull/19
