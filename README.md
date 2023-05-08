@@ -41,14 +41,13 @@
 
 ### [📝更改日志](https://github.com/r3x5ur/unveilr/blob/master/CHANGELOG.md)
 
-### 💫小圈子
-[![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/200px-Telegram_2019_Logo.svg.png)](https://t.me/+efnutdKTsDU5MmY1)
-
-
 ### 💬其他说明
 
 - 本程序现在使用的开源协议是 [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)
 - 使用请标明出处，并遵循开源协议
+- [![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/15px-Telegram_2019_Logo.svg.png)Telegram](https://t.me/+efnutdKTsDU5MmY1)
+
+
 
 
 [repo]:https://github.com/r3x5ur/unveilr
