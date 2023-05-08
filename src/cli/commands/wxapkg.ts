@@ -6,7 +6,10 @@ const wxCommand = new Command('wx')
 const noParseOption = new Option('-p, --no-parse', 'Only extract files, do not parse').implies({
   clearDecompile: false,
 })
-const depthOptions = new Option('-d, --depth <depth>', 'Set read-depth')
+const depthOptions = new Option(
+  '-d, --depth <depth>',
+  'Set the search depth from the directory, no limit depth when set to 0',
+)
   .argParser((v) => {
     const depth = parseInt(v)
     if (isNaN(depth)) throw new CommanderError(1, 'depth.error', 'Invalid depth')
@@ -14,16 +17,16 @@ const depthOptions = new Option('-d, --depth <depth>', 'Set read-depth')
   })
   .default(1)
 wxCommand
-  .option('-i, --appid <appid>', 'Set wxAppId, not provided will try to fetch from path')
-  .option('-f, --format', 'Enable format code')
-  .option('--no-clear-decompile', 'Retain decompiling residual files')
-  .option('--no-clear-save', 'The path to be saved will not be cleared')
+  .option('-i, --appid <appid>', 'Provide `appid` manually (only works when evaluating packages on `windows`)')
+  .option('-f, --format', 'Reformatted output')
+  .option('--no-clear-parsed', 'Residual files after parsing will not be cleared')
+  .option('--no-clear-save', 'Paths to save will not be cleared')
   .addOption(noParseOption)
   .addOption(depthOptions)
   .option('-o, --output <path>', 'Set output path, default: main package whit out')
   .option('--clear-output', 'Empty the specified output folder')
-  .description('Decompile the WeChat applet')
-  .addArgument(new Argument('<packages...>', 'Set package path, could be a file, directory or multiple files'))
+  .description('Security assessment for wx applet')
+  .addArgument(new Argument('<packages...>', 'The path of the package can be multiple or a directory'))
   .showHelpAfterError()
   .configureOutput(outputConfig)
 export default wxCommand

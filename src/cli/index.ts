@@ -25,11 +25,10 @@ export function registerCommand(version: string, name: string, _argv?: string[])
       'after',
       `
 Example:
-  $ ${name} /path/to/wxapkg/dir/
-  $ ${name} 1.wxapkg 2.wxapkg 3.wxapkg ...
-  $ ${name} wx /path/to/wxapkg/dir/           Specify wx subcommand
-  $ ${name} wx 1.wxapkg 2.wxapkg 3.wxapkg ... Specify wx subcommand
-  $ ${name} wx -h                             Show wx help info
+  $ ${name} /path/to/dir/                     Default wx subcommand
+  $ ${name} -f /path/to/dir/                  Reformat output
+  $ ${name} -f -o /target/dir/ /path/to/dir/  Reformat output & set output path
+  ...
 `,
     )
     .showHelpAfterError()
