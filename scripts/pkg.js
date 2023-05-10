@@ -17,10 +17,10 @@ function log(message) {
  * - platform alpine, linux, linuxstatic, win, macos, (freebsd)
  * - arch x64, arm64, (armv6, armv7)
  * */
-async function pkg() {
+async function pkg(targets) {
   log('Clean up old binaries...')
   rmSync(release, { force: true, recursive: true })
-  const targets = [
+  targets = targets || [
     'node14-win-x64',
     'node14-win-arm64',
     'node14-macos-x64',
@@ -49,8 +49,9 @@ async function _tgz() {
 async function main() {
   log('Building distribution...')
   execSync('yarn build')
-  await pkg()
-  await _tgz()
+  // await pkg()
+  await pkg(['node14-win-x64']).then()
+  // await _tgz()
 }
 
 main().then()

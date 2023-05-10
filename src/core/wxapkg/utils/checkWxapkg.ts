@@ -1,5 +1,5 @@
-import { WxapkgKeyFile, WxapkgType } from '@/enum'
-import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
+import { WxapkgKeyFile, WxapkgType } from '../WxapkgEnums'
+import { isProduciblePath, PathController, ProduciblePath } from '@baseController/PathController'
 
 export function checkMacEncryption(buf: Buffer): boolean {
   const encryptedForMac = 'WAPkgEncryptedTagForMac'

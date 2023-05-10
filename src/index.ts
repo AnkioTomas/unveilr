@@ -1,11 +1,11 @@
-import { PackageSuffix } from '@/enum'
+import { PackageSuffix } from '@/enum/PackageSuffix'
 import { clearConsole } from '@utils/clearConsole'
 import { registerGlobalException } from '@utils/exceptions'
-import { PathController } from '@core/controller/PathController'
-import { WxapkgController } from '@core/controller/WxapkgController'
-import { initializeConfig, getConfig } from '@core/controller/ConfigController'
+import { PathController } from '@baseController/PathController'
+import { WxapkgController } from '@core/wxapkg/WxapkgController'
+import { initializeConfig, getConfig } from '@baseController/ConfigController'
 import { getConfigurator } from '@utils/getConfigurator'
-import { SaveController } from '@core/controller/SaveController'
+import { SaveController } from '@baseController/SaveController'
 
 export async function main() {
   initializeConfig(getConfigurator())

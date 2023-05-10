@@ -1,7 +1,6 @@
 import { BaseLogger } from '@utils/logger'
-import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { PathController, ProduciblePath } from './PathController'
 import { info } from '@utils/colors'
-import { WxapkgKeyFile } from '@/enum'
 import { checkSupport, reformat } from '@utils/reformat'
 
 export type SaveAble = string | Buffer | object
@@ -16,7 +15,7 @@ export class SaveController extends BaseLogger {
   static isClean = false
   static isSafeMode = false
   static isReFormat = false
-  static readonly OVERRIDE_FILES: string[] = [WxapkgKeyFile.GAME, WxapkgKeyFile.PLUGIN]
+  static readonly OVERRIDE_FILES: string[] = []
   static getInstance(): SaveController {
     if (!SaveController.instance) {
       SaveController.instance = new SaveController()
@@ -29,6 +28,9 @@ export class SaveController extends BaseLogger {
   static setIsSafeMode(isSafeMode: boolean) {
     SaveController.isSafeMode = isSafeMode
     isSafeMode && getSaveController().logger.warn(`Safe mode is enabled, Will not write files to disk`)
+  }
+  static addOverrideFiles(overrideFiles: string[]) {
+    SaveController.OVERRIDE_FILES.push(...overrideFiles)
   }
 
   static setIsReFormat(isReFormat: boolean) {

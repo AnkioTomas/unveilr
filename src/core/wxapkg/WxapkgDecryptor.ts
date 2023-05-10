@@ -1,7 +1,7 @@
-import { BaseDecryptor, DecryptorError } from '@core/decryptor/BaseDecryptor'
-import { checkWxapkg } from '@utils/checkWxapkg'
-import { PackageSuffix } from '@/enum'
-import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
+import { BaseDecryptor, DecryptorError } from '@base/BaseDecryptor'
+import { checkWxapkg } from './utils/checkWxapkg'
+import { PackageSuffix } from '@enum/PackageSuffix'
+import { isProduciblePath, PathController, ProduciblePath } from '@baseController/PathController'
 import { decryptBuffer } from '@utils/crypto'
 import { info } from '@utils/colors'
 

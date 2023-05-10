@@ -8,12 +8,15 @@ import clear from 'rollup-plugin-clear'
 import obfuscator from 'rollup-plugin-obfuscator'
 import { terser } from 'rollup-plugin-terser'
 import { dependencies } from './package.json'
+import { basename, dirname } from 'path'
+
 const output = {
   dir: 'dist',
   format: 'cjs',
   manualChunks(id) {
-    if (id.includes('wxml-parser')) return 'parser'
-    if (id.includes('traverse.ts')) return 'traverse'
+    if (id.endsWith('worker.ts')) {
+      return ['chunk', basename(dirname(id))].join('-')
+    }
   },
 }
 export default {

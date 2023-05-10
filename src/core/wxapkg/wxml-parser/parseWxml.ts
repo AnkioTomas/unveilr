@@ -3,8 +3,8 @@ import { VM } from 'vm2'
 import { parseScript } from 'esprima'
 import { generate } from 'escodegen'
 import { parserZArray, restoreGroup } from './parseZArray'
-import { removeInvalidLineCode, toDir, getZArrayKey } from '@core/parser/wxapkg/wxml-parser/utils'
-import { ZArray } from '@core/parser/wxapkg/types'
+import { removeInvalidLineCode, toDir, getZArrayKey } from './utils'
+import { ZArray } from '../types'
 
 export interface ParserResult {
   [filename: string]: string

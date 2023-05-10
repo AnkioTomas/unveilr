@@ -29,9 +29,7 @@
     "dev": "ts-node-dev -r tsconfig-paths/register --respawn --transpile-only src/index.ts",
     "run": "ts-node -r tsconfig-paths/register --transpile-only src/index.ts",
     "ts-node": "ts-node -r tsconfig-paths/register --transpile-only",
-    "build": "npx rollup -c --bundleConfigAsCjs",
-    "pkg": "node scripts/pkg.js",
-    "release": "node scripts/release.js"
+    "build": "npx rollup -c --bundleConfigAsCjs"
   },
   "dependencies": {
     "@babel/core": "^7.21.3",

@@ -2,7 +2,7 @@ import { ModuleThread, Pool, spawn, Thread, Worker } from 'threads'
 import { QueuedTask, TaskRunFunction } from 'threads/dist/master/pool-types'
 import { cpus } from 'os'
 import { ModuleMethods } from 'threads/dist/types/master'
-import { PathController } from '@core/controller/PathController'
+import { PathController } from './/PathController'
 import { BaseError } from '@utils/exceptions'
 
 export type EachCallback<T extends ModuleMethods, R> = (

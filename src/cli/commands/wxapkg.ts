@@ -1,5 +1,5 @@
 import { Command, Argument, Option, CommanderError } from 'commander'
-import { outputConfig } from '@/cli/outputConfig'
+import { outputConfig } from '@/cli/config/outputConfig'
 
 const wxCommand = new Command('wx')
 // read-depth

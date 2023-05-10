@@ -1,13 +1,13 @@
-import { ParserError, BaseParser } from '../BaseParser'
-import { WxapkgKeyFile } from '@/enum'
-import { PathController, ProduciblePath } from '@core/controller/PathController'
 import { Visitor } from '@babel/core'
-import { AppConfigServiceSubject, S2Observable, TVSubject } from '@core/parser/wxapkg/types'
-import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 import { md5 } from '@utils/crypto'
-import { findBuffer } from '@core/controller/SaveController'
 import { info } from '@utils/colors'
+import { Saver } from '@utils/classes/Saver'
+import { ParserError, BaseParser } from '@base/BaseParser'
+import { findBuffer } from '@baseController/SaveController'
+import { PathController, ProduciblePath } from '@baseController/PathController'
+import { AppConfigServiceSubject, S2Observable, TVSubject } from './types'
+import { WxapkgKeyFile } from './WxapkgEnums'
 
 interface PageInfo {
   [key: string]: {
@@ -21,7 +21,7 @@ interface TabBarItem {
   selectedIconData?: string
   pagePath?: string
 }
-export class AppConfigParser extends BaseParser {
+export class WxapkgAppConfigParser extends BaseParser {
   private serviceSource: string
   private sources: string
   isGame = false
