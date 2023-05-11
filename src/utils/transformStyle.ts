@@ -51,12 +51,12 @@ export function transformStyle(style: string, path?: string): TransformStyleResu
                 _itemValue.children &&
                 _itemValue.children.first &&
                 'name' in _itemValue.children.first &&
-                (_itemValue.children.first.name as string | undefined)
+                (_itemValue.children.first['name'] as string | undefined)
               let yValue =
                 _tempNodeData.children &&
                 _tempNodeData.children.first &&
                 'name' in _tempNodeData.children.first &&
-                (_tempNodeData.children.first.name as string | undefined)
+                (_tempNodeData.children.first['name'] as string | undefined)
 
               if (xValue && yValue) {
                 for (const type of removeType) {

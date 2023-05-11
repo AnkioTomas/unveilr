@@ -1,6 +1,6 @@
 import { bold, grey, yellow } from '@utils/colors'
 import { createLogger, format, Logger, transports } from 'winston'
-import { getConfig } from '@core/controller/ConfigController'
+import { getConfig } from '@baseController/ConfigController'
 
 const { combine, timestamp, printf, colorize } = format
 const levels = { error: 0, warn: 1, info: 2, debug: 3 }

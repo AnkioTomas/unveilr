@@ -1,4 +1,4 @@
-import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { PathController, ProduciblePath } from './controller/PathController'
 import { BaseError } from '@utils/exceptions'
 import { BaseLogger } from '@utils/logger'
 

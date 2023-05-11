@@ -1,7 +1,7 @@
 import { Command, Option } from 'commander'
 import wxCommand, { WxConfigurator } from '@/cli/commands/wxapkg'
 import { LoggerLevel } from '@utils/logger'
-import { outputConfig } from '@/cli/outputConfig'
+import { outputConfig } from '@/cli/config/outputConfig'
 
 export interface CliConfigurator {
   global: {

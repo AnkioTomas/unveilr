@@ -1,5 +1,5 @@
 import { BuiltInParserName, format } from 'prettier'
-import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { PathController, ProduciblePath } from '@baseController/PathController'
 
 export const REFORMAT_MAP: Record<string, BuiltInParserName> = {
   wxss: 'css',

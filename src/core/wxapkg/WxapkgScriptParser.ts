@@ -1,11 +1,11 @@
-import { BaseParser } from '../BaseParser'
-import { Visitor } from '@babel/core'
-import { S2Observable, ScriptParserSubject, TVSubject } from '@core/parser/wxapkg/types'
-import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
-import { PathController } from '@core/controller/PathController'
+import { BaseParser } from '@base/BaseParser'
+import { Visitor } from '@babel/core'
+import { S2Observable, ScriptParserSubject, TVSubject } from './types'
+import { Saver } from '@utils/classes/Saver'
+import { PathController } from '@baseController/PathController'
 
-export class ScriptParser extends BaseParser {
+export class WxapkgScriptParser extends BaseParser {
   constructor(saver: Saver) {
     super(saver)
   }

@@ -20,7 +20,9 @@
       "@/*": ["./*"],
       "@utils/*": ["utils/*"],
       "@core/*": ["core/*"],
-      "@enum/*": ["enum/*"]
+      "@enum/*": ["enum/*"],
+      "@base/*": ["core/base/*"],
+      "@baseController/*": ["core/base/controller/*"],
     }
   },
   "exclude": ["node_modules", "/**/*.d.ts"],

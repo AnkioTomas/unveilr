@@ -1,5 +1,4 @@
-import { BaseParser } from '../BaseParser'
-import { PathController, ProduciblePath } from '@core/controller/PathController'
+import { PathController, ProduciblePath } from '@baseController/PathController'
 import { matchScripts } from '@utils/matchScripts'
 import {
   Dict,
@@ -8,16 +7,17 @@ import {
   WxssParserCommon2Subject,
   WxssParserCommonSubject,
   WxssParserSubject,
-} from '@core/parser/wxapkg/types'
+} from './types'
 import { Visitor } from '@babel/core'
 import { Saver } from '@utils/classes/Saver'
 import { filter } from 'observable-fns'
 import { transformStyle } from '@utils/transformStyle'
-import { WxapkgKeyFile } from '@/enum'
+import { WxapkgKeyFile } from './WxapkgEnums'
 import { md5 } from '@utils/crypto'
 import { getLogger } from '@utils/logger'
 import { parseJSONFromJSCode } from '@utils/ast'
-import { findBuffer, getSaveController, saveAble2String } from '@core/controller/SaveController'
+import { findBuffer, getSaveController, saveAble2String } from '@baseController/SaveController'
+import { BaseParser } from '@base/BaseParser'
 
 function makeCStyleName(index: number): string {
   return `./@unveilr/wxss/unveilr.${md5(index.toString()).slice(-6)}.wxss`
@@ -61,7 +61,7 @@ export function styleConversion(k: string, source: string): string {
   return transformStyle(newData).buffer
 }
 
-export class WxssParser extends BaseParser {
+export class WxapkgWxssParser extends BaseParser {
   constructor(saver: Saver) {
     super(saver)
   }

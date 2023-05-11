@@ -1,11 +1,11 @@
-import { BaseParser } from '../BaseParser'
+import { BaseParser } from '@base/BaseParser'
 import { Saver } from '@utils/classes/Saver'
-import { parseWxml, parseZArrayFromCode } from '@core/parser/wxapkg/wxml-parser'
-import { S2Observable, TraverseResult, TVSubject, WxmlParserV3Subject, ZArray } from '@core/parser/wxapkg/types'
+import { parseWxml, parseZArrayFromCode } from './wxml-parser'
+import { S2Observable, TraverseResult, TVSubject, WxmlParserV3Subject, ZArray } from './types'
 import { Visitor } from '@babel/traverse'
 import { filter } from 'observable-fns'
 import { deepCopy } from '@utils/deepCopy'
-import { SaveAble } from '@core/controller/SaveController'
+import { SaveAble } from '@baseController/SaveController'
 
 const zArrayFunctionNameRE = /gz\$gwx\d*_[A-Za-z_0-9]+/
 const scopeNameRE = /\$gwx\d*$|\$gwx\d*_[A-Za-z_0-9]+/
@@ -45,7 +45,7 @@ function makeVisitor(result: TraverseResult): Visitor {
   result.z = data
   return visitor
 }
-export class WxmlParser extends BaseParser {
+export class WxapkgWxmlParser extends BaseParser {
   private sources: string
   constructor(saver: Saver) {
     super(saver)

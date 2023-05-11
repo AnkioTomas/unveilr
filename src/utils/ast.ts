@@ -1,7 +1,7 @@
 import * as babel from '@babel/core'
 import { traverse, Visitor, BabelFileResult } from '@babel/core'
 import { TraverseOptions } from '@babel/traverse'
-import { isProduciblePath, PathController, ProduciblePath } from '@core/controller/PathController'
+import { isProduciblePath, PathController, ProduciblePath } from '@baseController/PathController'
 import { error } from '@utils/colors'
 
 export async function buildAST(path: ProduciblePath): Promise<BabelFileResult>

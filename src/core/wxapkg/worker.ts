@@ -1,25 +1,25 @@
 import { expose } from 'threads/worker'
 import { isWorkerRuntime } from '@utils/isWorkerRuntime'
 import { Observable, Subject } from 'threads/observable'
-import { TraverseVisitorKeys, TraverseVisitorMap, TVSubjectType } from '@core/parser/wxapkg/types'
-import { AppConfigParser } from '@core/parser/wxapkg/AppConfigParser'
 import { Visitor } from '@babel/core'
-import { WxssParser } from '@core/parser/wxapkg/WxssParser'
-import { ScriptParser } from '@core/parser/wxapkg/ScriptParser'
-import { TraverseController } from '@core/controller/TraverseController'
-import { WxmlParser } from '@core/parser/wxapkg/WxmlParser'
-import { initializeConfig } from '@core/controller/ConfigController'
+import { TraverseController } from '@baseController/TraverseController'
+import { initializeConfig } from '@baseController/ConfigController'
+import { TraverseVisitorKeys, TraverseVisitorMap, TVSubjectType } from './types'
+import { WxapkgAppConfigParser } from './WxapkgAppConfigParser'
+import { WxapkgWxssParser } from './WxapkgWxssParser'
+import { WxapkgScriptParser } from './WxapkgScriptParser'
+import { WxapkgWxmlParser } from './WxapkgWxmlParser'
 
 export function createExposed() {
   const subject = new Subject<TVSubjectType>()
   const visitors: Partial<TraverseVisitorMap> = {}
   const visitorsFn: Record<TraverseVisitorKeys, (subject1: typeof subject) => Visitor> = {
-    AppConfigService: AppConfigParser.visitor,
-    WxssParser: WxssParser.visitorSetCssToHead,
-    WxssParserCommon: WxssParser.visitorCommonStyle,
-    WxssParserCommon2: WxssParser.visitorCArray,
-    ScriptParser: ScriptParser.visitor,
-    WxmlParserV3: WxmlParser.visitorV3,
+    AppConfigService: WxapkgAppConfigParser.visitor,
+    WxssParser: WxapkgWxssParser.visitorSetCssToHead,
+    WxssParserCommon: WxapkgWxssParser.visitorCommonStyle,
+    WxssParserCommon2: WxapkgWxssParser.visitorCArray,
+    ScriptParser: WxapkgScriptParser.visitor,
+    WxmlParserV3: WxapkgWxmlParser.visitorV3,
   }
   return {
     // worker 运行时需要复制一份配置
