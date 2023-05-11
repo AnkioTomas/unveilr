@@ -134,3 +134,4 @@ files/
 release/
 .npmrc
 .release.lock
+.DS_Store
