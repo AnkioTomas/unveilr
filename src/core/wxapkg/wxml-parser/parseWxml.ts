@@ -333,7 +333,7 @@ function elemToString(elem, dep, moreInfo = false) {
   if (isTextTag(elem)) {
     //In comment, you can use typify text node, which beautify its code, but may destroy ui.
     //So, we use a "hack" way to solve this problem by letting typify program stop when face textNode
-    let str: any = String(wxmlify(elem.content, true))
+    let str: any = new String(wxmlify(elem.content, true))
     str.textNode = 1
     return wxmlify(str, true) //indent.repeat(dep)+wxmlify(elem.content.trim(),true)+"\n";
   }

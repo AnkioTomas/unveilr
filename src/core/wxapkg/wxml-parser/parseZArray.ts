@@ -222,7 +222,7 @@ function restoreSingle(ops, withScope = false) {
             ans = enBrace('__unTestedGetValue:' + enBrace(jsoToWxon(ops), '['), '{')
             break
           case 3:
-            ans = String(ops[1][1])
+            ans = new String(ops[1][1])
             ans._type = 'var'
             break
           default:
