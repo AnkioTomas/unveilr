@@ -2,6 +2,7 @@ import { Command, Option } from 'commander'
 import wxCommand, { WxConfigurator } from '@/cli/commands/wxapkg'
 import { LoggerLevel } from '@utils/logger'
 import { outputConfig } from '@/cli/config/outputConfig'
+// import ttCommand from '@/cli/commands/ttapkg'
 
 export interface CliConfigurator {
   global: {
@@ -21,6 +22,7 @@ export function registerCommand(version: string, name: string, _argv?: string[])
     .version(version, '-v, --version')
     .addOption(logLevel)
     .addCommand(wxCommand, { isDefault: true })
+    // .addCommand(ttCommand)
     .addHelpText(
       'after',
       `
