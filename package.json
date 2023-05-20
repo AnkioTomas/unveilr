@@ -2,18 +2,16 @@
   "name": "unveilr",
   "author": "r3x5ur",
   "version": "2.0.2",
-  "displayName": "小程序反编译",
+  "displayName": "一款小程序安全评估工具",
   "keywords": [
     "wxapkg",
-    "unpack",
     "微信小程序",
     "微信小游戏",
-    "反编译",
     "unveilr",
     "抖音小程序",
     "抖音小游戏"
   ],
-  "description": "将小程序包反编译成源码，小程序安全利器",
+  "description": "一款小程序安全评估工具，支持小程序的代码审计和发现敏感信息泄露、接口未授权等安全问题",
   "main": "dist/index.js",
   "license": "GPL-3.0",
   "repository": {
