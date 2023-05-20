@@ -128,8 +128,11 @@ export class WxapkgDecompiler extends BaseLogger {
           if (!this.isSubpackage) {
             this.parsers.AppConfigService = new WxapkgAppConfigParser(this.saver)
           }
-          if (this.isParserV1 || this.isParserV3) {
+          // 虽然实例一样，但是名字不一样，使用的解析器也不一样
+          if (this.isParserV1) {
             this.parsers.WxmlParserV1 = new WxapkgWxmlParser(this.saver)
+          } else if (this.isParserV3) {
+            this.parsers.WxmlParserV3 = new WxapkgWxmlParser(this.saver)
           }
         }
         break

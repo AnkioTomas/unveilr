@@ -173,13 +173,24 @@ export class WxapkgExtractor extends BaseExtractor {
     this.logger.debug(`Header data length ${dataLength}`)
     const files = this.getFileByRaw(buf.subarray(14, infoLength + 14))
     this.logger.debug(`Starting save extracted files`)
+    let isExistProjectPrivateConfig = false
     const pathList = files.map((file) => {
       const { name, start, end } = file
       const path = name.startsWith('/') ? name.slice(1) : name
+      if (path === WxapkgKeyFile.PROJECT_PRIVATE_CONFIG) isExistProjectPrivateConfig = true
       this.saver.add(path, buf.subarray(start, end))
       const basename = PathController.make(path).basename
       return { path, basename }
     })
+    // 如果没有配置文件则添加默认配置
+    if (!isExistProjectPrivateConfig) {
+      this.saver.add(WxapkgKeyFile.PROJECT_PRIVATE_CONFIG, {
+        setting: {
+          es6: false,
+          urlCheck: false,
+        },
+      })
+    }
     const type = checkWxapkgType(pathList.map(({ basename }) => basename))
     if (!type) this.logger.warn(`Parsed packages are not supported`)
     this.logger.info(`The package ${this.pathCtrl.logpath} type is: [${info(type)}]`)

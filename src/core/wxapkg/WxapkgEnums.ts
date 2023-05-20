@@ -17,6 +17,8 @@ export enum WxapkgKeyFile {
 
   PLUGIN = 'plugin.js',
   PLUGIN_JSON = 'plugin.json',
+
+  PROJECT_PRIVATE_CONFIG = 'project.private.config.json',
 }
 
 export enum WxapkgType {

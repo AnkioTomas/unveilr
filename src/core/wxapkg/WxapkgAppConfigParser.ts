@@ -4,16 +4,12 @@ import { md5 } from '@utils/crypto'
 import { info } from '@utils/colors'
 import { Saver } from '@utils/classes/Saver'
 import { ParserError, BaseParser } from '@base/BaseParser'
-import { findBuffer } from '@baseController/SaveController'
+import { findBuffer, SaveAble } from '@baseController/SaveController'
 import { PathController, ProduciblePath } from '@baseController/PathController'
 import { AppConfigServiceSubject, S2Observable, TVSubject } from './types'
 import { WxapkgKeyFile } from './WxapkgEnums'
+import { PageInfo, createPage } from './utils/createPage'
 
-interface PageInfo {
-  [key: string]: {
-    window: { usingComponents: { [key: string]: unknown }; [key: string]: unknown }
-  }
-}
 interface TabBarItem {
   iconPath?: string
   iconData?: string
@@ -32,6 +28,7 @@ export class WxapkgAppConfigParser extends BaseParser {
   async parse(observable: S2Observable<TVSubject>): Promise<void> {
     try {
       if (this.isGame) return this.parseGame()
+      const isDisallowPlugins = true
       const dirCtrl = this.saver.saveDirectory
       const config = {
         ...JSON.parse(this.sources),
@@ -44,10 +41,11 @@ export class WxapkgAppConfigParser extends BaseParser {
       // 处理入口
       const entryPagePath = PathController.make(config.pop('entryPagePath'))
       const pages: string[] = config.pop('pages')
+      isDisallowPlugins && config.pop('plugins')
       const global = config.pop('global')
       const epp = entryPagePath.whitout().unixpath
       const seenPage = new Set()
-      const save = (path: ProduciblePath, buffer: string | object) => {
+      const save = (path: ProduciblePath, buffer: SaveAble) => {
         const filename = PathController.make(path).unixpath
         if (seenPage.has(filename)) return
         seenPage.add(filename)
@@ -56,14 +54,15 @@ export class WxapkgAppConfigParser extends BaseParser {
       pages.splice(pages.indexOf(epp), 1)
       pages.unshift(epp)
       // 处理分包路径
-      const subPackages: { [key: string]: unknown }[] = config.pop('subPackages')
+      const subPackages: Array<{ [key: string]: unknown }> = config.pop('subPackages')
       if (subPackages) {
         subPackages.forEach((subPack) => {
           const root = subPack.root as string
+          isDisallowPlugins && delete subPack['plugins']
           const _subPages = (subPack.pages as string[]) || pages.filter((p) => p.startsWith(root))
-          subPack.pages = _subPages.map((page) => {
-            const _index = pages.indexOf(page)
-            _index > 0 && pages.splice(_index, 1)
+          subPack.pages = Array.from(new Set(_subPages)).map((page) => {
+            let _index: number
+            while ((_index = pages.indexOf(page)) > -1) pages.splice(_index, 1)
             return page.replace(root, '')
           })
         })
@@ -120,6 +119,7 @@ export class WxapkgAppConfigParser extends BaseParser {
         })
       })
       const result = Object.assign(config, {
+        debug: true,
         tabBar,
         subPackages,
         ...global,
@@ -136,9 +136,7 @@ export class WxapkgAppConfigParser extends BaseParser {
         },
         complete() {
           Object.keys(page).forEach((key) => {
-            let pCtrl = PathController.make(key)
-            if (pCtrl.suffix !== '.json') pCtrl = pCtrl.whitout('.json')
-            save(pCtrl, page[key]['window'])
+            createPage(key, page[key]).forEach((args) => save(...args))
           })
           resolve && resolve()
         },
