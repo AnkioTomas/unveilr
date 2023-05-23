@@ -5,6 +5,8 @@ import nodeResolve from '@rollup/plugin-node-resolve'
 import typescript from 'rollup-plugin-typescript2'
 import license from 'rollup-plugin-license'
 import clear from 'rollup-plugin-clear'
+import babel from '@rollup/plugin-babel'
+import staticFs from 'babel-plugin-static-fs'
 import obfuscator from 'rollup-plugin-obfuscator'
 import { terser } from 'rollup-plugin-terser'
 import { dependencies } from './package.json'
@@ -22,7 +24,7 @@ const output = {
 export default {
   input: 'src/index.ts',
   output,
-  external: Object.keys(dependencies),
+  external: Object.keys(dependencies).filter((item) => item !== 'vm2'),
   plugins: [
     clear({
       targets: [output.dir],
@@ -34,6 +36,10 @@ export default {
           declaration: false,
         },
       },
+    }),
+    babel({
+      babelHelpers: 'inline',
+      plugins: [staticFs],
     }),
     commonjs(),
     nodeResolve(),
