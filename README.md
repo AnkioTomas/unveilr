@@ -25,6 +25,7 @@
 ### 📝参数详解
 
 - 子命令默认为 `wx`
+> [![Typing SVG](https://readme-typing-svg.herokuapp.com/?size=21&duration=3333&pause=333&color=00F72B&background=000000&multiline=true&width=453&height=75&lines=%24%20unveilr%20%2Fpath%2Fto%2Fpkg%2Fdir%3B%E3%80%80You%20will%20open%20the%20door%20to%20a%20new%20world)<br>][repo]
 
 | 子命令  | 参数                        | 解释                                             |
 |------|---------------------------|------------------------------------------------|
