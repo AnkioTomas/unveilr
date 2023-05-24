@@ -17,6 +17,7 @@
 
 ### ✅安装方法
 - 使用 `node > 12` 环境自行构建
+- 不会安装的[![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/15px-Telegram_2019_Logo.svg.png)找我](https://t.me/uvrrrr)
 
 ### 📝参数详解
 
@@ -45,8 +46,6 @@
 
 - 本程序现在使用的开源协议是 [GPL-3.0](https://www.gnu.org/licenses/gpl-3.0.html)
 - 使用请标明出处，并遵循开源协议
-- [![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/15px-Telegram_2019_Logo.svg.png)Telegram](https://t.me/+efnutdKTsDU5MmY1)
-
 
 
 
