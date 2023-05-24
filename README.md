@@ -1,10 +1,11 @@
 ![logo](./images/logo.svg)<br>
-[![badge](https://img.shields.io/badge/r3x5ur-unveilr-red)][repo]
-[![license](https://img.shields.io/github/license/r3x5ur/unveilr?v=2)][repo]
+[![license](https://img.shields.io/github/license/r3x5ur/unveilr)][repo]
 [![languages](https://img.shields.io/github/languages/top/r3x5ur/unveilr)][repo]
-[![visitor](https://visitor-badge.glitch.me/badge?page_id=https://github.com/r3x5ur/unveilr)][repo]
-[![visitor](https://img.shields.io/github/commit-activity/m/r3x5ur/unveilr)][repo]
-[![vul](https://img.shields.io/snyk/vulnerabilities/github/r3x5ur/unveilr)][repo]
+[![tg](https://img.shields.io/badge/t.me-unveilr-blue)](https://t.me/unveilr)
+[![v](https://img.shields.io/endpoint?color=blue&label=visitor&url=https%3A%2F%2Fhits.dwyl.com%2Fr3x5ur%2Funveilr.json)][repo]
+[![commit](https://img.shields.io/github/commit-activity/m/r3x5ur/unveilr)][repo]
+[![version](https://img.shields.io/github/package-json/v/r3x5ur/unveilr?color=red)][repo]
+[![star](https://img.shields.io/github/stars/r3x5ur/unveilr?style=social)][repo]
 
 ## 免责声明
 - **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非法操作，开发者不负任何连带法律责任。**<br/>
@@ -17,7 +18,7 @@
 
 ### ✅安装方法
 - 使用 `node > 12` 环境自行构建
-- 不会安装的[![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/15px-Telegram_2019_Logo.svg.png)找我](https://t.me/uvrrrr)
+- 不会安装的[![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/15px-Telegram_2019_Logo.svg.png)找我](https://t.me/unveilr)
 
 ### 📝参数详解
 
