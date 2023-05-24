@@ -7,6 +7,7 @@
 [![version](https://img.shields.io/github/package-json/v/r3x5ur/unveilr?color=red)][repo]
 [![star](https://img.shields.io/github/stars/r3x5ur/unveilr?style=social)][repo]
 
+
 ## 免责声明
 - **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非法操作，开发者不负任何连带法律责任。**<br/>
 - **如有任何侵权相关问题，请联系作者。**<br/>
@@ -14,6 +15,7 @@
 - **在使用本工具进行时，您应确保该行为符合当地的法律法规，并且已经取得了足够的授权。**
 
 ### 什么是unveilr?
+> [![Typing SVG](https://readme-typing-svg.herokuapp.com/?size=21&duration=3333&pause=333&color=00F72B&background=000000&multiline=true&width=453&height=75&lines=%24+unveilr;%E3%80%80A%20small%20program%20security%20assessment%20tool)<br>][repo]
 > `unveilr` 是一款小程序安全评估工具，支持小程序的代码审计和发现敏感信息泄露、接口未授权等安全问题
 
 ### ✅安装方法
