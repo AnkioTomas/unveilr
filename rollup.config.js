@@ -42,7 +42,7 @@ export default {
       plugins: [staticFs],
     }),
     commonjs(),
-    nodeResolve(),
+    nodeResolve({ preferBuiltins: true }),
     json(),
     obfuscator({
       options: {

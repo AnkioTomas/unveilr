@@ -39,10 +39,13 @@ export class WxapkgScriptParser extends BaseParser {
           const args = path.get('arguments')
           const [filenamePathNode, sourcePathNode] = args
           if (!filenamePathNode.isStringLiteral()) return
-          if (sourcePathNode.node.type !== 'FunctionExpression') return
+          if (!sourcePathNode.isFunctionExpression()) return
           const filename = filenamePathNode.node.value
-          const body = sourcePathNode.get('body.body')
-          const source = (Array.isArray(body) ? body : [body]).map((p) => p.getSource()).join('')
+          const block = sourcePathNode.get('body')
+          let _blockSource = block.getSource()
+          _blockSource = _blockSource.startsWith('\x7b') ? _blockSource.slice(1) : _blockSource
+          _blockSource = _blockSource.endsWith('\x7d') ? _blockSource.slice(0, -1) : _blockSource
+          const source = _blockSource
           subject.next({
             ScriptParser: {
               [filename]: source,
