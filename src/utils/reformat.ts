@@ -6,17 +6,6 @@ export const REFORMAT_MAP: Record<string, BuiltInParserName> = {
   json: 'json',
   wxs: 'babel',
   js: 'babel',
-  /**
-   * fix like:
-   * ```html
-   * <view style="
-   *  width: 100%;
-   *  height: 100%;
-   * "><view/>
-   * ```
-   * resulting in an error
-   * */
-  // wxml: 'html',
 }
 export function reformat(path: ProduciblePath, source: string): string {
   try {
@@ -28,9 +17,10 @@ export function reformat(path: ProduciblePath, source: string): string {
     throw e
   }
 }
-
+const minFileRE = /\.min\.js$/i
 export function checkSupport(path: ProduciblePath): string | false {
   const ctrl = PathController.make(path)
+  if (minFileRE.test(ctrl.basename)) return false
   const suffix = ctrl.suffixWithout
   return Object.keys(REFORMAT_MAP).includes(suffix) ? suffix : false
 }
