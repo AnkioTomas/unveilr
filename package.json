@@ -32,7 +32,7 @@
   "dependencies": {
     "@babel/core": "^7.21.3",
     "chalk": "4.1.2",
-    "commander": "^10.0.0",
+    "commander": "^11.1.0",
     "crypto-js": "^4.1.1",
     "css-tree": "^2.3.1",
     "escodegen": "^2.0.0",
