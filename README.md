@@ -1,12 +1,4 @@
 ![logo](./images/logo.svg)<br>
-[![license](https://img.shields.io/github/license/r3x5ur/unveilr)][repo]
-[![languages](https://img.shields.io/github/languages/top/r3x5ur/unveilr)][repo]
-[![tg](https://img.shields.io/badge/t.me-unveilr-blue)](https://t.me/unveilr)
-[![v](https://img.shields.io/endpoint?color=blue&label=visitor&url=https%3A%2F%2Fhits.dwyl.com%2Fr3x5ur%2Funveilr.json)][repo]
-[![commit](https://img.shields.io/github/commit-activity/m/r3x5ur/unveilr)][repo]
-[![version](https://img.shields.io/github/package-json/v/r3x5ur/unveilr?color=red)][repo]
-[![star](https://img.shields.io/github/stars/r3x5ur/unveilr?style=social)][repo]
-
 
 ## 免责声明
 - **本程序仅供于学习交流，请使用者遵守《中华人民共和国网络安全法》，勿将此工具用于非法操作，开发者不负任何连带法律责任。**<br/>
@@ -19,8 +11,27 @@
 > `unveilr` 是一款小程序安全评估工具，支持小程序的代码审计和发现敏感信息泄露、接口未授权等安全问题
 
 ### ✅安装方法
-- 使用 `node > 12` 环境自行构建
-- 不会安装的[![tg](https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Telegram_2019_Logo.svg/15px-Telegram_2019_Logo.svg.png)找我](https://t.me/unveilr)
+
+```shell
+# 下载源码
+git clone https://github.com/AnkioTomas/unveilr
+# 进入源码文件夹
+cd unveilr
+# 安装依赖
+yarn install
+# 构建js
+yanr build
+# 进入输出目录
+cd dist
+# 执行解包
+node index.js <小程序包1> <小程序包2> ...
+```
+
+Example:
+
+```shell
+node index.js /xxxxxx/debug_-2012297348_2_-1108410057.wxapkg /xxxxxx/debug_665707407_2_514241127.wxapkg
+```
 
 ### 📝参数详解
 
