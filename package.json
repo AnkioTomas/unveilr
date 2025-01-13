@@ -53,7 +53,7 @@
     "@types/crypto-js": "^4.1.1",
     "@types/css-tree": "^2.3.1",
     "@types/escodegen": "^0.0.7",
-    "@types/esprima": "^4.0.3",
+    "@types/esprima": "^4.0.6",
     "@types/node": "^18.14.4",
     "@types/prettier": "^2.7.2",
     "@typescript-eslint/eslint-plugin": "^5.59.7",
