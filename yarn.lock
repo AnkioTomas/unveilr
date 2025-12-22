@@ -1072,17 +1072,15 @@ commondir@^1.0.1:
   resolved "https://registry.yarnpkg.com/commondir/-/commondir-1.0.1.tgz#ddd800da0c66127393cca5950ea968a3aaf1253b"
   integrity sha512-W9pAhw0ja1Edb5GVdIF1mjZw/ASI0AlShXM83UUGe2DVr5TdAPEA1OA8m/g8zWp9x6On7gqufY+FatDbC3MDQg==
 
-compressing@^1.8.0:
-  version "1.9.0"
-  resolved "https://registry.yarnpkg.com/compressing/-/compressing-1.9.0.tgz#52400f0b3a7c6a56222461175a7e4d0ef2700fd3"
-  integrity sha512-WBNRH/mIV7aEFuYQFk4zCQZPEXDtyuCCeIcq5wYbmk5VewmUWV1YXAGyG6+hwrRGfG3HTy3c4BV79yfgloPJWQ==
+compressing@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/compressing/-/compressing-2.0.0.tgz#d84ae8f77e502da2b860dc4aa7c8800e7dcfe5ac"
+  integrity sha512-hRG5wpuy/lkO/oO8AEhSmLw2FVJOs2DnFPtmm0XUVWoDP6k3HAw5RVgyzbbATl0ytjJDCY03DvRiyjHkSHc1Dg==
   dependencies:
     "@eggjs/yauzl" "^2.11.0"
     flushwritable "^1.0.0"
     get-ready "^1.0.0"
     iconv-lite "^0.5.0"
-    mkdirp "^0.5.1"
-    pump "^3.0.0"
     streamifier "^0.1.1"
     tar-stream "^1.5.2"
     yazl "^2.4.2"
@@ -2170,13 +2168,6 @@ mkdirp@2.1.3:
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-2.1.3.tgz#b083ff37be046fd3d6552468c1f0ff44c1545d1f"
   integrity sha512-sjAkg21peAG9HS+Dkx7hlG9Ztx7HLeKnvB3NQRcu/mltCVmvkF0pisbiTSfDVYTT86XEfZrTUosLdZLStquZUw==
-
-mkdirp@^0.5.1:
-  version "0.5.6"
-  resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-0.5.6.tgz#7def03d2432dcae4ba1d611445c48396062255f6"
-  integrity sha512-FP+p8RB8OWpF3YZBCrP5gtADmtXApB5AMLn+vdyA+PyxCjrCs00mjyUozssO33cwDeT3wNGdLxJ5M//YqtHAJw==
-  dependencies:
-    minimist "^1.2.6"
 
 mkdirp@^1.0.4, mkdirp@~1.0.4:
   version "1.0.4"
