@@ -59,7 +59,7 @@
     "@typescript-eslint/eslint-plugin": "^5.59.7",
     "@typescript-eslint/parser": "^5.59.7",
     "babel-plugin-static-fs": "^3.0.0",
-    "compressing": "^1.8.0",
+    "compressing": "^2.0.0",
     "eslint": "8.22.0",
     "javascript-obfuscator": "^4.0.2",
     "pkg": "^5.8.1",
